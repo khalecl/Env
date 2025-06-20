@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تأثير التواصل الجيد على نتائج المشروع</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #2d3436;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #636e72;
+            font-size: 1.2em;
+        }
+        
+        .animation-container {
+            position: relative;
+            height: 600px;
+            margin: 40px 0;
+            overflow: hidden;
+        }
+        
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            position: relative;
+        }
+        
+        .flow-step {
+            background: white;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin: 15px 0;
+            min-width: 250px;
+            text-align: center;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .flow-step.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .flow-step.good-communication {
+            border-color: #00b894;
+            background: linear-gradient(135deg, #d1f2eb, #ffffff);
+        }
+        
+        .flow-step.outcome {
+            border-color: #0984e3;
+            background: linear-gradient(135deg, #e3f2fd, #ffffff);
+        }
+        
+        .flow-step.benefit {
+            border-color: #6c5ce7;
+            background: linear-gradient(135deg, #f3e5f5, #ffffff);
+        }
+        
+        .step-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .step-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2d3436;
+            margin-bottom: 8px;
+        }
+        
+        .step-description {
+            font-size: 1em;
+            color: #636e72;
+            line-height: 1.5;
+        }
+        
+        .arrow {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: -25px;
+            font-size: 2em;
+            color: #0984e3;
+            opacity: 0;
+            animation: arrowPulse 2s infinite;
+        }
+        
+        .arrow.visible {
+            opacity: 1;
+        }
+        
+        @keyframes arrowPulse {
+            0%, 100% { opacity: 0.5; transform: translateX(-50%) translateY(0); }
+            50% { opacity: 1; transform: translateX(-50%) translateY(5px); }
+        }
+        
+        .branches {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 30px;
+        }
+        
+        .branch {
+            flex: 1;
+            margin: 0 15px;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #0984e3, #74b9ff);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(9, 132, 227, 0.4);
+        }
+        
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #fd79a8, #fdcb6e);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.8s ease;
+        }
+        
+        .stat-card.visible {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .comparison {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 30px;
+        }
+        
+        .comparison-side {
+            flex: 1;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .good-side {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+        }
+        
+        .poor-side {
+            background: linear-gradient(135deg, #d63031, #e17055);
+            color: white;
+        }
+        
+        .comparison-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .comparison-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .comparison-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 20px; }
+            .branches { flex-direction: column; }
+            .comparison { flex-direction: column; }
+            .statistics { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 تأثير التواصل الجيد على نتائج المشروع</h1>
+            <p>Impact of Good Communication on Project Outcomes</p>
+        </div>
+        
+        <div class="animation-container">
+            <div class="flowchart">
+                <div class="flow-step good-communication" id="step1">
+                    <span class="step-icon">💬</span>
+                    <div class="step-title">تواصل واضح ومبكر</div>
+                    <div class="step-description">Clear & Early Communication</div>
+                    <div class="arrow">⬇️</div>
+                </div>
+                
+                <div class="flow-step outcome" id="step2">
+                    <span class="step-icon">🤝</span>
+                    <div class="step-title">فهم أفضل للمتطلبات</div>
+                    <div class="step-description">Better Understanding of Requirements</div>
+                    <div class="arrow">⬇️</div>
+                </div>
+                
+                <div class="branches">
+                    <div class="branch">
+                        <div class="flow-step benefit" id="step3a">
+                            <span class="step-icon">⏰</span>
+                            <div class="step-title">تقليل التأخير</div>
+                            <div class="step-description">Reduced Delays</div>
+                        </div>
+                    </div>
+                    <div class="branch">
+                        <div class="flow-step benefit" id="step3b">
+                            <span class="step-icon">📊</span>
+                            <div class="step-title">تحسين جودة الدراسات</div>
+                            <div class="step-description">Better Study Quality</div>
+                        </div>
+                    </div>
+                    <div class="branch">
+                        <div class="flow-step benefit" id="step3c">
+                            <span class="step-icon">✅</span>
+                            <div class="step-title">زيادة الامتثال</div>
+                            <div class="step-description">Increased Compliance</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="statistics">
+            <div class="stat-card" id="stat1">
+                <div class="stat-number">40%</div>
+                <div class="stat-label">تقليل وقت المراجعة</div>
+            </div>
+            <div class="stat-card" id="stat2">
+                <div class="stat-number">60%</div>
+                <div class="stat-label">تحسين جودة التقارير</div>
+            </div>
+            <div class="stat-card" id="stat3">
+                <div class="stat-number">75%</div>
+                <div class="stat-label">زيادة رضا أصحاب المصلحة</div>
+            </div>
+            <div class="stat-card" id="stat4">
+                <div class="stat-number">50%</div>
+                <div class="stat-label">تقليل التعديلات المطلوبة</div>
+            </div>
+        </div>
+        
+        <div class="comparison">
+            <div class="comparison-side good-side">
+                <div class="comparison-title">✅ التواصل الجيد</div>
+                <ul class="comparison-list">
+                    <li>✓ توقعات واضحة من البداية</li>
+                    <li>✓ حل المشاكل بسرعة</li>
+                    <li>✓ تعاون أفضل مع الفريق</li>
+                    <li>✓ مراجعات أقل وأسرع</li>
+                    <li>✓ جودة أعلى للمخرجات</li>
+                </ul>
+            </div>
+            <div class="comparison-side poor-side">
+                <div class="comparison-title">❌ التواصل الضعيف</div>
+                <ul class="comparison-list">
+                    <li>✗ سوء فهم للمتطلبات</li>
+                    <li>✗ تأخير في حل المشاكل</li>
+                    <li>✗ صراعات ومقاومة</li>
+                    <li>✗ مراجعات متكررة</li>
+                    <li>✗ جودة أقل للنتائج</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="startAnimation()">🎬 تشغيل الحركة</button>
+            <button class="btn" onclick="resetAnimation()">🔄 إعادة تشغيل</button>
+            <button class="btn" onclick="showStatistics()">📊 إظهار الإحصائيات</button>
+        </div>
+    </div>
+    
+    <script>
+        let animationStep = 0;
+        let animationInterval;
+        
+        function startAnimation() {
+            resetAnimation();
+            
+            const steps = [
+                { id: 'step1', delay: 500 },
+                { id: 'step2', delay: 1500 },
+                { id: 'step3a', delay: 2500 },
+                { id: 'step3b', delay: 3000 },
+                { id: 'step3c', delay: 3500 }
+            ];
+            
+            steps.forEach((step, index) => {
+                setTimeout(() => {
+                    const element = document.getElementById(step.id);
+                    element.classList.add('visible');
+                    
+                    // Add arrow animation
+                    const arrow = element.querySelector('.arrow');
+                    if (arrow && index < steps.length - 1) {
+                        setTimeout(() => {
+                            arrow.classList.add('visible');
+                        }, 300);
+                    }
+                    
+                    // Add sound effect (optional)
+                    playStepSound();
+                    
+                }, step.delay);
+            });
+            
+            // Show statistics after main animation
+            setTimeout(showStatistics, 4500);
+        }
+        
+        function resetAnimation() {
+            const steps = document.querySelectorAll('.flow-step');
+            const arrows = document.querySelectorAll('.arrow');
+            const stats = document.querySelectorAll('.stat-card');
+            
+            steps.forEach(step => step.classList.remove('visible'));
+            arrows.forEach(arrow => arrow.classList.remove('visible'));
+            stats.forEach(stat => stat.classList.remove('visible'));
+            
+            animationStep = 0;
+        }
+        
+        function showStatistics() {
+            const stats = document.querySelectorAll('.stat-card');
+            
+            stats.forEach((stat, index) => {
+                setTimeout(() => {
+                    stat.classList.add('visible');
+                    
+                    // Animate the number counting up
+                    const numberElement = stat.querySelector('.stat-number');
+                    const finalNumber = parseInt(numberElement.textContent);
+                    animateNumber(numberElement, 0, finalNumber, 1000);
+                    
+                }, index * 200);
+            });
+        }
+        
+        function animateNumber(element, start, end, duration) {
+            const startTime = performance.now();
+            
+            function updateNumber(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const currentNumber = Math.floor(start + (end - start) * easeOutCubic(progress));
+                element.textContent = currentNumber + '%';
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateNumber);
+                }
+            }
+            
+            requestAnimationFrame(updateNumber);
+        }
+        
+        function easeOutCubic(t) {
+            return 1 - Math.pow(1 - t, 3);
+        }
+        
+        function playStepSound() {
+            // Create a simple beep sound using Web Audio API
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.2);
+            } catch (e) {
+                // Audio not supported, continue silently
+            }
+        }
+        
+        // Interactive hover effects
+        document.querySelectorAll('.flow-step').forEach(step => {
+            step.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+                this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.2)';
+            });
+            
+            step.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+            });
+        });
+        
+        // Auto-start animation when page loads
+        window.addEventListener('load', function() {
+            setTimeout(startAnimation, 1000);
+        });
+        
+        // Add click interaction to steps
+        document.querySelectorAll('.flow-step').forEach((step, index) => {
+            step.addEventListener('click', function() {
+                // Show detailed information about this step
+                const details = {
+                    0: {
+                        title: "تواصل واضح ومبكر",
+                        description: "التواصل الفعال منذ البداية يضع توقعات واضحة ويمنع سوء الفهم."
+                    },
+                    1: {
+                        title: "فهم أفضل للمتطلبات",
+                        description: "عندما يفهم جميع الأطراف المتطلبات بوضوح، تتحسن جودة العمل."
+                    },
+                    2: {
+                        title: "تقليل التأخير",
+                        description: "التواصل الجيد يقلل الحاجة للمراجعات المتكررة والتوضيحات الإضافية."
+                    },
+                    3: {
+                        title: "تحسين جودة الدراسات",
+                        description: "فهم أفضل للمتطلبات يؤدي إلى دراسات أكثر دقة وشمولية."
+                    },
+                    4: {
+                        title: "زيادة الامتثال",
+                        description: "عندما تكون التوقعات واضحة، يزداد الالتزام بالمعايير والشروط."
+                    }
+                };
+                
+                const stepIndex = Array.from(document.querySelectorAll('.flow-step')).indexOf(this);
+                if (details[stepIndex]) {
+                    alert(`${details[stepIndex].title}\n\n${details[stepIndex].description}`);
+                }
+            });
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                startAnimation();
+            } else if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                resetAnimation();
+            } else if (e.key === 's' || e.key === 'S') {
+                e.preventDefault();
+                showStatistics();
+            }
+        });
+    </script>
+</body>
+</html>
