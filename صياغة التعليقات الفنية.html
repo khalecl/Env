@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تمرين: صياغة التعليقات الفنية</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+            background: #f8f9fa;
+        }
+        
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        
+        .eia-text {
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+            margin: 20px 0;
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+        
+        .comment-area {
+            margin: 20px 0;
+        }
+        
+        .comment-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        .comment-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+        }
+        
+        .comment-type {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .type-btn {
+            padding: 10px 20px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .type-btn.critical { border-color: #e74c3c; color: #e74c3c; }
+        .type-btn.important { border-color: #f39c12; color: #f39c12; }
+        .type-btn.optional { border-color: #27ae60; color: #27ae60; }
+        
+        .type-btn.active.critical { background: #e74c3c; color: white; }
+        .type-btn.active.important { background: #f39c12; color: white; }
+        .type-btn.active.optional { background: #27ae60; color: white; }
+        
+        .guidelines {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .guidelines h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .guidelines ul {
+            margin: 0;
+            padding-right: 20px;
+        }
+        
+        .guidelines li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+        
+        .timer {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #2c3e50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .results {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .comment-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            .comment-type { flex-direction: column; }
+            .timer { position: relative; margin-bottom: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="timer" id="timer">⏰ 20:00</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🎯 تمرين صياغة التعليقات الفنية</h1>
+            <p>Technical Comment Writing Exercise</p>
+        </div>
+        
+        <div class="content">
+            <div class="guidelines">
+                <h3>📋 إرشادات التمرين:</h3>
+                <ul>
+                    <li><strong>الهدف:</strong> كتابة ثلاثة تعليقات فنية على النص المعروض</li>
+                    <li><strong>الوقت المحدد:</strong> 20 دقيقة</li>
+                    <li><strong>المطلوب:</strong> تعليق أساسي، مهم، واختياري</li>
+                    <li><strong>معايير التقييم:</strong> الوضوح، المرجعية القانونية، قابلية التنفيذ</li>
+                </ul>
+            </div>
+            
+            <div class="section">
+                <h2>📄 نص من دراسة تقييم الأثر البيئي</h2>
+                <div class="eia-text">
+                    <h3>الفصل الرابع: تقييم جودة الهواء</h3>
+                    <p><strong>4.1 المنهجية:</strong> تم قياس جودة الهواء في موقع واحد لمدة شهر واحد خلال فصل الشتاء. تم قياس PM10 و PM2.5 باستخدام جهاز محمول.</p>
+                    
+                    <p><strong>4.2 النتائج:</strong> أظهرت القياسات أن متوسط تركيز PM10 هو 45 μg/m³ و PM2.5 هو 25 μg/m³. هذه القيم أقل من الحدود المسموحة دولياً.</p>
+                    
+                    <p><strong>4.3 التأثيرات المتوقعة:</strong> من المتوقع أن تزيد انبعاثات الغبار أثناء أعمال البناء، لكن هذا مؤقت وسيتم التحكم فيه.</p>
+                    
+                    <p><strong>4.4 إجراءات التخفيف:</strong> سيتم رش الماء على الطرق التراب ية حسب الحاجة. كما سيتم تغطية شاحنات نقل المواد.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>✍️ التعليق الأول</h2>
+                <div class="comment-type">
+                    <button class="type-btn critical" data-type="critical">🔴 أساسي (Critical)</button>
+                    <button class="type-btn important" data-type="important">🟡 مهم (Important)</button>
+                    <button class="type-btn optional" data-type="optional">🟢 اختياري (Optional)</button>
+                </div>
+                <div class="comment-area">
+                    <textarea class="comment-input" placeholder="اكتب التعليق الأول هنا...&#10;&#10;مثال: بيانات جودة الهواء غير كافية حسب المادة 12 من قانون حماية البيئة الاتحادي. مطلوب قياسات لمدة 12 شهر في 3 مواقع مختلفة تشمل المناطق السكنية المجاورة."></textarea>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>✍️ التعليق الثاني</h2>
+                <div class="comment-type">
+                    <button class="type-btn critical" data-type="critical">🔴 أساسي (Critical)</button>
+                    <button class="type-btn important" data-type="important">🟡 مهم (Important)</button>
+                    <button class="type-btn optional" data-type="optional">🟢 اختياري (Optional)</button>
+                </div>
+                <div class="comment-area">
+                    <textarea class="comment-input" placeholder="اكتب التعليق الثاني هنا..."></textarea>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>✍️ التعليق الثالث</h2>
+                <div class="comment-type">
+                    <button class="type-btn critical" data-type="critical">🔴 أساسي (Critical)</button>
+                    <button class="type-btn important" data-type="important">🟡 مهم (Important)</button>
+                    <button class="type-btn optional" data-type="optional">🟢 اختياري (Optional)</button>
+                </div>
+                <div class="comment-area">
+                    <textarea class="comment-input" placeholder="اكتب التعليق الثالث هنا..."></textarea>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="submit-btn" onclick="submitComments()">📝 تسليم التعليقات</button>
+            </div>
+            
+            <div class="results" id="results">
+                <h3>✅ تم تسليم التعليقات بنجاح!</h3>
+                <p>سيتم مراجعة تعليقاتكم ومناقشتها مع المجموعة.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Timer functionality
+        let timeLeft = 20 * 60; // 20 minutes in seconds
+        
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = `⏰ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                alert('انتهى الوقت المحدد للتمرين!');
+                return;
+            }
+            
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        }
+        
+        updateTimer();
+        
+        // Comment type selection
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active class from siblings
+                const siblings = this.parentElement.querySelectorAll('.type-btn');
+                siblings.forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+            });
+        });
+        
+        // Submit function
+        function submitComments() {
+            const comments = document.querySelectorAll('.comment-input');
+            const types = document.querySelectorAll('.type-btn.active');
+            
+            let allFilled = true;
+            comments.forEach(comment => {
+                if (comment.value.trim() === '') {
+                    allFilled = false;
+                }
+            });
+            
+            if (!allFilled) {
+                alert('يرجى كتابة جميع التعليقات قبل التسليم');
+                return;
+            }
+            
+            if (types.length < 3) {
+                alert('يرجى تحديد نوع كل تعليق');
+                return;
+            }
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({behavior: 'smooth'});
+            
+            // Disable all inputs
+            comments.forEach(comment => comment.disabled = true);
+            document.querySelectorAll('.type-btn').forEach(btn => btn.disabled = true);
+        }
+        
+        // Auto-save functionality
+        setInterval(() => {
+            const comments = [];
+            document.querySelectorAll('.comment-input').forEach((input, index) => {
+                comments.push({
+                    index: index,
+                    value: input.value,
+                    type: input.closest('.section').querySelector('.type-btn.active')?.dataset.type || ''
+                });
+            });
+            localStorage.setItem('commentExercise', JSON.stringify(comments));
+        }, 30000); // Save every 30 seconds
+        
+        // Load saved data on page load
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('commentExercise');
+            if (saved) {
+                const comments = JSON.parse(saved);
+                comments.forEach(comment => {
+                    const input = document.querySelectorAll('.comment-input')[comment.index];
+                    if (input) {
+                        input.value = comment.value;
+                        if (comment.type) {
+                            const typeBtn = input.closest('.section').querySelector(`[data-type="${comment.type}"]`);
+                            if (typeBtn) {
+                                typeBtn.click();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

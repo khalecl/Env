@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحليل أصحاب المصلحة</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2d3436, #636e72);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .project-info {
+            background: #e8f4f8;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #0984e3;
+        }
+        
+        .project-info h2 {
+            color: #2d3436;
+            margin-bottom: 15px;
+        }
+        
+        .matrix-container {
+            display: grid;
+            grid-template-columns: 200px 1fr 1fr;
+            grid-template-rows: 60px 1fr 1fr;
+            gap: 2px;
+            background: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 30px 0;
+            height: 600px;
+        }
+        
+        .axis-label {
+            background: #2d3436;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .corner {
+            background: #636e72;
+        }
+        
+        .quadrant {
+            background: white;
+            padding: 15px;
+            position: relative;
+            min-height: 250px;
+            border: 2px dashed #ddd;
+            transition: all 0.3s;
+        }
+        
+        .quadrant:hover {
+            border-color: #0984e3;
+            background: #f8f9fa;
+        }
+        
+        .quadrant h3 {
+            margin: 0 0 15px 0;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 1em;
+            text-align: center;
+        }
+        
+        .high-influence-high-interest {
+            background: #d63031;
+            color: white;
+        }
+        
+        .high-influence-low-interest {
+            background: #fdcb6e;
+            color: #2d3436;
+        }
+        
+        .low-influence-high-interest {
+            background: #00b894;
+            color: white;
+        }
+        
+        .low-influence-low-interest {
+            background: #74b9ff;
+            color: white;
+        }
+        
+        .stakeholder-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stakeholder-item {
+            background: white;
+            padding: 12px 18px;
+            border-radius: 25px;
+            border: 2px solid #0984e3;
+            cursor: move;
+            user-select: none;
+            transition: all 0.3s;
+            font-weight: bold;
+            color: #2d3436;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .stakeholder-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(9, 132, 227, 0.3);
+        }
+        
+        .stakeholder-item.dragging {
+            opacity: 0.5;
+            transform: rotate(5deg);
+        }
+        
+        .dropped-stakeholder {
+            background: #e8f4f8;
+            padding: 8px 12px;
+            margin: 5px;
+            border-radius: 15px;
+            border: 1px solid #0984e3;
+            font-size: 0.9em;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .remove-btn {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #d63031;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .instructions {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .instructions h3 {
+            color: #e17055;
+            margin-bottom: 15px;
+        }
+        
+        .analysis-btn {
+            background: linear-gradient(45deg, #00b894, #00cec9);
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin: 20px 0;
+        }
+        
+        .analysis-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 184, 148, 0.4);
+        }
+        
+        .results {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .strategy-box {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #0984e3;
+        }
+        
+        @media (max-width: 1200px) {
+            .matrix-container {
+                grid-template-columns: 150px 1fr 1fr;
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            .matrix-container {
+                grid-template-columns: 120px 1fr;
+                grid-template-rows: 50px 1fr 1fr 1fr 1fr;
+                height: auto;
+            }
+            .quadrant { min-height: 200px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 تحليل أصحاب المصلحة</h1>
+            <p>Stakeholder Analysis Matrix</p>
+        </div>
+        
+        <div class="content">
+            <div class="project-info">
+                <h2>🏗️ المشروع: منتجع سياحي ساحلي في رأس الخيمة</h2>
+                <p><strong>الموقع:</strong> ساحل رأس الخيمة الشمالي</p>
+                <p><strong>المساحة:</strong> 50 هكتار</p>
+                <p><strong>الاستثمار:</strong> 500 مليون درهم</p>
+                <p><strong>المرافق:</strong> فندق 5 نجوم، شاطئ خاص، مارينا، ملعب جولف، مطاعم</p>
+            </div>
+            
+            <div class="instructions">
+                <h3>📋 تعليمات التمرين:</h3>
+                <ul>
+                    <li>اسحب أصحاب المصلحة من القائمة أدناه إلى المربع المناسب</li>
+                    <li>صنف كل طرف حسب <strong>تأثيره</strong> و <strong>اهتمامه</strong> بالمشروع</li>
+                    <li>فكر في استراتيجية التواصل المناسبة لكل مجموعة</li>
+                    <li>اضغط "تحليل النتائج" لرؤية الاستراتيجيات المقترحة</li>
+                </ul>
+            </div>
+            
+            <h3>🎯 اسحب أصحاب المصلحة إلى المربع المناسب:</h3>
+            <div class="stakeholder-list" id="stakeholderList">
+                <div class="stakeholder-item" draggable="true">المطور العقاري</div>
+                <div class="stakeholder-item" draggable="true">هيئة حماية البيئة</div>
+                <div class="stakeholder-item" draggable="true">السكان المحليين</div>
+                <div class="stakeholder-item" draggable="true">بلدية رأس الخيمة</div>
+                <div class="stakeholder-item" draggable="true">الصيادين المحليين</div>
+                <div class="stakeholder-item" draggable="true">شركات السياحة</div>
+                <div class="stakeholder-item" draggable="true">وزارة التغير المناخي</div>
+                <div class="stakeholder-item" draggable="true">الإعلام المحلي</div>
+                <div class="stakeholder-item" draggable="true">المنظمات البيئية</div>
+                <div class="stakeholder-item" draggable="true">الاستشاري البيئي</div>
+                <div class="stakeholder-item" draggable="true">أصحاب الفنادق المجاورة</div>
+                <div class="stakeholder-item" draggable="true">دائرة الطيران المدني</div>
+                <div class="stakeholder-item" draggable="true">الجمعيات التراثية</div>
+                <div class="stakeholder-item" draggable="true">البنوك الممولة</div>
+            </div>
+            
+            <div class="matrix-container">
+                <div class="axis-label corner"></div>
+                <div class="axis-label">اهتمام عالي<br>High Interest</div>
+                <div class="axis-label">اهتمام منخفض<br>Low Interest</div>
+                
+                <div class="axis-label" style="writing-mode: vertical-rl; text-orientation: mixed;">تأثير عالي<br>High Influence</div>
+                <div class="quadrant" data-category="high-high">
+                    <h3 class="high-influence-high-interest">🔴 إدارة عن كثب</h3>
+                    <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">Manage Closely</p>
+                    <div class="dropped-items"></div>
+                </div>
+                <div class="quadrant" data-category="high-low">
+                    <h3 class="high-influence-low-interest">🟡 إبقاء راضين</h3>
+                    <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">Keep Satisfied</p>
+                    <div class="dropped-items"></div>
+                </div>
+                
+                <div class="axis-label" style="writing-mode: vertical-rl; text-orientation: mixed;">تأثير منخفض<br>Low Influence</div>
+                <div class="quadrant" data-category="low-high">
+                    <h3 class="low-influence-high-interest">🟢 إبقاء مطلعين</h3>
+                    <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">Keep Informed</p>
+                    <div class="dropped-items"></div>
+                </div>
+                <div class="quadrant" data-category="low-low">
+                    <h3 class="low-influence-low-interest">🔵 مراقبة</h3>
+                    <p style="color: #666; font-size: 0.9em; margin-bottom: 15px;">Monitor</p>
+                    <div class="dropped-items"></div>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="analysis-btn" onclick="analyzeResults()">📊 تحليل النتائج</button>
+            </div>
+            
+            <div class="results" id="results">
+                <h3>📈 نتائج التحليل واستراتيجيات التواصل</h3>
+                <div id="analysisContent"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Drag and drop functionality
+        let draggedElement = null;
+        
+        // Add event listeners to stakeholder items
+        document.querySelectorAll('.stakeholder-item').forEach(item => {
+            item.addEventListener('dragstart', handleDragStart);
+            item.addEventListener('dragend', handleDragEnd);
+        });
+        
+        // Add event listeners to quadrants
+        document.querySelectorAll('.quadrant').forEach(quadrant => {
+            quadrant.addEventListener('dragover', handleDragOver);
+            quadrant.addEventListener('drop', handleDrop);
+        });
+        
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+        
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+        }
+        
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+        
+        function handleDrop(e) {
+            e.preventDefault();
+            
+            if (draggedElement) {
+                // Create dropped item
+                const droppedItem = document.createElement('div');
+                droppedItem.className = 'dropped-stakeholder';
+                droppedItem.textContent = draggedElement.textContent;
+                
+                // Add remove button
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.innerHTML = '×';
+                removeBtn.onclick = function() {
+                    // Return item to original list
+                    const originalItem = document.createElement('div');
+                    originalItem.className = 'stakeholder-item';
+                    originalItem.draggable = true;
+                    originalItem.textContent = droppedItem.textContent;
+                    originalItem.addEventListener('dragstart', handleDragStart);
+                    originalItem.addEventListener('dragend', handleDragEnd);
+                    
+                    document.getElementById('stakeholderList').appendChild(originalItem);
+                    droppedItem.remove();
+                };
+                
+                droppedItem.appendChild(removeBtn);
+                
+                // Add to quadrant
+                this.querySelector('.dropped-items').appendChild(droppedItem);
+                
+                // Remove from original list
+                draggedElement.remove();
+                draggedElement = null;
+            }
+        }
+        
+        function analyzeResults() {
+            const quadrants = {
+                'high-high': [],
+                'high-low': [],
+                'low-high': [],
+                'low-low': []
+            };
+            
+            // Collect stakeholders in each quadrant
+            document.querySelectorAll('.quadrant').forEach(quadrant => {
+                const category = quadrant.dataset.category;
+                const stakeholders = quadrant.querySelectorAll('.dropped-stakeholder');
+                stakeholders.forEach(stakeholder => {
+                    quadrants[category].push(stakeholder.textContent.replace('×', '').trim());
+                });
+            });
+            
+            // Generate analysis
+            let analysisHTML = '';
+            
+            if (quadrants['high-high'].length > 0) {
+                analysisHTML += `
+                    <div class="strategy-box">
+                        <h4>🔴 إدارة عن كثب (${quadrants['high-high'].length} أطراف)</h4>
+                        <p><strong>الأطراف:</strong> ${quadrants['high-high'].join(', ')}</p>
+                        <p><strong>الاستراتيجية:</strong> تواصل مستمر ومكثف، اجتماعات دورية، إشراكهم في صنع القرار</p>
+                        <p><strong>تكرار التواصل:</strong> أسبوعي أو حسب الحاجة</p>
+                        <p><strong>أسلوب التواصل:</strong> رسمي وتفصيلي مع تقارير مكتوبة</p>
+                    </div>
+                `;
+            }
+            
+            if (quadrants['high-low'].length > 0) {
+                analysisHTML += `
+                    <div class="strategy-box">
+                        <h4>🟡 إبقاء راضين (${quadrants['high-low'].length} أطراف)</h4>
+                        <p><strong>الأطراف:</strong> ${quadrants['high-low'].join(', ')}</p>
+                        <p><strong>الاستراتيجية:</strong> تحديثات منتظمة، معالجة مخاوفهم بسرعة، تجنب المشاكل</p>
+                        <p><strong>تكرار التواصل:</strong> شهري أو عند التطورات المهمة</p>
+                        <p><strong>أسلوب التواصل:</strong> تقارير موجزة وواضحة</p>
+                    </div>
+                `;
+            }
+            
+            if (quadrants['low-high'].length > 0) {
+                analysisHTML += `
+                    <div class="strategy-box">
+                        <h4>🟢 إبقاء مطلعين (${quadrants['low-high'].length} أطراف)</h4>
+                        <p><strong>الأطراف:</strong> ${quadrants['low-high'].join(', ')}</p>
+                        <p><strong>الاستراتيجية:</strong> معلومات واضحة ومنتظمة، استمع لآرائهم، شفافية في التواصل</p>
+                        <p><strong>تكرار التواصل:</strong> ربع سنوي أو عند الأحداث المهمة</p>
+                        <p><strong>أسلوب التواصل:</strong> نشرات إعلامية، اجتماعات مجتمعية</p>
+                    </div>
+                `;
+            }
+            
+            if (quadrants['low-low'].length > 0) {
+                analysisHTML += `
+                    <div class="strategy-box">
+                        <h4>🔵 مراقبة (${quadrants['low-low'].length} أطراف)</h4>
+                        <p><strong>الأطراف:</strong> ${quadrants['low-low'].join(', ')}</p>
+                        <p><strong>الاستراتيجية:</strong> تواصل محدود، مراقبة أي تغيير في موقفهم</p>
+                        <p><strong>تكرار التواصل:</strong> سنوي أو عند الضرورة</p>
+                        <p><strong>أسلوب التواصل:</strong> إشعارات عامة، موقع إلكتروني</p>
+                    </div>
+                `;
+            }
+            
+            // Add general recommendations
+            analysisHTML += `
+                <div class="strategy-box" style="border-left-color: #e17055;">
+                    <h4>💡 توصيات عامة للتواصل</h4>
+                    <ul>
+                        <li><strong>الشفافية:</strong> كن واضح وصادق في جميع التواصلات</li>
+                        <li><strong>الاستباقية:</strong> تواصل قبل أن تصبح المشاكل كبيرة</li>
+                        <li><strong>التخصيص:</strong> استخدم أسلوب مناسب لكل مجموعة</li>
+                        <li><strong>التوثيق:</strong> احتفظ بسجل لجميع التواصلات</li>
+                        <li><strong>المرونة:</strong> كن مستعد لتعديل الاستراتيجية حسب الحاجة</li>
+                    </ul>
+                </div>
+            `;
+            
+            document.getElementById('analysisContent').innerHTML = analysisHTML;
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({behavior: 'smooth'});
+        }
+        
+        // Auto-save functionality
+        function saveState() {
+            const state = {};
+            document.querySelectorAll('.quadrant').forEach(quadrant => {
+                const category = quadrant.dataset.category;
+                const stakeholders = [];
+                quadrant.querySelectorAll('.dropped-stakeholder').forEach(item => {
+                    stakeholders.push(item.textContent.replace('×', '').trim());
+                });
+                state[category] = stakeholders;
+            });
+            
+            const remainingItems = [];
+            document.querySelectorAll('#stakeholderList .stakeholder-item').forEach(item => {
+                remainingItems.push(item.textContent);
+            });
+            state.remaining = remainingItems;
+            
+            localStorage.setItem('stakeholderAnalysis', JSON.stringify(state));
+        }
+        
+        function loadState() {
+            const saved = localStorage.getItem('stakeholderAnalysis');
+            if (saved) {
+                const state = JSON.parse(saved);
+                
+                // Clear current state
+                document.querySelectorAll('.dropped-stakeholder').forEach(item => item.remove());
+                document.querySelectorAll('#stakeholderList .stakeholder-item').forEach(item => item.remove());
+                
+                // Restore quadrants
+                Object.keys(state).forEach(category => {
+                    if (category !== 'remaining') {
+                        const quadrant = document.querySelector(`[data-category="${category}"]`);
+                        if (quadrant) {
+                            state[category].forEach(stakeholderText => {
+                                const droppedItem = document.createElement('div');
+                                droppedItem.className = 'dropped-stakeholder';
+                                droppedItem.textContent = stakeholderText;
+                                
+                                const removeBtn = document.createElement('button');
+                                removeBtn.className = 'remove-btn';
+                                removeBtn.innerHTML = '×';
+                                removeBtn.onclick = function() {
+                                    const originalItem = document.createElement('div');
+                                    originalItem.className = 'stakeholder-item';
+                                    originalItem.draggable = true;
+                                    originalItem.textContent = droppedItem.textContent;
+                                    originalItem.addEventListener('dragstart', handleDragStart);
+                                    originalItem.addEventListener('dragend', handleDragEnd);
+                                    
+                                    document.getElementById('stakeholderList').appendChild(originalItem);
+                                    droppedItem.remove();
+                                    saveState();
+                                };
+                                
+                                droppedItem.appendChild(removeBtn);
+                                quadrant.querySelector('.dropped-items').appendChild(droppedItem);
+                            });
+                        }
+                    }
+                });
+                
+                // Restore remaining items
+                if (state.remaining) {
+                    state.remaining.forEach(stakeholderText => {
+                        const item = document.createElement('div');
+                        item.className = 'stakeholder-item';
+                        item.draggable = true;
+                        item.textContent = stakeholderText;
+                        item.addEventListener('dragstart', handleDragStart);
+                        item.addEventListener('dragend', handleDragEnd);
+                        document.getElementById('stakeholderList').appendChild(item);
+                    });
+                }
+            }
+        }
+        
+        // Save state when items are moved
+        document.addEventListener('drop', () => {
+            setTimeout(saveState, 100);
+        });
+        
+        // Load saved state on page load
+        window.addEventListener('load', loadState);
+        
+        // Reset function
+        function resetMatrix() {
+            localStorage.removeItem('stakeholderAnalysis');
+            location.reload();
+        }
+        
+        // Add reset button
+        document.querySelector('.analysis-btn').insertAdjacentHTML('afterend', 
+            '<button class="analysis-btn" style="background: linear-gradient(45deg, #d63031, #e17055); margin-left: 10px;" onclick="resetMatrix()">🔄 إعادة تعيين</button>'
+        );
+    </script>
+</body>
+</html>
