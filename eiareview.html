@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مراجعة تقييم الأثر البيئي - سيناريو تفاعلي</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            animation: slideInUp 1s ease-out;
+        }
+
+        .project-overview {
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+            border-radius: 15px;
+            padding: 25px;
+            color: white;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            animation: pulse 2s infinite;
+        }
+
+        .project-overview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .project-card {
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .review-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .step-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .step-card.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .step-card.completed {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+        }
+
+        .step-card.error {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            line-height: 40px;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .timer {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            z-index: 1000;
+            animation: bounceIn 1s ease-out;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+            transition: width 0.5s ease;
+            z-index: 1001;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: zoomIn 0.3s ease;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 5px solid #ddd;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checklist li:hover {
+            background: #e9ecef;
+            border-left-color: #667eea;
+        }
+
+        .checklist li.checked {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .checklist li.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .impact-matrix {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .matrix-cell {
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .matrix-cell:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .matrix-header {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+
+        .score-1 { background: #d4edda; }
+        .score-2 { background: #fff3cd; }
+        .score-3 { background: #f8d7da; }
+
+        .recommendation-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+        }
+
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 3000;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            animation: confettiFall 3s linear infinite;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%) translateY(-100%) rotate(45deg);
+            }
+            100% {
+                transform: translateX(100%) translateY(100%) rotate(45deg);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            z-index: 2000;
+            animation: slideInRight 0.5s ease;
+            display: none;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .score-display {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .gdp-context {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .project-grid,
+            .review-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .timer,
+            .score-display {
+                position: relative;
+                margin: 10px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <div class="timer" id="timer">
+        ⏱️ الوقت: <span id="timeDisplay">00:00</span>
+    </div>
+    
+    <div class="score-display" id="scoreDisplay">
+        🏆 النقاط: <span id="score">0</span><br>
+        📊 التقدم: <span id="progress">0%</span>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🌍 مراجعة تقييم الأثر البيئي - سيناريو تفاعلي</h1>
+            <p class="subtitle">تجربة تدريبية غامرة لمراجعة تقارير تقييم الأثر البيئي</p>
+        </div>
+
+        <div class="game-board">
+            <div class="project-overview">
+                <h2>🏭 مشروع مصنع الكيماويات - منطقة الغيل الصناعية</h2>
+                
+                <div class="gdp-context">
+                    <h3>📈 السياق الاقتصادي لرأس الخيمة</h3>
+                    <p>الصناعات التحويلية تساهم بـ 11.8 مليار درهم في الناتج المحلي الإجمالي (2023)</p>
+                    <p>نمو مستمر في القطاع الصناعي مما يتطلب رقابة بيئية صارمة</p>
+                </div>
+                
+                <div class="project-grid">
+                    <div class="project-card">
+                        <h3>📏 المساحة</h3>
+                        <p>12 هكتار</p>
+                    </div>
+                    <div class="project-card">
+                        <h3>💰 الاستثمار</h3>
+                        <p>150 مليون درهم</p>
+                    </div>
+                    <div class="project-card">
+                        <h3>👥 العمالة</h3>
+                        <p>120 موظف</p>
+                    </div>
+                    <div class="project-card">
+                        <h3>📅 مدة الإنشاء</h3>
+                        <p>18 شهر</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="review-steps" id="reviewSteps">
+                <div class="step-card" data-step="1" onclick="openStep(1)">
+                    <div class="step-number">1</div>
+                    <h3>فحص القائمة المرجعية</h3>
+                    <p>مراجعة اكتمال الوثائق الأساسية</p>
+                    <p><strong>المدة:</strong> 5 دقائق</p>
+                </div>
+
+                <div class="step-card" data-step="2" onclick="openStep(2)">
+                    <div class="step-number">2</div>
+                    <h3>مراجعة الهيكل العام</h3>
+                    <p>تقييم الفصول العشرة المطلوبة</p>
+                    <p><strong>المدة:</strong> 10 دقائق</p>
+                </div>
+
+                <div class="step-card" data-step="3" onclick="openStep(3)">
+                    <div class="step-number">3</div>
+                    <h3>تقييم الإطار القانوني</h3>
+                    <p>مراجعة الامتثال للقوانين الاتحادية</p>
+                    <p><strong>المدة:</strong> 15 دقائق</p>
+                </div>
+
+                <div class="step-card" data-step="4" onclick="openStep(4)">
+                    <div class="step-number">4</div>
+                    <h3>مراجعة مصفوفة التأثيرات</h3>
+                    <p>تقييم دقة تحديد وتقييم التأثيرات البيئية</p>
+                    <p><strong>المدة:</strong> 20 دقائق</p>
+                </div>
+
+                <div class="step-card" data-step="5" onclick="openStep(5)">
+                    <div class="step-number">5</div>
+                    <h3>تقييم إجراءات التخفيف</h3>
+                    <p>مراجعة الحلول المقترحة والمراقبة</p>
+                    <p><strong>المدة:</strong> 15 دقائق</p>
+                </div>
+
+                <div class="step-card" data-step="6" onclick="openStep(6)">
+                    <div class="step-number">6</div>
+                    <h3>كتابة التوصيات</h3>
+                    <p>إعداد القرار النهائي والتوصيات</p>
+                    <p><strong>المدة:</strong> 10 دقائق</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for each step -->
+    <div class="modal" id="modal1">
+        <div class="modal-content">
+            <h2>الخطوة 1: فحص القائمة المرجعية</h2>
+            <p>تحقق من وجود جميع المتطلبات الأساسية:</p>
+            
+            <ul class="checklist">
+                <li onclick="toggleCheck(this)">📋 القائمة المرجعية موقعة من المقيم؟</li>
+                <li onclick="toggleCheck(this)">📚 جميع الفصول العشرة موجودة؟</li>
+                <li onclick="toggleCheck(this)">📎 الملاحق الأربعة مكتملة؟</li>
+                <li onclick="toggleCheck(this)">🗺️ الخرائط والإحداثيات واضحة؟</li>
+                <li onclick="toggleCheck(this, true)">📖 المراجع والمصادر محددة؟</li>
+            </ul>
+            
+            <div class="recommendation-box" id="step1Result" style="display: none;">
+                <h3>⚠️ النتيجة: مشكلة حرجة!</h3>
+                <p>القائمة المرجعية مفقودة! في الواقع العملي، يُرجع التقرير فوراً.</p>
+                <p>لكن للتدريب، سنكمل المراجعة ونفترض وجود القائمة.</p>
+            </div>
+            
+            <button class="btn btn-danger" onclick="completeStep(1, false)">متابعة رغم المشكلة</button>
+            <button class="btn" onclick="closeModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modal2">
+        <div class="modal-content">
+            <h2>الخطوة 2: مراجعة الهيكل العام</h2>
+            <p>قارن بين المطلوب والموجود:</p>
+            
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <tr>
+                    <th style="padding: 10px; background: #667eea; color: white;">المطلوب حسب الدليل</th>
+                    <th style="padding: 10px; background: #667eea; color: white;">الموجود في التقرير</th>
+                    <th style="padding: 10px; background: #667eea; color: white;">التقييم</th>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;">الملخص التنفيذي</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">✅ موجود</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; background: #d4edda;">مقبول</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;">المقدمة</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">✅ موجود</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; background: #d4edda;">مقبول</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #ddd;">الإطار القانوني</td>
+                    <td style="padding: 10px; border: 1px solid #ddd;">⚠️ ناقص</td>
+                    <td style="padding: 10px; border: 1px solid #ddd; background: #fff3cd;">مراجعة مطلوبة</td>
+                </tr>
+            </table>
+            
+            <button class="btn btn-success" onclick="completeStep(2, true)">الهيكل مقبول مع تحفظات</button>
+            <button class="btn" onclick="closeModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modal3">
+        <div class="modal-content">
+            <h2>الخطوة 3: تقييم الإطار القانوني</h2>
+            <p>تحليل الثغرات في القوانين المذكورة:</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                <div style="padding: 20px; background: #f8d7da; border-radius: 10px;">
+                    <h3>❌ المفقود:</h3>
+                    <ul>
+                        <li>القانون الاتحادي رقم 24/1999 (غير مذكور!)</li>
+                        <li>القانون الاتحادي رقم 12/2018 (غير مذكور!)</li>
+                        <li>ربط القوانين بأنشطة المشروع</li>
+                    </ul>
+                </div>
+                <div style="padding: 20px; background: #d4edda; border-radius: 10px;">
+                    <h3>✅ الموجود:</h3>
+                    <ul>
+                        <li>بعض القوانين البيئية العامة</li>
+                        <li>معايير منظمة الصحة العالمية</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                <h4>💡 كيف نكتب تعليق مراجعة فعال؟</h4>
+                <p><strong>❌ تعليق ضعيف:</strong> "الإطار القانوني ناقص"</p>
+                <p><strong>✅ تعليق فعال:</strong> "الفصل الثالث يفتقر لذكر القانون الاتحادي رقم 24/1999 المادة 3، والقانون رقم 12/2018 المادة 25. يرجى إضافة هذين القانونين مع توضيح كيفية تطبيقهما على أنشطة المصنع الكيماوي."</p>
+            </div>
+            
+            <button class="btn btn-danger" onclick="completeStep(3, false)">الإطار القانوني غير مقبول</button>
+            <button class="btn" onclick="closeModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modal4">
+        <div class="modal-content">
+            <h2>الخطوة 4: مراجعة مصفوفة التأثيرات</h2>
+            <p>قيم دقة تقييم التأثيرات البيئية:</p>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h4>مثال: انبعاثات غازية من المداخن</h4>
+                <div class="impact-matrix">
+                    <div class="matrix-cell matrix-header">المعيار</div>
+                    <div class="matrix-cell matrix-header">تقييم التقرير</div>
+                    <div class="matrix-cell matrix-header">التقييم الصحيح</div>
+                    <div class="matrix-cell matrix-header">المشكلة</div>
+                    
+                    <div class="matrix-cell">الحجم</div>
+                    <div class="matrix-cell score-2">2</div>
+                    <div class="matrix-cell score-2">2</div>
+                    <div class="matrix-cell score-1">✓</div>
+                    
+                    <div class="matrix-cell">الدوام</div>
+                    <div class="matrix-cell score-2">2</div>
+                    <div class="matrix-cell score-3">3</div>
+                    <div class="matrix-cell score-3">قلل من الدائمية</div>
+                    
+                    <div class="matrix-cell">القابلية للعكس</div>
+                    <div class="matrix-cell score-1">1</div>
+                    <div class="matrix-cell score-2">2</div>
+                    <div class="matrix-cell score-2">أخطأ التقييم</div>
+                    
+                    <div class="matrix-cell">التراكمية</div>
+                    <div class="matrix-cell score-2">2</div>
+                    <div class="matrix-cell score-3">3</div>
+                    <div class="matrix-cell score-3">تجاهل التراكم</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-danger" onclick="completeStep(4, false)">المصفوفة تحتاج إعادة تقييم</button>
+            <button class="btn" onclick="closeModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modal5">
+        <div class="modal-content">
+            <h2>الخطوة 5: تقييم إجراءات التخفيف</h2>
+            <p>تقييم هرمية التخفيف والحلول المقترحة:</p>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <div style="background: #dc3545; color: white; padding: 10px; border-radius: 10px; margin: 5px;">🚫 التجنب (Avoidance)</div>
+                <div style="background: #ffc107; color: black; padding: 10px; border-radius: 10px; margin: 5px;">⬇️ التقليل (Minimization)</div>
+                <div style="background: #28a745; color: white; padding: 10px; border-radius: 10px; margin: 5px;">🔧 التخفيف (Mitigation)</div>
+                <div style="background: #17a2b8; color: white; padding: 10px; border-radius: 10px; margin: 5px;">💰 التعويض (Offset)</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0;">
+                <div style="padding: 15px; background: #d4edda; border-radius: 10px;">
+                    <h4>✅ إجراءات تقنية جيدة</h4>
+                    <ul>
+                        <li>مرشحات متقدمة</li>
+                        <li>أبراج تنظيف</li>
+                        <li>نظم مراقبة آلية</li>
+                    </ul>
+                </div>
+                <div style="padding: 15px; background: #fff3cd; border-radius: 10px;">
+                    <h4>⚠️ نقص في المراقبة</h4>
+                    <ul>
+                        <li>لا يوجد برنامج مراقبة مفصل</li>
+                        <li>عدم تحديد التردد</li>
+                        <li>غياب المؤشرات الواضحة</li>
+                    </ul>
+                </div>
+                <div style="padding: 15px; background: #f8d7da; border-radius: 10px;">
+                    <h4>❌ مفقود تماماً</h4>
+                    <ul>
+                        <li>خطة طوارئ للحوادث</li>
+                        <li>إجراءات الاستجابة السريعة</li>
+                        <li>تدريب الموظفين</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="background: #667eea; color: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h4>📊 متطلبات برنامج المراقبة</h4>
+                <p><strong>مثال من الدليل:</strong> "الضوضاء المولدة يجب ألا تتجاوز 60 ديسيبل عند حدود المصنع"</p>
+                <ul>
+                    <li>🎯 المؤشرات - للقضايا البيئية الرئيسية</li>
+                    <li>📏 المعايير - تطبيق معايير دولة الإمارات</li>
+                    <li>🔬 المنهجية - طرق القياس والمواقع والجدولة</li>
+                    <li>👥 المسؤوليات - من يراقب، متى، وبكم</li>
+                    <li>📊 التقارير - متى وكم مرة ومن المسؤول</li>
+                </ul>
+            </div>
+            
+            <button class="btn btn-success" onclick="completeStep(5, true)">الحلول التقنية مقبولة مع إضافات</button>
+            <button class="btn" onclick="closeModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modal6">
+        <div class="modal-content">
+            <h2>الخطوة 6: كتابة التوصيات النهائية</h2>
+            <p>بناءً على جميع المراجعات السابقة، اكتب توصياتك:</p>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <h4>📋 ملخص المراجعة:</h4>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">الهيكل العام</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #fff3cd;">مقبول مع تحفظات</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">الإطار القانوني</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8d7da;">يحتاج تحديث جذري</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">تقييم التأثيرات</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #f8d7da;">يحتاج إعادة تقييم</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">إجراءات التخفيف</td>
+                        <td style="padding: 10px; border: 1px solid #ddd; background: #fff3cd;">مقبولة مع إضافات</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <div class="recommendation-box">
+                <h3>🔴 القرار النهائي: إرجاع للتعديل</h3>
+                <p>⏰ المدة المقترحة: 30 يوم لإعادة التقديم</p>
+                <p>📝 المتطلبات الأساسية للتحسين:</p>
+                <ul style="text-align: right; list-style: none; padding: 0;">
+                    <li>✓ إضافة القوانين الاتحادية المفقودة</li>
+                    <li>✓ إعادة تقييم مصفوفة التأثيرات</li>
+                    <li>✓ وضع برنامج مراقبة مفصل</li>
+                    <li>✓ إضافة خطة طوارئ شاملة</li>
+                </ul>
+            </div>
+            
+            <button class="btn btn-success" onclick="completeStep(6, true); finishGame()">إنهاء المراجعة وإصدار القرار</button>
+            <button class="btn" onclick="closeModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <div class="celebration" id="celebration"></div>
+
+    <script>
+        // Game state
+        let currentStep = 0;
+        let score = 0;
+        let startTime = Date.now();
+        let timer;
+        let completedSteps = [];
+
+        // Initialize game
+        function initGame() {
+            startTimer();
+            updateProgress();
+            showNotification("مرحباً! ابدأ بالخطوة الأولى", "info");
+        }
+
+        // Timer functions
+        function startTimer() {
+            timer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timeDisplay').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        function updateProgress() {
+            const progress = (completedSteps.length / 6) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progress').textContent = Math.round(progress) + '%';
+            document.getElementById('score').textContent = score;
+        }
+
+        // Step management
+        function openStep(stepNumber) {
+            if (stepNumber > 1 && !completedSteps.includes(stepNumber - 1)) {
+                showNotification("يجب إكمال الخطوة السابقة أولاً!", "warning");
+                return;
+            }
+            
+            currentStep = stepNumber;
+            document.getElementById(`modal${stepNumber}`).style.display = 'block';
+            
+            // Mark as active
+            document.querySelectorAll('.step-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`[data-step="${stepNumber}"]`).classList.add('active');
+            
+            // Add some interactive effects
+            playStepSound();
+        }
+
+        function completeStep(stepNumber, success) {
+            if (!completedSteps.includes(stepNumber)) {
+                completedSteps.push(stepNumber);
+                
+                // Add score
+                if (success) {
+                    score += 20;
+                    showNotification("أحسنت! تم إكمال الخطوة بنجاح", "success");
+                } else {
+                    score += 10;
+                    showNotification("تم إكمال الخطوة مع ملاحظات", "warning");
+                }
+                
+                // Update visual state
+                const stepCard = document.querySelector(`[data-step="${stepNumber}"]`);
+                stepCard.classList.remove('active');
+                stepCard.classList.add(success ? 'completed' : 'error');
+                
+                updateProgress();
+                closeModal();
+                
+                // Special effects for critical issues
+                if (!success && (stepNumber === 1 || stepNumber === 3)) {
+                    createWarningEffect();
+                }
+            }
+        }
+
+        function finishGame() {
+            clearInterval(timer);
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            
+            // Calculate final score
+            let timeBonus = Math.max(0, 100 - totalTime);
+            score += timeBonus;
+            
+            // Show celebration
+            createCelebration();
+            showFinalResults(totalTime);
+            
+            updateProgress();
+        }
+
+        // Modal management
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+
+        // Interactive elements
+        function toggleCheck(element, isError = false) {
+            element.classList.toggle('checked');
+            
+            if (isError && element.classList.contains('checked')) {
+                element.classList.add('error');
+                document.getElementById('step1Result').style.display = 'block';
+                playErrorSound();
+            }
+            
+            playClickSound();
+        }
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification';
+            
+            if (type === 'success') {
+                notification.style.background = '#28a745';
+            } else if (type === 'warning') {
+                notification.style.background = '#ffc107';
+                notification.style.color = '#000';
+            } else if (type === 'error') {
+                notification.style.background = '#dc3545';
+            } else {
+                notification.style.background = '#17a2b8';
+            }
+            
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Visual effects
+        function createCelebration() {
+            const celebration = document.getElementById('celebration');
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57'][Math.floor(Math.random() * 5)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                celebration.appendChild(confetti);
+            }
+            
+            setTimeout(() => {
+                celebration.innerHTML = '';
+            }, 6000);
+        }
+
+        function createWarningEffect() {
+            document.body.style.animation = 'shake 0.5s ease-in-out';
+            setTimeout(() => {
+                document.body.style.animation = '';
+            }, 500);
+        }
+
+        function showFinalResults(totalTime) {
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+            
+            const resultModal = document.createElement('div');
+            resultModal.className = 'modal';
+            resultModal.style.display = 'block';
+            resultModal.innerHTML = `
+                <div class="modal-content" style="text-align: center; max-width: 600px;">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">🏆 تهانينا! لقد أكملت المراجعة</h2>
+                    
+                    <div style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 25px; border-radius: 15px; margin: 20px 0;">
+                        <h3>📊 نتائجك النهائية</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 15px;">
+                            <div>
+                                <h4>⏱️ الوقت المستغرق</h4>
+                                <p style="font-size: 1.5rem;">${minutes}:${seconds.toString().padStart(2, '0')}</p>
+                            </div>
+                            <div>
+                                <h4>🏆 النقاط النهائية</h4>
+                                <p style="font-size: 1.5rem;">${score}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                        <h4>📋 ملخص قرارك</h4>
+                        <p style="font-size: 1.1rem; color: #dc3545; font-weight: bold;">إرجاع التقرير للتعديل خلال 30 يوماً</p>
+                        <p>تم تحديد المشاكل الرئيسية وكتابة تعليقات بناءة للتحسين</p>
+                    </div>
+                    
+                    <div style="background: #d4edda; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                        <h4>💡 ما تعلمته اليوم</h4>
+                        <ul style="text-align: right; list-style: none; padding: 0;">
+                            <li>✓ أهمية القائمة المرجعية في منع المشاكل</li>
+                            <li>✓ كيفية تحديد الثغرات في الإطار القانوني</li>
+                            <li>✓ تقييم دقة مصفوفة التأثيرات البيئية</li>
+                            <li>✓ كتابة تعليقات مراجعة فعالة وبناءة</li>
+                            <li>✓ أهمية برامج المراقبة وخطط الطوارئ</li>
+                        </ul>
+                    </div>
+                    
+                    <button class="btn btn-success" onclick="this.parentElement.parentElement.remove()">إنهاء التدريب</button>
+                    <button class="btn" onclick="location.reload()">إعادة التدريب</button>
+                </div>
+            `;
+            document.body.appendChild(resultModal);
+        }
+
+        // Sound effects (placeholder functions)
+        function playStepSound() {
+            // In a real implementation, you would play actual sounds
+            console.log("🔊 Step opened sound");
+        }
+
+        function playClickSound() {
+            console.log("🔊 Click sound");
+        }
+
+        function playErrorSound() {
+            console.log("🔊 Error sound");
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            } else if (e.key >= '1' && e.key <= '6') {
+                openStep(parseInt(e.key));
+            }
+        });
+
+        // Add shake animation to CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize the game when page loads
+        window.addEventListener('load', initGame);
+
+        // Add GDP context data animation
+        function animateGDPData() {
+            const gdpElement = document.querySelector('.gdp-context');
+            if (gdpElement) {
+                setInterval(() => {
+                    gdpElement.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        gdpElement.style.transform = 'scale(1)';
+                    }, 200);
+                }, 5000);
+            }
+        }
+
+        // Start GDP animation
+        setTimeout(animateGDPData, 2000);
+
+        // Add touch support for mobile
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartY = e.changedTouches[0].screenY;
+        });
+
+        document.addEventListener('touchend', e => {
+            touchEndY = e.changedTouches[0].screenY;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartY - touchEndY;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    // Swipe up - next step
+                    if (currentStep < 6) {
+                        openStep(currentStep + 1);
+                    }
+                } else {
+                    // Swipe down - previous step
+                    if (currentStep > 1) {
+                        openStep(currentStep - 1);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
