@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تمرين 3: تحليل تدابير التخفيف</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            margin-top: 20px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00c851, #00ff41);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .scenario-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .scenario-box h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        .measure-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid #3498db;
+            transition: all 0.3s ease;
+        }
+        .measure-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        .measure-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .measure-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .measure-type {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .type-general {
+            background: #e74c3c;
+        }
+        .type-specific {
+            background: #27ae60;
+        }
+        .measure-text {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-style: italic;
+            border-right: 3px solid #bdc3c7;
+        }
+        .evaluation-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .criterion {
+            text-align: center;
+        }
+        .criterion-label {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 5px;
+        }
+        .rating-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+        .rating-btn {
+            width: 30px;
+            height: 30px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: white;
+        }
+        .rating-btn.excellent {
+            background: #27ae60;
+        }
+        .rating-btn.good {
+            background: #f39c12;
+        }
+        .rating-btn.poor {
+            background: #e74c3c;
+        }
+        .rating-btn:hover {
+            transform: scale(1.2);
+        }
+        .rating-btn.selected {
+            transform: scale(1.3);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+        .classification-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+        }
+        .classification-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .classify-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: white;
+        }
+        .classify-strong {
+            background: #27ae60;
+        }
+        .classify-weak {
+            background: #f39c12;
+        }
+        .classify-rejected {
+            background: #e74c3c;
+        }
+        .classify-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .classify-btn.selected {
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .comments-section {
+            margin-top: 15px;
+        }
+        .comment-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ecf0f1;
+            border-radius: 10px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            transition: border-color 0.3s ease;
+        }
+        .comment-input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .summary-section {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .stat-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .red-flags-section {
+            background: #fff5f5;
+            border: 2px solid #fed7d7;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .red-flags-title {
+            color: #e53e3e;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .red-flag-item {
+            background: #feb2b2;
+            color: #742a2a;
+            padding: 8px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 5px;
+            font-size: 12px;
+        }
+        .timer {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="timer" id="timer">⏱️ 08:00</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>تمرين 3: تحليل تدابير التخفيف</h1>
+            <p>Exercise 3: Mitigation Measures Analysis</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="scenario-box">
+                <h2>🏗️ السيناريو</h2>
+                <p>تم تقديم دراسة تقييم أثر بيئي لمشروع محجر جديد في منطقة الخران، رأس الخيمة. قم بتقييم تدابير التخفيف المقترحة باستخدام المعايير المحددة.</p>
+                <p><strong>المدة:</strong> 8 دقائق | <strong>نوع النشاط:</strong> تحليل وتصنيف</p>
+            </div>
+
+            <div id="measuresContainer"></div>
+
+            <div class="summary-section" id="summarySection">
+                <h2>📊 ملخص التقييم</h2>
+                <div class="summary-stats" id="summaryStats">
+                    <div class="stat-item">
+                        <div class="stat-number" id="strongCount">0</div>
+                        <div class="stat-label">تدابير قوية</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="weakCount">0</div>
+                        <div class="stat-label">تدابير ضعيفة</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="rejectedCount">0</div>
+                        <div class="stat-label">تدابير مرفوضة</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" id="completionRate">0%</div>
+                        <div class="stat-label">نسبة الإنجاز</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="red-flags-section">
+                <div class="red-flags-title">🚩 العبارات التي تعتبر "علامات حمراء":</div>
+                <span class="red-flag-item">الإجراءات المناسبة</span>
+                <span class="red-flag-item">أحدث التقنيات المتاحة</span>
+                <span class="red-flag-item">أفضل الممارسات</span>
+                <span class="red-flag-item">قدر الإمكان</span>
+                <span class="red-flag-item">التنسيق مع الجهات</span>
+                <span class="red-flag-item">وفقاً للمعايير</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const measures = [
+            {
+                id: 'dust_general',
+                category: 'للتحكم في الغبار',
+                title: 'التدبير أ (غبار عام)',
+                type: 'general',
+                text: 'سيتم اتخاذ جميع الإجراءات المناسبة لتقليل انبعاثات الغبار والحفاظ على جودة الهواء في المنطقة وفقاً للمعايير البيئية المحلية والدولية.'
+            },
+            {
+                id: 'dust_specific',
+                category: 'للتحكم في الغبار',
+                title: 'التدبير ب (غبار محدد)',
+                type: 'specific',
+                text: 'رش المياه على الطرق الترابية مرتين يومياً (8:00 ص و 2:00 م) باستخدام شاحنات مياه سعة 8,000 لتر. تكلفة العملية 400 درهم يومياً. المسؤول: مدير الصحة والسلامة. المراقبة: فحص يومي وتوثيق عمليات الرش.'
+            },
+            {
+                id: 'noise_general',
+                category: 'للتحكم في الضوضاء',
+                title: 'التدبير ج (ضوضاء عام)',
+                type: 'general',
+                text: 'استخدام أحدث التقنيات المتاحة للحد من مستويات الضوضاء والالتزام بالمعايير المحددة من قبل السلطات المختصة.'
+            },
+            {
+                id: 'noise_specific',
+                category: 'للتحكم في الضوضاء',
+                title: 'التدبير د (ضوضاء محدد)',
+                type: 'specific',
+                text: 'تركيب حواجز صوتية بارتفاع 4 أمتار وطول 200 متر على الحدود الشمالية للمحجر (الجهة السكنية). مواد الحاجز: ألواح خرسانية مع مواد امتصاص صوتي. التكلفة: 180,000 درهم. زمن التنفيذ: 3 أشهر قبل بداية التشغيل. المراقبة: قياس مستويات الضوضاء شهرياً.'
+            },
+            {
+                id: 'water_general',
+                category: 'لحماية المياه الجوفية',
+                title: 'التدبير هـ (مياه عام)',
+                type: 'general',
+                text: 'اتباع أفضل الممارسات البيئية في جميع العمليات لضمان عدم تلوث المياه الجوفية والمحافظة على جودتها للأجيال القادمة.'
+            },
+            {
+                id: 'water_specific',
+                category: 'لحماية المياه الجوفية',
+                title: 'التدبير و (مياه محدد)',
+                type: 'specific',
+                text: 'حفر 4 آبار مراقبة على عمق 60 متر حول المحجر (المواقع: شمال، جنوب، شرق، غرب). أخذ عينات مياه شهرياً وتحليلها في مختبر معتمد للمعايير التالية: pH, TDS, معادن ثقيلة، هيدروكربونات. التكلفة: 15,000 درهم سنوياً. المسؤول: مهندس البيئة. التقارير: تقرير شهري للهيئة.'
+            },
+            {
+                id: 'restoration_general',
+                category: 'لاستعادة الموقع',
+                title: 'التدبير ز (تأهيل عام)',
+                type: 'general',
+                text: 'سيتم القيام بأعمال إعادة التأهيل البيئي للموقع بعد انتهاء عمليات الاستخراج وذلك لإعادة الموقع إلى حالته الطبيعية قدر الإمكان.'
+            },
+            {
+                id: 'restoration_specific',
+                category: 'لاستعادة الموقع',
+                title: 'التدبير ح (تأهيل محدد)',
+                type: 'specific',
+                text: 'خطة تأهيل تدريجية: ردم المناطق المستنزفة بالتربة المحفوظة (50,000 م³)، زراعة 2,000 شتلة من الأشجار المحلية (الغاف والسمر)، إنشاء 3 برك مياه للحياة البرية. المدة: 24 شهر. التكلفة: 800,000 درهم. البدء: خلال سنة من انتهاء الاستخراج. المراقبة: تقرير مرحلي كل 6 أشهر.'
+            },
+            {
+                id: 'traffic_general',
+                category: 'لإدارة المرور',
+                title: 'التدبير ط (مرور عام)',
+                type: 'general',
+                text: 'التنسيق مع الجهات المعنية لضمان سلاسة حركة المرور وتجنب أي تأثيرات سلبية على الطرق المحيطة.'
+            },
+            {
+                id: 'traffic_specific',
+                category: 'لإدارة المرور',
+                title: 'التدبير ي (مرور محدد)',
+                type: 'specific',
+                text: 'تحديد مسارات ثابتة للشاحنات عبر الطريق الصناعي تجنباً للمناطق السكنية. تشغيل الشاحنات من 6:00 ص إلى 6:00 م فقط. حد أقصى 25 شاحنة يومياً. تركيب إشارات مرورية عند مدخل المحجر. المسؤول: مدير النقل. التكلفة: 50,000 درهم للإشارات.'
+            }
+        ];
+
+        const criteria = [
+            { key: 'clarity', label: 'الوضوح والتحديد' },
+            { key: 'feasibility', label: 'القابلية للتنفيذ' },
+            { key: 'measurability', label: 'القابلية للقياس' },
+            { key: 'completeness', label: 'اكتمال المعلومات' },
+            { key: 'economic', label: 'الجدوى الاقتصادية' }
+        ];
+
+        let evaluations = {};
+        let timer = 480; // 8 minutes in seconds
+
+        function initializeEvaluations() {
+            measures.forEach(measure => {
+                evaluations[measure.id] = {
+                    ratings: {},
+                    classification: null,
+                    comments: ''
+                };
+            });
+        }
+
+        function createMeasureCard(measure) {
+            return `
+                <div class="measure-card" data-measure="${measure.id}">
+                    <div class="measure-header">
+                        <div class="measure-title">${measure.title}</div>
+                        <div class="measure-type ${measure.type === 'general' ? 'type-general' : 'type-specific'}">
+                            ${measure.type === 'general' ? 'عام' : 'محدد'}
+                        </div>
+                    </div>
+                    <div class="measure-text">${measure.text}</div>
+                    
+                    <div class="evaluation-section">
+                        ${criteria.map(criterion => `
+                            <div class="criterion">
+                                <div class="criterion-label">${criterion.label}</div>
+                                <div class="rating-buttons">
+                                    <button class="rating-btn excellent" data-measure="${measure.id}" data-criterion="${criterion.key}" data-rating="3">3</button>
+                                    <button class="rating-btn good" data-measure="${measure.id}" data-criterion="${criterion.key}" data-rating="2">2</button>
+                                    <button class="rating-btn poor" data-measure="${measure.id}" data-criterion="${criterion.key}" data-rating="1">1</button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <div class="classification-section">
+                        <div class="classification-buttons">
+                            <button class="classify-btn classify-strong" data-measure="${measure.id}" data-classification="strong">قوي ✅</button>
+                            <button class="classify-btn classify-weak" data-measure="${measure.id}" data-classification="weak">ضعيف ⚠️</button>
+                            <button class="classify-btn classify-rejected" data-measure="${measure.id}" data-classification="rejected">مرفوض ❌</button>
+                        </div>
+                        
+                        <div class="comments-section">
+                            <textarea class="comment-input" data-measure="${measure.id}" placeholder="التعليقات والتوصيات..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMeasures() {
+            const container = document.getElementById('measuresContainer');
+            container.innerHTML = measures.map(createMeasureCard).join('');
+            attachEventListeners();
+        }
+
+        function attachEventListeners() {
+            // Rating buttons
+            document.querySelectorAll('.rating-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const measureId = this.dataset.measure;
+                    const criterion = this.dataset.criterion;
+                    const rating = parseInt(this.dataset.rating);
+                    
+                    // Remove selected class from other buttons in same criterion
+                    document.querySelectorAll(`[data-measure="${measureId}"][data-criterion="${criterion}"]`).forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    evaluations[measureId].ratings[criterion] = rating;
+                    updateProgress();
+                });
+            });
+
+            // Classification buttons
+            document.querySelectorAll('.classify-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const measureId = this.dataset.measure;
+                    const classification = this.dataset.classification;
+                    
+                    // Remove selected class from other buttons in same measure
+                    document.querySelectorAll(`[data-measure="${measureId}"].classify-btn`).forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    evaluations[measureId].classification = classification;
+                    updateProgress();
+                });
+            });
+
+            // Comment inputs
+            document.querySelectorAll('.comment-input').forEach(input => {
+                input.addEventListener('input', function() {
+                    const measureId = this.dataset.measure;
+                    evaluations[measureId].comments = this.value;
+                    updateProgress();
+                });
+            });
+        }
+
+        function updateProgress() {
+            const totalItems = measures.length;
+            let completedItems = 0;
+            
+            measures.forEach(measure => {
+                const evaluation = evaluations[measure.id];
+                const ratingsComplete = Object.keys(evaluation.ratings).length === criteria.length;
+                const classificationComplete = evaluation.classification !== null;
+                
+                if (ratingsComplete && classificationComplete) {
+                    completedItems++;
+                }
+            });
+            
+            const progressPercentage = (completedItems / totalItems) * 100;
+            document.getElementById('progressFill').style.width = `${progressPercentage}%`;
+            
+            updateSummary();
+        }
+
+        function updateSummary() {
+            let strongCount = 0;
+            let weakCount = 0;
+            let rejectedCount = 0;
+            let totalEvaluated = 0;
+
+            measures.forEach(measure => {
+                const classification = evaluations[measure.id].classification;
+                if (classification) {
+                    totalEvaluated++;
+                    switch (classification) {
+                        case 'strong': strongCount++; break;
+                        case 'weak': weakCount++; break;
+                        case 'rejected': rejectedCount++; break;
+                    }
+                }
+            });
+
+            document.getElementById('strongCount').textContent = strongCount;
+            document.getElementById('weakCount').textContent = weakCount;
+            document.getElementById('rejectedCount').textContent = rejectedCount;
+            document.getElementById('completionRate').textContent = `${Math.round((totalEvaluated / measures.length) * 100)}%`;
+        }
+
+        function startTimer() {
+            const timerElement = document.getElementById('timer');
+            
+            const updateTimer = () => {
+                const minutes = Math.floor(timer / 60);
+                const seconds = timer % 60;
+                timerElement.textContent = `⏱️ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timer <= 0) {
+                    timerElement.textContent = '⏱️ انتهى الوقت!';
+                    timerElement.style.background = 'rgba(231, 76, 60, 0.9)';
+                    return;
+                }
+                
+                if (timer <= 60) {
+                    timerElement.style.background = 'rgba(231, 76, 60, 0.9)';
+                } else if (timer <= 120) {
+                    timerElement.style.background = 'rgba(243, 156, 18, 0.9)';
+                }
+                
+                timer--;
+                setTimeout(updateTimer, 1000);
+            };
+            
+            updateTimer();
+        }
+
+        // Initialize the application
+        initializeEvaluations();
+        renderMeasures();
+        updateSummary();
+        startTimer();
+    </script>
+</body>
+</html>
