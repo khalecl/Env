@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تمرين 1: تقييم البيانات الأساسية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            margin-top: 20px;
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f260, #0575e6);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 3px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .scenario {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideIn 0.8s ease forwards;
+        }
+
+        @keyframes slideIn {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .data-section {
+            background: white;
+            border: 2px solid #e3f2fd;
+            border-radius: 15px;
+            margin: 20px 0;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            transform: translateX(30px);
+            opacity: 0;
+            animation: slideInRight 0.8s ease forwards;
+        }
+
+        .data-section:nth-child(even) {
+            animation-delay: 0.2s;
+        }
+
+        .data-section:nth-child(odd) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes slideInRight {
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .data-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .data-title {
+            color: #2c3e50;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .icon-air { background: linear-gradient(45deg, #87CEEB, #4682B4); }
+        .icon-water { background: linear-gradient(45deg, #00CED1, #008B8B); }
+        .icon-noise { background: linear-gradient(45deg, #FFD700, #FFA500); }
+        .icon-bio { background: linear-gradient(45deg, #90EE90, #32CD32); }
+        .icon-social { background: linear-gradient(45deg, #DDA0DD, #9370DB); }
+
+        .question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #007bff;
+        }
+
+        .question h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .rating-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+
+        .rating-btn {
+            padding: 10px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .rating-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .rating-btn.poor {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        .rating-btn.poor.selected {
+            background: #e74c3c;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .rating-btn.average {
+            border-color: #f39c12;
+            color: #f39c12;
+        }
+
+        .rating-btn.average.selected {
+            background: #f39c12;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .rating-btn.good {
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+
+        .rating-btn.good.selected {
+            background: #27ae60;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 30px;
+            display: none;
+            text-align: center;
+            color: #2c3e50;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-excellent {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .score-good {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+        }
+
+        .score-average {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+        }
+
+        .score-poor {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .feedback-section {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: bold;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .rating-container {
+                justify-content: center;
+            }
+            
+            .rating-btn {
+                flex: 1;
+                min-width: 80px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔬 تمرين 1: تقييم البيانات الأساسية</h1>
+            <p>Exercise 1: Baseline Data Evaluation</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="scenario">
+                <h3>📍 السيناريو</h3>
+                <p><strong>مشروع:</strong> مصنع أسمنت جديد في منطقة الرمس، رأس الخيمة</p>
+                <p><strong>المساحة:</strong> 25 هكتار | <strong>الإنتاج:</strong> 500,000 طن سنوياً</p>
+                <p><strong>مهمتك:</strong> قيّم جودة البيانات الأساسية المقدمة باستخدام المعايير المهنية</p>
+            </div>
+
+            <div class="data-section">
+                <div class="data-title">
+                    <div class="icon icon-air">🌬️</div>
+                    بيانات جودة الهواء
+                </div>
+                <p><strong>فترة الجمع:</strong> يناير - مارس 2022 (3 أشهر فقط)</p>
+                <p><strong>عدد المواقع:</strong> موقعين للقياس</p>
+                <p><strong>تكرار القياس:</strong> مرة واحدة أسبوعياً</p>
+                
+                <div class="table-responsive">
+                    <table>
+                        <tr>
+                            <th>المعيار</th>
+                            <th>الموقع الأول</th>
+                            <th>الموقع الثاني</th>
+                            <th>معيار WHO</th>
+                        </tr>
+                        <tr>
+                            <td>PM10</td>
+                            <td>85 μg/m³</td>
+                            <td>92 μg/m³</td>
+                            <td>45 μg/m³</td>
+                        </tr>
+                        <tr>
+                            <td>PM2.5</td>
+                            <td>28 μg/m³</td>
+                            <td>31 μg/m³</td>
+                            <td>15 μg/m³</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="question">
+                    <h4>قيّم جودة بيانات الهواء:</h4>
+                    <div class="rating-container">
+                        <button class="rating-btn poor" onclick="selectRating('air', 'poor', this)">ضعيف</button>
+                        <button class="rating-btn average" onclick="selectRating('air', 'average', this)">متوسط</button>
+                        <button class="rating-btn good" onclick="selectRating('air', 'good', this)">جيد</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <div class="data-title">
+                    <div class="icon icon-water">💧</div>
+                    بيانات المياه الجوفية
+                </div>
+                <p><strong>المصدر:</strong> "دراسة سابقة للمنطقة - غير محدد التاريخ"</p>
+                <p><strong>عدد العينات:</strong> 3 عينات فقط</p>
+                <p><strong>آخر تحليل:</strong> "منذ عدة سنوات"</p>
+                <p><strong>البيانات:</strong> ملوحة 1,800-2,400 mg/L، pH: 7.2-7.8</p>
+
+                <div class="question">
+                    <h4>قيّم جودة بيانات المياه:</h4>
+                    <div class="rating-container">
+                        <button class="rating-btn poor" onclick="selectRating('water', 'poor', this)">ضعيف</button>
+                        <button class="rating-btn average" onclick="selectRating('water', 'average', this)">متوسط</button>
+                        <button class="rating-btn good" onclick="selectRating('water', 'good', this)">جيد</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <div class="data-title">
+                    <div class="icon icon-noise">🔊</div>
+                    بيانات الضوضاء
+                </div>
+                <p><strong>فترة القياس:</strong> يوم واحد في فبراير 2022</p>
+                <p><strong>التوقيت:</strong> 9:00 ص - 5:00 م فقط (نهاري فقط)</p>
+                <p><strong>النتائج:</strong> 58-62 dB أثناء النهار</p>
+
+                <div class="question">
+                    <h4>قيّم جودة بيانات الضوضاء:</h4>
+                    <div class="rating-container">
+                        <button class="rating-btn poor" onclick="selectRating('noise', 'poor', this)">ضعيف</button>
+                        <button class="rating-btn average" onclick="selectRating('noise', 'average', this)">متوسط</button>
+                        <button class="rating-btn good" onclick="selectRating('noise', 'good', this)">جيد</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <div class="data-title">
+                    <div class="icon icon-bio">🌱</div>
+                    بيانات التنوع الحيوي
+                </div>
+                <p><strong>المحتوى:</strong> "لا توجد نباتات أو حيوانات مهمة في المنطقة"</p>
+                <p><strong>التوثيق:</strong> بدون صور أو أدلة داعمة</p>
+                <p><strong>المنهجية:</strong> "ملاحظات عامة أثناء الزيارة"</p>
+
+                <div class="question">
+                    <h4>قيّم جودة بيانات التنوع الحيوي:</h4>
+                    <div class="rating-container">
+                        <button class="rating-btn poor" onclick="selectRating('bio', 'poor', this)">ضعيف</button>
+                        <button class="rating-btn average" onclick="selectRating('bio', 'average', this)">متوسط</button>
+                        <button class="rating-btn good" onclick="selectRating('bio', 'good', this)">جيد</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-section">
+                <div class="data-title">
+                    <div class="icon icon-social">👥</div>
+                    البيانات الاجتماعية والاقتصادية
+                </div>
+                <p><strong>المصدر:</strong> "إحصائيات عامة من الإنترنت"</p>
+                <p><strong>المحتوى:</strong> بيانات عامة عن رأس الخيمة</p>
+                <p><strong>التفصيل:</strong> لا تحتوي على بيانات للمنطقة المتأثرة</p>
+                <p><strong>التاريخ:</strong> إحصائيات 2019</p>
+
+                <div class="question">
+                    <h4>قيّم جودة البيانات الاجتماعية:</h4>
+                    <div class="rating-container">
+                        <button class="rating-btn poor" onclick="selectRating('social', 'poor', this)">ضعيف</button>
+                        <button class="rating-btn average" onclick="selectRating('social', 'average', this)">متوسط</button>
+                        <button class="rating-btn good" onclick="selectRating('social', 'good', this)">جيد</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="submit-btn" id="submitBtn" onclick="calculateResults()" disabled>
+                📊 احسب النتيجة والتقييم
+            </button>
+
+            <div class="results" id="results">
+                <div class="score-circle" id="scoreCircle">
+                    <span id="scoreText">0%</span>
+                </div>
+                <h3 id="resultTitle">نتيجة التقييم</h3>
+                <div class="feedback-section" id="feedback"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let responses = {};
+        let totalQuestions = 5;
+
+        function selectRating(category, rating, button) {
+            // Remove selection from siblings
+            button.parentNode.querySelectorAll('.rating-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // Add selection to clicked button
+            button.classList.add('selected');
+            
+            // Store response
+            responses[category] = rating;
+            
+            // Update progress
+            updateProgress();
+            
+            // Check if all questions answered
+            if (Object.keys(responses).length === totalQuestions) {
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').classList.add('pulse');
+            }
+        }
+
+        function updateProgress() {
+            const progress = (Object.keys(responses).length / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function calculateResults() {
+            const correctAnswers = {
+                air: 'poor',      // 3 months only, old data, insufficient coverage
+                water: 'poor',    // Old data, undefined source, insufficient samples
+                noise: 'poor',    // One day only, daytime only
+                bio: 'poor',      // Unscientific, no documentation
+                social: 'poor'    // Generic data, old, not specific to area
+            };
+
+            let score = 0;
+            let feedback = [];
+
+            // Calculate score and generate feedback
+            for (let category in responses) {
+                if (responses[category] === correctAnswers[category]) {
+                    score += 20;
+                } else {
+                    // Provide specific feedback for wrong answers
+                    feedback.push(generateFeedback(category, responses[category], correctAnswers[category]));
+                }
+            }
+
+            displayResults(score, feedback);
+        }
+
+        function generateFeedback(category, userAnswer, correctAnswer) {
+            const feedbackMap = {
+                air: {
+                    title: "بيانات جودة الهواء",
+                    issues: "فترة قصيرة (3 أشهر)، بيانات قديمة (2022)، موقعين فقط غير كافيان، لا تغطي مواسم مختلفة",
+                    correct: "يجب رفض هذه البيانات لعدم كفايتها"
+                },
+                water: {
+                    title: "بيانات المياه الجوفية", 
+                    issues: "مصدر غير محدد، بيانات قديمة جداً، 3 عينات فقط غير كافية، نقص في المعايير المهمة",
+                    correct: "تحتاج بيانات جديدة ومصادر موثقة"
+                },
+                noise: {
+                    title: "بيانات الضوضاء",
+                    issues: "يوم واحد فقط، قياسات نهارية فقط، لا تشمل الليل، نقاط قليلة",
+                    correct: "غير كافية للتقييم السليم"
+                },
+                bio: {
+                    title: "بيانات التنوع الحيوي",
+                    issues: "غير علمي، لا يوجد مسح حقيقي، بدون توثيق، استنتاجات غير مبررة",
+                    correct: "يجب إجراء مسح علمي شامل"
+                },
+                social: {
+                    title: "البيانات الاجتماعية",
+                    issues: "عامة وغير محددة، قديمة (2019)، لا تخص المنطقة المتأثرة",
+                    correct: "تحتاج دراسة محددة للمنطقة"
+                }
+            };
+
+            return feedbackMap[category];
+        }
+
+        function displayResults(score, feedback) {
+            const resultsDiv = document.getElementById('results');
+            const scoreCircle = document.getElementById('scoreCircle');
+            const scoreText = document.getElementById('scoreText');
+            const resultTitle = document.getElementById('resultTitle');
+            const feedbackDiv = document.getElementById('feedback');
+
+            // Show results
+            resultsDiv.style.display = 'block';
+            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+
+            // Animate score
+            let currentScore = 0;
+            const targetScore = score;
+            const increment = targetScore / 50;
+
+            const scoreAnimation = setInterval(() => {
+                currentScore += increment;
+                if (currentScore >= targetScore) {
+                    currentScore = targetScore;
+                    clearInterval(scoreAnimation);
+                }
+                scoreText.textContent = Math.round(currentScore) + '%';
+            }, 20);
+
+            // Set score circle color and title
+            scoreCircle.classList.remove('score-excellent', 'score-good', 'score-average', 'score-poor');
+            
+            if (score >= 80) {
+                scoreCircle.classList.add('score-excellent');
+                resultTitle.textContent = '🌟 ممتاز! تقييم احترافي دقيق';
+            } else if (score >= 60) {
+                scoreCircle.classList.add('score-good');
+                resultTitle.textContent = '👍 جيد! فهم صحيح مع بعض النقاط للتحسين';
+            } else if (score >= 40) {
+                scoreCircle.classList.add('score-average');
+                resultTitle.textContent = '⚠️ متوسط! يحتاج مراجعة للمعايير';
+            } else {
+                scoreCircle.classList.add('score-poor');
+                resultTitle.textContent = '🔄 يحتاج تحسين! راجع معايير التقييم';
+            }
+
+            // Generate detailed feedback
+            let feedbackHTML = `
+                <h4>🎯 التقييم المهني الصحيح:</h4>
+                <p><strong>جميع البيانات المقدمة ضعيفة ومرفوضة</strong> لعدة أسباب:</p>
+                <ul style="text-align: right; margin: 15px 0;">
+                    <li>البيانات قديمة ولا تمثل الوضع الحالي</li>
+                    <li>فترات المراقبة قصيرة جداً</li>
+                    <li>عينات غير كافية إحصائياً</li>
+                    <li>مصادر غير موثقة أو مجهولة</li>
+                    <li>منهجيات غير علمية</li>
+                </ul>
+            `;
+
+            if (feedback.length > 0) {
+                feedbackHTML += '<h4>📋 نقاط التحسين:</h4>';
+                feedback.forEach(item => {
+                    feedbackHTML += `
+                        <div style="background: #fff3cd; padding: 15px; margin: 10px 0; border-radius: 10px; border-right: 4px solid #ffc107;">
+                            <strong>${item.title}:</strong><br>
+                            <span style="color: #856404;">${item.issues}</span><br>
+                            <strong style="color: #155724;">✅ ${item.correct}</strong>
+                        </div>
+                    `;
+                });
+            }
+
+            feedbackHTML += `
+                <div style="background: #d1ecf1; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                    <h4 style="color: #0c5460;">🏆 توصية المراجع المهني:</h4>
+                    <p style="color: #0c5460; font-weight: bold;">رفض جميع البيانات وطلب دراسة جديدة شاملة وفقاً لمعايير هيئة رأس الخيمة</p>
+                </div>
+            `;
+
+            feedbackDiv.innerHTML = feedbackHTML;
+        }
+
+        // Initialize animations
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.data-section').forEach((section, index) => {
+                    section.style.animationDelay = (index * 0.2) + 's';
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>
