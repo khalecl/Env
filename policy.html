@@ -37,7 +37,6 @@
             padding: 0 20px;
         }
 
-        /* Hero Section */
         .hero {
             padding: 60px 0;
             text-align: center;
@@ -96,7 +95,6 @@
             to { opacity: 1; }
         }
 
-        /* Triangle Diagram */
         .triangle-container {
             max-width: 500px;
             margin: 50px auto;
@@ -128,7 +126,6 @@
             font-weight: 600;
         }
 
-        /* Stats Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -180,7 +177,6 @@
             color: var(--text-secondary);
         }
 
-        /* Calculator Section */
         .calculator {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -230,7 +226,7 @@
             width: 100%;
             height: 8px;
             border-radius: 5px;
-            background: linear-gradient(to right, var(--aramco-green) 0%, var(--aramco-green) 50%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.1) 100%);
+            background: rgba(255,255,255,0.1);
             outline: none;
             transition: all 0.3s ease;
         }
@@ -262,7 +258,6 @@
             transform: scale(1.2);
         }
 
-        /* Output Dashboard */
         .output-dashboard {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -287,7 +282,6 @@
             font-size: 2rem;
             font-weight: 800;
             margin-bottom: 5px;
-            transition: all 0.5s ease;
         }
 
         .output-label {
@@ -307,7 +301,6 @@
             50% { opacity: 0.5; }
         }
 
-        /* Chart */
         .chart-container {
             background: rgba(0, 0, 0, 0.2);
             border-radius: 16px;
@@ -316,7 +309,6 @@
             height: 400px;
         }
 
-        /* Scenario Presets */
         .scenarios-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -341,10 +333,6 @@
             border-color: var(--aramco-green);
         }
 
-        .scenario-card:active {
-            transform: scale(0.98);
-        }
-
         .scenario-title {
             font-size: 1.2rem;
             font-weight: 700;
@@ -358,7 +346,6 @@
             line-height: 1.5;
         }
 
-        /* Strategy Comparison */
         .strategy-controls {
             display: flex;
             gap: 15px;
@@ -375,7 +362,6 @@
             transition: all 0.3s ease;
             font-size: 1rem;
             min-height: 44px;
-            min-width: 44px;
         }
 
         .btn-primary {
@@ -422,7 +408,6 @@
             font-weight: 700;
         }
 
-        /* Debate Section */
         .debate-section {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -494,7 +479,6 @@
             color: var(--aramco-green);
         }
 
-        /* Key Insights */
         .insights-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -536,7 +520,6 @@
             line-height: 1.6;
         }
 
-        /* Mobile Optimizations */
         @media (max-width: 768px) {
             .hero {
                 padding: 40px 0;
@@ -577,48 +560,16 @@
                 grid-template-columns: 1fr;
             }
         }
-
-        /* Print Styles */
-        @media print {
-            body {
-                background: white;
-                color: black;
-            }
-
-            .calculator, .stat-card, .scenario-card {
-                background: white;
-                border: 1px solid #ddd;
-            }
-
-            .btn {
-                display: none;
-            }
-        }
-
-        /* Accessibility */
-        .sr-only {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border-width: 0;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Hero Section -->
         <section class="hero">
             <h1 class="hero-title">Aramco Climate Policy Strategy Simulator</h1>
             <p class="hero-subtitle">Navigate the trilemma: Balance climate action, national revenue, and energy security</p>
 
-            <!-- Triangle Diagram -->
             <div class="triangle-container">
-                <svg class="triangle-svg" viewBox="0 0 400 350" xmlns="http://www.w3.org/2000/svg">
+                <svg class="triangle-svg" viewBox="0 0 400 350">
                     <path class="triangle-line" d="M 200 50 L 80 300 L 320 300 Z" />
                     <text class="triangle-text" x="200" y="35" text-anchor="middle">Climate Action</text>
                     <text class="triangle-text" x="50" y="330" text-anchor="middle">National Revenue</text>
@@ -626,7 +577,6 @@
                 </svg>
             </div>
 
-            <!-- Stats Cards -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" data-counter="10.4">0</div>
@@ -647,7 +597,6 @@
             </div>
         </section>
 
-        <!-- Calculator Section -->
         <section class="calculator">
             <h2 class="section-title">Interactive Strategy Calculator</h2>
 
@@ -657,7 +606,7 @@
                         <span>Production Volume (M bpd)</span>
                         <span class="input-value" id="prod-value">10.4</span>
                     </label>
-                    <input type="range" id="production" min="1" max="12" step="0.1" value="10.4" aria-label="Production Volume">
+                    <input type="range" id="production" min="1" max="12" step="0.1" value="10.4">
                 </div>
 
                 <div class="input-group">
@@ -665,7 +614,7 @@
                         <span>Oil Price ($/barrel)</span>
                         <span class="input-value" id="price-value">$80</span>
                     </label>
-                    <input type="range" id="oilPrice" min="40" max="150" step="1" value="80" aria-label="Oil Price">
+                    <input type="range" id="oilPrice" min="40" max="150" step="1" value="80">
                 </div>
 
                 <div class="input-group">
@@ -673,7 +622,7 @@
                         <span>Carbon Tax ($/barrel)</span>
                         <span class="input-value" id="tax-value">$0</span>
                     </label>
-                    <input type="range" id="carbonTax" min="0" max="150" step="5" value="0" aria-label="Carbon Tax">
+                    <input type="range" id="carbonTax" min="0" max="150" step="5" value="0">
                 </div>
 
                 <div class="input-group">
@@ -681,7 +630,7 @@
                         <span>CCS Investment ($B)</span>
                         <span class="input-value" id="ccs-value">$0B</span>
                     </label>
-                    <input type="range" id="ccsInvestment" min="0" max="50" step="1" value="0" aria-label="CCS Investment">
+                    <input type="range" id="ccsInvestment" min="0" max="50" step="1" value="0">
                 </div>
 
                 <div class="input-group">
@@ -689,7 +638,7 @@
                         <span>Petrochemicals Share (%)</span>
                         <span class="input-value" id="petro-value">10%</span>
                     </label>
-                    <input type="range" id="petrochemicals" min="0" max="50" step="1" value="10" aria-label="Petrochemicals Share">
+                    <input type="range" id="petrochemicals" min="0" max="50" step="1" value="10">
                 </div>
 
                 <div class="input-group">
@@ -697,7 +646,7 @@
                         <span>Asia Market (%)</span>
                         <span class="input-value" id="asia-value">82%</span>
                     </label>
-                    <input type="range" id="asiaMarket" min="0" max="100" step="1" value="82" aria-label="Asia Market Share">
+                    <input type="range" id="asiaMarket" min="0" max="100" step="1" value="82">
                 </div>
 
                 <div class="input-group">
@@ -705,7 +654,7 @@
                         <span>Europe Market (%)</span>
                         <span class="input-value" id="europe-value">10%</span>
                     </label>
-                    <input type="range" id="europeMarket" min="0" max="100" step="1" value="10" aria-label="Europe Market Share">
+                    <input type="range" id="europeMarket" min="0" max="100" step="1" value="10">
                 </div>
 
                 <div class="input-group">
@@ -713,11 +662,10 @@
                         <span>Americas Market (%)</span>
                         <span class="input-value" id="americas-value">8%</span>
                     </label>
-                    <input type="range" id="americasMarket" min="0" max="100" step="1" value="8" aria-label="Americas Market Share">
+                    <input type="range" id="americasMarket" min="0" max="100" step="1" value="8">
                 </div>
             </div>
 
-            <!-- Output Dashboard -->
             <div class="output-dashboard">
                 <div class="output-card">
                     <div class="output-value" id="revenue">$303B</div>
@@ -749,13 +697,11 @@
                 </div>
             </div>
 
-            <!-- Chart -->
             <div class="chart-container">
-                <canvas id="strategyChart" aria-label="Revenue and Emissions Chart"></canvas>
+                <canvas id="strategyChart"></canvas>
             </div>
         </section>
 
-        <!-- Scenario Presets -->
         <section>
             <h2 class="section-title">Policy Scenarios</h2>
             <div class="scenarios-grid">
@@ -778,7 +724,6 @@
             </div>
         </section>
 
-        <!-- Strategy Comparison -->
         <section class="calculator">
             <h2 class="section-title">Strategy Comparison</h2>
             <div class="strategy-controls">
@@ -787,7 +732,7 @@
                 <button class="btn btn-secondary" id="exportCSV">Export CSV</button>
             </div>
             <div class="comparison-table">
-                <table id="comparisonTable">
+                <table>
                     <thead>
                         <tr>
                             <th>Metric</th>
@@ -803,7 +748,6 @@
             </div>
         </section>
 
-        <!-- Debate Section -->
         <section class="debate-section">
             <div class="debate-header" id="debateToggle">
                 <h2 class="section-title" style="margin: 0;">The Scope 3 Dilemma</h2>
@@ -838,7 +782,6 @@
             </div>
         </section>
 
-        <!-- Key Insights -->
         <section>
             <h2 class="section-title">Strategic Insights</h2>
             <div class="insights-grid">
@@ -867,7 +810,6 @@
     </div>
 
     <script>
-        // Constants
         const DAYS_PER_YEAR = 365;
         const SCOPE1_BASE = 56.1;
         const SCOPE2_BASE = 12.4;
@@ -876,12 +818,10 @@
         const SAUDI_BUDGET = 336;
         const BREAKEVEN_PRICE = 90;
 
-        // State
         let savedStrategies = [];
         let updateTimeout;
         let chart;
 
-        // Get elements
         const inputs = {
             production: document.getElementById('production'),
             oilPrice: document.getElementById('oilPrice'),
@@ -893,27 +833,6 @@
             americasMarket: document.getElementById('americasMarket')
         };
 
-        // Counter animation
-        function animateCounter(element, target, decimals = 0) {
-            const start = parseFloat(element.textContent) || 0;
-            const duration = 1000;
-            const startTime = performance.now();
-
-            function update(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                const easeProgress = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-                const current = start + (target - start) * easeProgress;
-                element.textContent = current.toFixed(decimals);
-                
-                if (progress < 1) {
-                    requestAnimationFrame(update);
-                }
-            }
-            requestAnimationFrame(update);
-        }
-
-        // Calculate metrics
         function calculateMetrics() {
             const production = parseFloat(inputs.production.value);
             const oilPrice = parseFloat(inputs.oilPrice.value);
@@ -921,13 +840,8 @@
             const ccsInvestment = parseFloat(inputs.ccsInvestment.value);
             const petrochemicals = parseFloat(inputs.petrochemicals.value);
 
-            // Revenue calculation
             const annualRevenue = (production * oilPrice * DAYS_PER_YEAR - production * carbonTax * DAYS_PER_YEAR) / 1000;
-            
-            // Carbon tax liability
             const carbonTaxLiability = (production * carbonTax * DAYS_PER_YEAR) / 1000;
-            
-            // Emissions
             const scope1Emissions = (production / 10.4) * SCOPE1_BASE;
             const scope2Emissions = SCOPE2_BASE;
             const ccsReductionFactor = 1 - (ccsInvestment / 50 * 0.20);
@@ -935,11 +849,8 @@
             const oilShare = 1 - (petrochemicals / 100);
             const scope3Emissions = production * DAYS_PER_YEAR * oilShare * COMBUSTION_FACTOR / 1000;
             const totalEmissions = scope1Emissions + scope2Emissions + scope3Emissions;
-            
-            // Budget impact
             const budgetContribution = (annualRevenue / SAUDI_BUDGET) * 100;
             
-            // Viability
             let viability, viabilityClass;
             if (annualRevenue > 250 && budgetContribution > 55) {
                 viability = "High";
@@ -952,37 +863,16 @@
                 viabilityClass = "viability-low";
             }
             
-            // Budget status
             let budgetStatus;
-            if (oilPrice >= BREAKEVEN_PRICE) {
-                budgetStatus = "Surplus";
-            } else if (oilPrice >= 80) {
-                budgetStatus = "Balanced";
-            } else {
-                budgetStatus = "Deficit";
-            }
+            if (oilPrice >= BREAKEVEN_PRICE) budgetStatus = "Surplus";
+            else if (oilPrice >= 80) budgetStatus = "Balanced";
+            else budgetStatus = "Deficit";
 
-            return {
-                annualRevenue,
-                budgetContribution,
-                carbonTaxLiability,
-                totalEmissions,
-                carbonIntensity,
-                viability,
-                viabilityClass,
-                budgetStatus,
-                production,
-                oilPrice,
-                carbonTax,
-                ccsInvestment,
-                petrochemicals
-            };
+            return { annualRevenue, budgetContribution, carbonTaxLiability, totalEmissions, carbonIntensity, viability, viabilityClass, budgetStatus, production, oilPrice, carbonTax, ccsInvestment, petrochemicals };
         }
 
-        // Update display
         function updateDisplay() {
             const metrics = calculateMetrics();
-            
             document.getElementById('revenue').textContent = `$${metrics.annualRevenue.toFixed(0)}B`;
             document.getElementById('budgetContrib').textContent = `${metrics.budgetContribution.toFixed(0)}%`;
             document.getElementById('taxLiability').textContent = `$${metrics.carbonTaxLiability.toFixed(0)}B`;
@@ -992,214 +882,112 @@
             const viabilityEl = document.getElementById('viability');
             viabilityEl.textContent = metrics.viability;
             viabilityEl.className = `output-value ${metrics.viabilityClass}`;
-            
             document.getElementById('budgetStatus').textContent = metrics.budgetStatus;
-            
             updateChart();
         }
 
-        // Update slider displays
         function updateSliderDisplay(id, value, prefix = '', suffix = '') {
             document.getElementById(`${id}-value`).textContent = `${prefix}${value}${suffix}`;
         }
 
-        // Update slider backgrounds
         function updateSliderBackground(slider) {
             const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
             slider.style.background = `linear-gradient(to right, var(--aramco-green) 0%, var(--aramco-green) ${value}%, rgba(255,255,255,0.1) ${value}%, rgba(255,255,255,0.1) 100%)`;
         }
 
-        // Initialize chart
         function initChart() {
             const ctx = document.getElementById('strategyChart').getContext('2d');
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: [],
-                    datasets: [
-                        {
-                            label: 'Revenue ($B)',
-                            data: [],
-                            borderColor: '#00B140',
-                            backgroundColor: 'rgba(0, 177, 64, 0.1)',
-                            yAxisID: 'y',
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Emissions (Mt CO₂e)',
-                            data: [],
-                            borderColor: '#FFB81C',
-                            backgroundColor: 'rgba(255, 184, 28, 0.1)',
-                            yAxisID: 'y1',
-                            tension: 0.4
-                        }
-                    ]
+                    datasets: [{
+                        label: 'Revenue ($B)',
+                        data: [],
+                        borderColor: '#00B140',
+                        backgroundColor: 'rgba(0, 177, 64, 0.1)',
+                        yAxisID: 'y',
+                        tension: 0.4
+                    }, {
+                        label: 'Emissions (Mt CO₂e)',
+                        data: [],
+                        borderColor: '#FFB81C',
+                        backgroundColor: 'rgba(255, 184, 28, 0.1)',
+                        yAxisID: 'y1',
+                        tension: 0.4
+                    }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#ffffff'
-                            }
-                        }
-                    },
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
                     scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Oil Price ($/barrel)',
-                                color: '#ffffff'
-                            },
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y: {
-                            type: 'linear',
-                            display: true,
-                            position: 'left',
-                            title: {
-                                display: true,
-                                text: 'Revenue ($B)',
-                                color: '#00B140'
-                            },
-                            ticks: { color: '#00B140' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y1: {
-                            type: 'linear',
-                            display: true,
-                            position: 'right',
-                            title: {
-                                display: true,
-                                text: 'Emissions (Mt CO₂e)',
-                                color: '#FFB81C'
-                            },
-                            ticks: { color: '#FFB81C' },
-                            grid: { drawOnChartArea: false }
-                        }
+                        x: { title: { display: true, text: 'Oil Price ($/barrel)', color: '#ffffff' }, ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Revenue ($B)', color: '#00B140' }, ticks: { color: '#00B140' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Emissions (Mt CO₂e)', color: '#FFB81C' }, ticks: { color: '#FFB81C' }, grid: { drawOnChartArea: false } }
                     }
                 }
             });
             updateChart();
         }
 
-        // Update chart
         function updateChart() {
             const production = parseFloat(inputs.production.value);
             const carbonTax = parseFloat(inputs.carbonTax.value);
             const ccsInvestment = parseFloat(inputs.ccsInvestment.value);
             const petrochemicals = parseFloat(inputs.petrochemicals.value);
             
-            const labels = [];
-            const revenueData = [];
-            const emissionsData = [];
-            
+            const labels = [], revenueData = [], emissionsData = [];
             for (let price = 40; price <= 150; price += 10) {
                 labels.push(price);
-                
-                const revenue = (production * price * DAYS_PER_YEAR - production * carbonTax * DAYS_PER_YEAR) / 1000;
-                revenueData.push(revenue);
-                
+                revenueData.push((production * price * DAYS_PER_YEAR - production * carbonTax * DAYS_PER_YEAR) / 1000);
                 const scope1 = (production / 10.4) * SCOPE1_BASE;
                 const scope2 = SCOPE2_BASE;
-                const ccsReduction = 1 - (ccsInvestment / 50 * 0.20);
                 const oilShare = 1 - (petrochemicals / 100);
                 const scope3 = production * DAYS_PER_YEAR * oilShare * COMBUSTION_FACTOR / 1000;
-                const total = scope1 + scope2 + scope3;
-                emissionsData.push(total);
+                emissionsData.push(scope1 + scope2 + scope3);
             }
-            
             chart.data.labels = labels;
             chart.data.datasets[0].data = revenueData;
             chart.data.datasets[1].data = emissionsData;
             chart.update('none');
         }
 
-        // Apply scenario
         function applyScenario(scenario) {
             const scenarios = {
-                euTax: {
-                    carbonTax: 60,
-                    europeMarket: 5
-                },
-                lowCarbon: {
-                    ccsInvestment: 25
-                },
-                demandCollapse: {
-                    production: 8,
-                    oilPrice: 65,
-                    petrochemicals: 30
-                },
-                fragmentation: {
-                    asiaMarket: 70,
-                    americasMarket: 20,
-                    europeMarket: 10
-                }
+                euTax: { carbonTax: 60, europeMarket: 5 },
+                lowCarbon: { ccsInvestment: 25 },
+                demandCollapse: { production: 8, oilPrice: 65, petrochemicals: 30 },
+                fragmentation: { asiaMarket: 70, americasMarket: 20, europeMarket: 10 }
             };
-
             const config = scenarios[scenario];
             Object.keys(config).forEach(key => {
                 if (inputs[key]) {
                     inputs[key].value = config[key];
                     updateSliderBackground(inputs[key]);
-                    
-                    const suffixes = {
-                        production: '',
-                        oilPrice: '',
-                        carbonTax: '',
-                        ccsInvestment: 'B',
-                        petrochemicals: '%',
-                        asiaMarket: '%',
-                        europeMarket: '%',
-                        americasMarket: '%'
-                    };
-                    const prefixes = {
-                        oilPrice: '$',
-                        carbonTax: '$',
-                        ccsInvestment: '$'
-                    };
+                    const suffixes = { production: '', oilPrice: '', carbonTax: '', ccsInvestment: 'B', petrochemicals: '%', asiaMarket: '%', europeMarket: '%', americasMarket: '%' };
+                    const prefixes = { oilPrice: '$', carbonTax: '$', ccsInvestment: '$' };
                     updateSliderDisplay(key, config[key], prefixes[key] || '', suffixes[key] || '');
                 }
             });
-            
             updateDisplay();
         }
 
-        // Save strategy
         function saveStrategy() {
-            if (savedStrategies.length >= 3) {
-                alert('Maximum 3 strategies. Clear existing strategies first.');
-                return;
-            }
-            
-            const metrics = calculateMetrics();
-            savedStrategies.push({
-                name: `Strategy ${savedStrategies.length + 1}`,
-                ...metrics
-            });
-            
+            if (savedStrategies.length >= 3) { alert('Maximum 3 strategies. Clear existing strategies first.'); return; }
+            savedStrategies.push({ name: `Strategy ${savedStrategies.length + 1}`, ...calculateMetrics() });
             updateComparisonTable();
         }
 
-        // Update comparison table
         function updateComparisonTable() {
-            const headers = ['strategy1Header', 'strategy2Header', 'strategy3Header'];
-            headers.forEach((id, i) => {
+            ['strategy1Header', 'strategy2Header', 'strategy3Header'].forEach((id, i) => {
                 document.getElementById(id).textContent = savedStrategies[i] ? savedStrategies[i].name : '-';
             });
-            
             if (savedStrategies.length === 0) {
-                document.getElementById('comparisonBody').innerHTML = 
-                    '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">No strategies saved yet</td></tr>';
+                document.getElementById('comparisonBody').innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">No strategies saved yet</td></tr>';
                 return;
             }
-            
             const metrics = [
                 { label: 'Production (M bpd)', key: 'production', decimals: 1 },
                 { label: 'Oil Price ($/bbl)', key: 'oilPrice', decimals: 0, prefix: '$' },
@@ -1209,50 +997,27 @@
                 { label: 'Carbon Intensity', key: 'carbonIntensity', decimals: 1 },
                 { label: 'Viability', key: 'viability' }
             ];
-            
             let html = '';
             metrics.forEach(metric => {
-                html += '<tr>';
-                html += `<td><strong>${metric.label}</strong></td>`;
+                html += '<tr><td><strong>' + metric.label + '</strong></td>';
                 for (let i = 0; i < 3; i++) {
                     if (savedStrategies[i]) {
                         const value = savedStrategies[i][metric.key];
-                        const display = metric.decimals !== undefined 
-                            ? `${metric.prefix || ''}${value.toFixed(metric.decimals)}${metric.suffix || ''}`
-                            : value;
+                        const display = metric.decimals !== undefined ? `${metric.prefix || ''}${value.toFixed(metric.decimals)}${metric.suffix || ''}` : value;
                         html += `<td>${display}</td>`;
-                    } else {
-                        html += '<td>-</td>';
-                    }
+                    } else html += '<td>-</td>';
                 }
                 html += '</tr>';
             });
-            
             document.getElementById('comparisonBody').innerHTML = html;
         }
 
-        // Export CSV
         function exportCSV() {
-            if (savedStrategies.length === 0) {
-                alert('No strategies to export');
-                return;
-            }
-            
+            if (savedStrategies.length === 0) { alert('No strategies to export'); return; }
             let csv = 'Metric,' + savedStrategies.map(s => s.name).join(',') + '\n';
-            const metrics = [
-                ['Production (M bpd)', 'production'],
-                ['Oil Price ($/bbl)', 'oilPrice'],
-                ['Revenue ($B)', 'annualRevenue'],
-                ['Budget Contribution (%)', 'budgetContribution'],
-                ['Emissions (Mt)', 'totalEmissions'],
-                ['Carbon Intensity', 'carbonIntensity'],
-                ['Viability', 'viability']
-            ];
-            
-            metrics.forEach(([label, key]) => {
+            [['Production (M bpd)', 'production'], ['Oil Price ($/bbl)', 'oilPrice'], ['Revenue ($B)', 'annualRevenue'], ['Budget Contribution (%)', 'budgetContribution'], ['Emissions (Mt)', 'totalEmissions'], ['Carbon Intensity', 'carbonIntensity'], ['Viability', 'viability']].forEach(([label, key]) => {
                 csv += label + ',' + savedStrategies.map(s => s[key]).join(',') + '\n';
             });
-            
             const blob = new Blob([csv], { type: 'text/csv' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -1262,143 +1027,67 @@
             URL.revokeObjectURL(url);
         }
 
-        // Initialize scope chart
         function initScopeChart() {
             const ctx = document.getElementById('scopeChart').getContext('2d');
             new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: ['Aramco Emissions'],
-                    datasets: [
-                        {
-                            label: 'Scope 1+2',
-                            data: [68.5],
-                            backgroundColor: '#00B140'
-                        },
-                        {
-                            label: 'Scope 3',
-                            data: [1600],
-                            backgroundColor: '#FFB81C'
-                        }
-                    ]
+                    datasets: [{ label: 'Scope 1+2', data: [68.5], backgroundColor: '#00B140' }, { label: 'Scope 3', data: [1600], backgroundColor: '#FFB81C' }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            labels: { color: '#ffffff' }
-                        },
-                        title: {
-                            display: true,
-                            text: 'Scope 1+2: 68.5 Mt (3.4%) vs Scope 3: 1,600 Mt (96.6%)',
-                            color: '#ffffff'
-                        }
-                    },
+                    plugins: { legend: { labels: { color: '#ffffff' } }, title: { display: true, text: 'Scope 1+2: 68.5 Mt (3.4%) vs Scope 3: 1,600 Mt (96.6%)', color: '#ffffff' } },
                     scales: {
-                        x: {
-                            stacked: true,
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        },
-                        y: {
-                            stacked: true,
-                            title: {
-                                display: true,
-                                text: 'Mt CO₂e',
-                                color: '#ffffff'
-                            },
-                            ticks: { color: '#ffffff' },
-                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                        }
+                        x: { stacked: true, ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        y: { stacked: true, title: { display: true, text: 'Mt CO₂e', color: '#ffffff' }, ticks: { color: '#ffffff' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
                     }
                 }
             });
         }
 
-        // Event listeners
         Object.keys(inputs).forEach(key => {
-            const input = inputs[key];
-            input.addEventListener('input', () => {
+            inputs[key].addEventListener('input', () => {
                 clearTimeout(updateTimeout);
-                
-                const suffixes = {
-                    production: '',
-                    oilPrice: '',
-                    carbonTax: '',
-                    ccsInvestment: 'B',
-                    petrochemicals: '%',
-                    asiaMarket: '%',
-                    europeMarket: '%',
-                    americasMarket: '%'
-                };
-                const prefixes = {
-                    oilPrice: '$',
-                    carbonTax: '$',
-                    ccsInvestment: '$'
-                };
-                
-                updateSliderDisplay(key, input.value, prefixes[key] || '', suffixes[key] || '');
-                updateSliderBackground(input);
-                
+                const suffixes = { production: '', oilPrice: '', carbonTax: '', ccsInvestment: 'B', petrochemicals: '%', asiaMarket: '%', europeMarket: '%', americasMarket: '%' };
+                const prefixes = { oilPrice: '$', carbonTax: '$', ccsInvestment: '$' };
+                updateSliderDisplay(key, inputs[key].value, prefixes[key] || '', suffixes[key] || '');
+                updateSliderBackground(inputs[key]);
                 updateTimeout = setTimeout(updateDisplay, 150);
             });
         });
 
-        // Scenario cards
         document.querySelectorAll('.scenario-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const scenario = card.dataset.scenario;
-                applyScenario(scenario);
-            });
+            card.addEventListener('click', () => applyScenario(card.dataset.scenario));
         });
 
-        // Strategy buttons
         document.getElementById('saveStrategy').addEventListener('click', saveStrategy);
-        document.getElementById('clearStrategies').addEventListener('click', () => {
-            savedStrategies = [];
-            updateComparisonTable();
-        });
+        document.getElementById('clearStrategies').addEventListener('click', () => { savedStrategies = []; updateComparisonTable(); });
         document.getElementById('exportCSV').addEventListener('click', exportCSV);
-
-        // Debate toggle
         document.getElementById('debateToggle').addEventListener('click', () => {
-            const content = document.getElementById('debateContent');
-            content.classList.toggle('active');
+            document.getElementById('debateContent').classList.toggle('active');
         });
 
-        // Initial counter animations on load
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('[data-counter]').forEach(el => {
                 const target = parseFloat(el.dataset.counter);
-                animateCounter(el, target, target % 1 !== 0 ? 1 : 0);
+                let start = 0;
+                const duration = 1000;
+                const startTime = performance.now();
+                function update(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    const current = start + (target - start) * progress;
+                    el.textContent = current.toFixed(target % 1 !== 0 ? 1 : 0);
+                    if (progress < 1) requestAnimationFrame(update);
+                }
+                requestAnimationFrame(update);
             });
-            
-            // Initialize sliders
-            Object.keys(inputs).forEach(key => {
-                updateSliderBackground(inputs[key]);
-            });
-            
+            Object.keys(inputs).forEach(key => updateSliderBackground(inputs[key]));
             initChart();
             initScopeChart();
             updateDisplay();
-        });
-
-        // Intersection Observer for scroll animations
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, { threshold: 0.1 });
-
-        document.querySelectorAll('.insight-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.style.transition = 'all 0.6s ease';
-            observer.observe(card);
         });
     </script>
 </body>
