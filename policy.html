@@ -847,7 +847,556 @@
                     <div class="insight-title">Asymmetric Policy Impacts</div>
                     <div class="insight-desc">Same carbon tax has vastly different effects on NOCs vs IOCs due to different cost structures and national dependencies.</div>
                 </div>
+</div>
+                </div>
                 <div class="insight-card">
-                    <div class="insight-icon">🔀</div>
-                    <div class="insight-title">Multiple Valid Trade-offs</div>
-                    <div class="insight-desc">No single "right" answer. Must balance revenue, climate goals, employment, and energy security simultaneously.
+                    <div class="insight-icon">🎯</div>
+                    <div class="insight-title">Competitive Advantages Shift</div>
+                    <div class="insight-desc">Low carbon intensity becomes competitive edge as carbon pricing expands. Aramco's 9.7 kg/boe vs global average 18 kg/boe matters more.</div>
+                </div>
+                <div class="insight-card">
+                    <div class="insight-icon">🔓</div>
+                    <div class="insight-title">Strategic Optionality</div>
+                    <div class="insight-desc">Preserve multiple pathways. Invest in CCS, petrochemicals, and low-carbon fuels while maintaining core business flexibility.</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Constants
+        const DAYS_PER_YEAR = 365;
+        const SCOPE1_BASE = 56.1;
+        const SCOPE2_BASE = 12.4;
+        const CARBON_INTENSITY_BASE = 9.7;
+        const COMBUSTION_FACTOR = 430;
+        const SAUDI_BUDGET = 336;
+        const BREAKEVEN_PRICE = 90;
+
+        // State
+        let savedStrategies = [];
+        let updateTimeout;
+        let chart;
+
+        // Get elements
+        const inputs = {
+            production: document.getElementById('production'),
+            oilPrice: document.getElementById('oilPrice'),
+            carbonTax: document.getElementById('carbonTax'),
+            ccsInvestment: document.getElementById('ccsInvestment'),
+            petrochemicals: document.getElementById('petrochemicals'),
+            asiaMarket: document.getElementById('asiaMarket'),
+            europeMarket: document.getElementById('europeMarket'),
+            americasMarket: document.getElementById('americasMarket')
+        };
+
+        // Counter animation
+        function animateCounter(element, target, decimals = 0) {
+            const start = parseFloat(element.textContent) || 0;
+            const duration = 1000;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+                const current = start + (target - start) * easeProgress;
+                element.textContent = current.toFixed(decimals);
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            requestAnimationFrame(update);
+        }
+
+        // Calculate metrics
+        function calculateMetrics() {
+            const production = parseFloat(inputs.production.value);
+            const oilPrice = parseFloat(inputs.oilPrice.value);
+            const carbonTax = parseFloat(inputs.carbonTax.value);
+            const ccsInvestment = parseFloat(inputs.ccsInvestment.value);
+            const petrochemicals = parseFloat(inputs.petrochemicals.value);
+
+            // Revenue calculation
+            const annualRevenue = (production * oilPrice * DAYS_PER_YEAR - production * carbonTax * DAYS_PER_YEAR) / 1000;
+            
+            // Carbon tax liability
+            const carbonTaxLiability = (production * carbonTax * DAYS_PER_YEAR) / 1000;
+            
+            // Emissions
+            const scope1Emissions = (production / 10.4) * SCOPE1_BASE;
+            const scope2Emissions = SCOPE2_BASE;
+            const ccsReductionFactor = 1 - (ccsInvestment / 50 * 0.20);
+            const carbonIntensity = CARBON_INTENSITY_BASE * ccsReductionFactor;
+            const oilShare = 1 - (petrochemicals / 100);
+            const scope3Emissions = production * DAYS_PER_YEAR * oilShare * COMBUSTION_FACTOR / 1000;
+            const totalEmissions = scope1Emissions + scope2Emissions + scope3Emissions;
+            
+            // Budget impact
+            const budgetContribution = (annualRevenue / SAUDI_BUDGET) * 100;
+            
+            // Viability
+            let viability, viabilityClass;
+            if (annualRevenue > 250 && budgetContribution > 55) {
+                viability = "High";
+                viabilityClass = "viability-high";
+            } else if (annualRevenue > 180 && budgetContribution > 45) {
+                viability = "Medium";
+                viabilityClass = "viability-medium";
+            } else {
+                viability = "Low";
+                viabilityClass = "viability-low";
+            }
+            
+            // Budget status
+            let budgetStatus;
+            if (oilPrice >= BREAKEVEN_PRICE) {
+                budgetStatus = "Surplus";
+            } else if (oilPrice >= 80) {
+                budgetStatus = "Balanced";
+            } else {
+                budgetStatus = "Deficit";
+            }
+
+            return {
+                annualRevenue,
+                budgetContribution,
+                carbonTaxLiability,
+                totalEmissions,
+                carbonIntensity,
+                viability,
+                viabilityClass,
+                budgetStatus,
+                production,
+                oilPrice,
+                carbonTax,
+                ccsInvestment,
+                petrochemicals
+            };
+        }
+
+        // Update display
+        function updateDisplay() {
+            const metrics = calculateMetrics();
+            
+            document.getElementById('revenue').textContent = `$${metrics.annualRevenue.toFixed(0)}B`;
+            document.getElementById('budgetContrib').textContent = `${metrics.budgetContribution.toFixed(0)}%`;
+            document.getElementById('taxLiability').textContent = `$${metrics.carbonTaxLiability.toFixed(0)}B`;
+            document.getElementById('emissions').textContent = `${metrics.totalEmissions.toFixed(0)} Mt`;
+            document.getElementById('intensity').textContent = metrics.carbonIntensity.toFixed(1);
+            
+            const viabilityEl = document.getElementById('viability');
+            viabilityEl.textContent = metrics.viability;
+            viabilityEl.className = `output-value ${metrics.viabilityClass}`;
+            
+            document.getElementById('budgetStatus').textContent = metrics.budgetStatus;
+            
+            updateChart();
+        }
+
+        // Update slider displays
+        function updateSliderDisplay(id, value, prefix = '', suffix = '') {
+            document.getElementById(`${id}-value`).textContent = `${prefix}${value}${suffix}`;
+        }
+
+        // Update slider backgrounds
+        function updateSliderBackground(slider) {
+            const value = (slider.value - slider.min) / (slider.max - slider.min) * 100;
+            slider.style.background = `linear-gradient(to right, var(--aramco-green) 0%, var(--aramco-green) ${value}%, rgba(255,255,255,0.1) ${value}%, rgba(255,255,255,0.1) 100%)`;
+        }
+
+        // Initialize chart
+        function initChart() {
+            const ctx = document.getElementById('strategyChart').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        {
+                            label: 'Revenue ($B)',
+                            data: [],
+                            borderColor: '#00B140',
+                            backgroundColor: 'rgba(0, 177, 64, 0.1)',
+                            yAxisID: 'y',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Emissions (Mt CO₂e)',
+                            data: [],
+                            borderColor: '#FFB81C',
+                            backgroundColor: 'rgba(255, 184, 28, 0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Oil Price ($/barrel)',
+                                color: '#ffffff'
+                            },
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Revenue ($B)',
+                                color: '#00B140'
+                            },
+                            ticks: { color: '#00B140' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Emissions (Mt CO₂e)',
+                                color: '#FFB81C'
+                            },
+                            ticks: { color: '#FFB81C' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+            updateChart();
+        }
+
+        // Update chart
+        function updateChart() {
+            const production = parseFloat(inputs.production.value);
+            const carbonTax = parseFloat(inputs.carbonTax.value);
+            const ccsInvestment = parseFloat(inputs.ccsInvestment.value);
+            const petrochemicals = parseFloat(inputs.petrochemicals.value);
+            
+            const labels = [];
+            const revenueData = [];
+            const emissionsData = [];
+            
+            for (let price = 40; price <= 150; price += 10) {
+                labels.push(price);
+                
+                const revenue = (production * price * DAYS_PER_YEAR - production * carbonTax * DAYS_PER_YEAR) / 1000;
+                revenueData.push(revenue);
+                
+                const scope1 = (production / 10.4) * SCOPE1_BASE;
+                const scope2 = SCOPE2_BASE;
+                const ccsReduction = 1 - (ccsInvestment / 50 * 0.20);
+                const oilShare = 1 - (petrochemicals / 100);
+                const scope3 = production * DAYS_PER_YEAR * oilShare * COMBUSTION_FACTOR / 1000;
+                const total = scope1 + scope2 + scope3;
+                emissionsData.push(total);
+            }
+            
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = revenueData;
+            chart.data.datasets[1].data = emissionsData;
+            chart.update('none');
+        }
+
+        // Apply scenario
+        function applyScenario(scenario) {
+            const scenarios = {
+                euTax: {
+                    carbonTax: 60,
+                    europeMarket: 5
+                },
+                lowCarbon: {
+                    ccsInvestment: 25
+                },
+                demandCollapse: {
+                    production: 8,
+                    oilPrice: 65,
+                    petrochemicals: 30
+                },
+                fragmentation: {
+                    asiaMarket: 70,
+                    americasMarket: 20,
+                    europeMarket: 10
+                }
+            };
+
+            const config = scenarios[scenario];
+            Object.keys(config).forEach(key => {
+                if (inputs[key]) {
+                    inputs[key].value = config[key];
+                    updateSliderBackground(inputs[key]);
+                    
+                    const suffixes = {
+                        production: '',
+                        oilPrice: '',
+                        carbonTax: '',
+                        ccsInvestment: 'B',
+                        petrochemicals: '%',
+                        asiaMarket: '%',
+                        europeMarket: '%',
+                        americasMarket: '%'
+                    };
+                    const prefixes = {
+                        oilPrice: '$',
+                        carbonTax: '$',
+                        ccsInvestment: '$'
+                    };
+                    updateSliderDisplay(key, config[key], prefixes[key] || '', suffixes[key] || '');
+                }
+            });
+            
+            updateDisplay();
+        }
+
+        // Save strategy
+        function saveStrategy() {
+            if (savedStrategies.length >= 3) {
+                alert('Maximum 3 strategies. Clear existing strategies first.');
+                return;
+            }
+            
+            const metrics = calculateMetrics();
+            savedStrategies.push({
+                name: `Strategy ${savedStrategies.length + 1}`,
+                ...metrics
+            });
+            
+            updateComparisonTable();
+        }
+
+        // Update comparison table
+        function updateComparisonTable() {
+            const headers = ['strategy1Header', 'strategy2Header', 'strategy3Header'];
+            headers.forEach((id, i) => {
+                document.getElementById(id).textContent = savedStrategies[i] ? savedStrategies[i].name : '-';
+            });
+            
+            if (savedStrategies.length === 0) {
+                document.getElementById('comparisonBody').innerHTML = 
+                    '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary);">No strategies saved yet</td></tr>';
+                return;
+            }
+            
+            const metrics = [
+                { label: 'Production (M bpd)', key: 'production', decimals: 1 },
+                { label: 'Oil Price ($/bbl)', key: 'oilPrice', decimals: 0, prefix: '$' },
+                { label: 'Revenue ($B)', key: 'annualRevenue', decimals: 0, prefix: '$', suffix: 'B' },
+                { label: 'Budget Contrib (%)', key: 'budgetContribution', decimals: 0, suffix: '%' },
+                { label: 'Emissions (Mt)', key: 'totalEmissions', decimals: 0, suffix: ' Mt' },
+                { label: 'Carbon Intensity', key: 'carbonIntensity', decimals: 1 },
+                { label: 'Viability', key: 'viability' }
+            ];
+            
+            let html = '';
+            metrics.forEach(metric => {
+                html += '<tr>';
+                html += `<td><strong>${metric.label}</strong></td>`;
+                for (let i = 0; i < 3; i++) {
+                    if (savedStrategies[i]) {
+                        const value = savedStrategies[i][metric.key];
+                        const display = metric.decimals !== undefined 
+                            ? `${metric.prefix || ''}${value.toFixed(metric.decimals)}${metric.suffix || ''}`
+                            : value;
+                        html += `<td>${display}</td>`;
+                    } else {
+                        html += '<td>-</td>';
+                    }
+                }
+                html += '</tr>';
+            });
+            
+            document.getElementById('comparisonBody').innerHTML = html;
+        }
+
+        // Export CSV
+        function exportCSV() {
+            if (savedStrategies.length === 0) {
+                alert('No strategies to export');
+                return;
+            }
+            
+            let csv = 'Metric,' + savedStrategies.map(s => s.name).join(',') + '\n';
+            const metrics = [
+                ['Production (M bpd)', 'production'],
+                ['Oil Price ($/bbl)', 'oilPrice'],
+                ['Revenue ($B)', 'annualRevenue'],
+                ['Budget Contribution (%)', 'budgetContribution'],
+                ['Emissions (Mt)', 'totalEmissions'],
+                ['Carbon Intensity', 'carbonIntensity'],
+                ['Viability', 'viability']
+            ];
+            
+            metrics.forEach(([label, key]) => {
+                csv += label + ',' + savedStrategies.map(s => s[key]).join(',') + '\n';
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'aramco_strategies.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize scope chart
+        function initScopeChart() {
+            const ctx = document.getElementById('scopeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Aramco Emissions'],
+                    datasets: [
+                        {
+                            label: 'Scope 1+2',
+                            data: [68.5],
+                            backgroundColor: '#00B140'
+                        },
+                        {
+                            label: 'Scope 3',
+                            data: [1600],
+                            backgroundColor: '#FFB81C'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#ffffff' }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Scope 1+2: 68.5 Mt (3.4%) vs Scope 3: 1,600 Mt (96.6%)',
+                            color: '#ffffff'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        y: {
+                            stacked: true,
+                            title: {
+                                display: true,
+                                text: 'Mt CO₂e',
+                                color: '#ffffff'
+                            },
+                            ticks: { color: '#ffffff' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listeners
+        Object.keys(inputs).forEach(key => {
+            const input = inputs[key];
+            input.addEventListener('input', () => {
+                clearTimeout(updateTimeout);
+                
+                const suffixes = {
+                    production: '',
+                    oilPrice: '',
+                    carbonTax: '',
+                    ccsInvestment: 'B',
+                    petrochemicals: '%',
+                    asiaMarket: '%',
+                    europeMarket: '%',
+                    americasMarket: '%'
+                };
+                const prefixes = {
+                    oilPrice: '$',
+                    carbonTax: '$',
+                    ccsInvestment: '$'
+                };
+                
+                updateSliderDisplay(key, input.value, prefixes[key] || '', suffixes[key] || '');
+                updateSliderBackground(input);
+                
+                updateTimeout = setTimeout(updateDisplay, 150);
+            });
+        });
+
+        // Scenario cards
+        document.querySelectorAll('.scenario-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const scenario = card.dataset.scenario;
+                applyScenario(scenario);
+            });
+        });
+
+        // Strategy buttons
+        document.getElementById('saveStrategy').addEventListener('click', saveStrategy);
+        document.getElementById('clearStrategies').addEventListener('click', () => {
+            savedStrategies = [];
+            updateComparisonTable();
+        });
+        document.getElementById('exportCSV').addEventListener('click', exportCSV);
+
+        // Debate toggle
+        document.getElementById('debateToggle').addEventListener('click', () => {
+            const content = document.getElementById('debateContent');
+            content.classList.toggle('active');
+        });
+
+        // Initial counter animations on load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-counter]').forEach(el => {
+                const target = parseFloat(el.dataset.counter);
+                animateCounter(el, target, target % 1 !== 0 ? 1 : 0);
+            });
+            
+            // Initialize sliders
+            Object.keys(inputs).forEach(key => {
+                updateSliderBackground(inputs[key]);
+            });
+            
+            initChart();
+            initScopeChart();
+            updateDisplay();
+        });
+
+        // Intersection Observer for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.insight-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
