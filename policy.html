@@ -858,7 +858,7 @@
                 <div class="insight-card">
                     <div class="insight-icon">🔓</div>
                     <div class="insight-title">Strategic Optionality</div>
-                    <div class="insight-desc">Preserve multiple pathways. Invest in CCS, petrochemicals , and low-carbon fuels while maintaining core business flexibility.</div>
+                    <div class="insight-desc">Preserve multiple pathways. Invest in CCS, petrochemicals , , and low-carbon fuels while maintaining core business flexibility.</div>
                 </div>
             </div>
         </section>
@@ -910,13 +910,34 @@
             const tax = parseFloat(document.getElementById('carbonTax').value);
             const ccs = parseFloat(document.getElementById('ccsInvestment').value);
             const petro = parseFloat(document.getElementById('petrochemicals').value);
+            const asia = parseFloat(document.getElementById('asiaMarket').value);
+            const europe = parseFloat(document.getElementById('europeMarket').value);
+            const americas = parseFloat(document.getElementById('americasMarket').value);
 
-            const revenue = (prod * price * DAYS - prod * tax * DAYS) / 1000;
-            const taxLiability = (prod * tax * DAYS) / 1000;
-            const scope1 = (prod / 10.4) * SCOPE1_BASE;
-            const scope2 = SCOPE2_BASE;
+            // Calculate carbon intensity with CCS reduction
             const ccsReduction = 1 - (ccs / 50 * 0.20);
             const intensity = INTENSITY_BASE * ccsReduction;
+
+            // Market share factor (total should be around 100%)
+            const totalMarket = asia + europe + americas;
+            const marketFactor = totalMarket / 100;
+
+            // Low carbon intensity provides pricing premium (up to +$5/bbl at 20% reduction)
+            const intensityPremium = (1 - ccsReduction) * 25; // Max $5 premium
+
+            // Effective price considering market access and intensity premium
+            const effectivePrice = price + intensityPremium;
+
+            // Revenue calculation with market factor
+            const grossRevenue = prod * effectivePrice * DAYS * marketFactor;
+            const carbonTaxCost = prod * tax * DAYS * marketFactor;
+            const revenue = (grossRevenue - carbonTaxCost) / 1000;
+            
+            const taxLiability = carbonTaxCost / 1000;
+            
+            // Emissions calculations
+            const scope1 = (prod / 10.4) * SCOPE1_BASE;
+            const scope2 = SCOPE2_BASE;
             const oilShare = 1 - (petro / 100);
             const scope3 = prod * DAYS * oilShare * COMBUSTION / 1000;
             const totalEmissions = scope1 + scope2 + scope3;
@@ -936,9 +957,9 @@
 
             const status = price >= BREAKEVEN ? "Surplus" : price >= 80 ? "Balanced" : "Deficit";
 
-            document.getElementById('out-revenue').textContent = `$${revenue.toFixed(0)}B`;
+            document.getElementById('out-revenue').textContent = `${revenue.toFixed(0)}B`;
             document.getElementById('out-budget').textContent = `${budgetContrib.toFixed(0)}%`;
-            document.getElementById('out-tax').textContent = `$${taxLiability.toFixed(0)}B`;
+            document.getElementById('out-tax').textContent = `${taxLiability.toFixed(0)}B`;
             document.getElementById('out-emissions').textContent = `${totalEmissions.toFixed(0)} Mt`;
             document.getElementById('out-intensity').textContent = intensity.toFixed(1);
             
@@ -956,19 +977,35 @@
             const tax = parseFloat(document.getElementById('carbonTax').value);
             const ccs = parseFloat(document.getElementById('ccsInvestment').value);
             const petro = parseFloat(document.getElementById('petrochemicals').value);
+            const asia = parseFloat(document.getElementById('asiaMarket').value);
+            const europe = parseFloat(document.getElementById('europeMarket').value);
+            const americas = parseFloat(document.getElementById('americasMarket').value);
 
             const labels = [];
             const revData = [];
             const emData = [];
 
+            // Market factor
+            const totalMarket = asia + europe + americas;
+            const marketFactor = totalMarket / 100;
+
+            // CCS calculations
+            const ccsReduction = 1 - (ccs / 50 * 0.20);
+            const intensityPremium = (1 - ccsReduction) * 25;
+
             for (let p = 40; p <= 150; p += 10) {
                 labels.push(p);
-                const rev = (prod * p * DAYS - prod * tax * DAYS) / 1000;
+                
+                // Revenue with market factor and intensity premium
+                const effectivePrice = p + intensityPremium;
+                const grossRev = prod * effectivePrice * DAYS * marketFactor;
+                const taxCost = prod * tax * DAYS * marketFactor;
+                const rev = (grossRev - taxCost) / 1000;
                 revData.push(rev);
 
+                // Emissions
                 const s1 = (prod / 10.4) * SCOPE1_BASE;
                 const s2 = SCOPE2_BASE;
-                const ccsR = 1 - (ccs / 50 * 0.20);
                 const oilS = 1 - (petro / 100);
                 const s3 = prod * DAYS * oilS * COMBUSTION / 1000;
                 emData.push(s1 + s2 + s3);
@@ -1158,13 +1195,25 @@
             const tax = state.carbonTax;
             const ccs = state.ccsInvestment;
             const petro = state.petrochemicals;
+            const asia = state.asiaMarket;
+            const europe = state.europeMarket;
+            const americas = state.americasMarket;
 
-            const revenue = (prod * price * DAYS - prod * tax * DAYS) / 1000;
-            const taxLiability = (prod * tax * DAYS) / 1000;
-            const scope1 = (prod / 10.4) * SCOPE1_BASE;
-            const scope2 = SCOPE2_BASE;
+            // Calculate with market factor and intensity premium
             const ccsReduction = 1 - (ccs / 50 * 0.20);
             const intensity = INTENSITY_BASE * ccsReduction;
+            const intensityPremium = (1 - ccsReduction) * 25;
+            const totalMarket = asia + europe + americas;
+            const marketFactor = totalMarket / 100;
+            const effectivePrice = price + intensityPremium;
+
+            const grossRevenue = prod * effectivePrice * DAYS * marketFactor;
+            const carbonTaxCost = prod * tax * DAYS * marketFactor;
+            const revenue = (grossRevenue - carbonTaxCost) / 1000;
+            const taxLiability = carbonTaxCost / 1000;
+
+            const scope1 = (prod / 10.4) * SCOPE1_BASE;
+            const scope2 = SCOPE2_BASE;
             const oilShare = 1 - (petro / 100);
             const scope3 = prod * DAYS * oilShare * COMBUSTION / 1000;
             const totalEmissions = scope1 + scope2 + scope3;
