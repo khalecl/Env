@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Footprint Calculator - Oil Field Emissions</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1e3c72;
+            --secondary: #2a5298;
+            --accent: #00d4ff;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3333;
+            --dark: #0a0e27;
+            --light: #f0f4ff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--dark) 0%, #1a2847 50%, var(--primary) 100%);
+            color: #fff;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(42, 82, 152, 0.1) 0%, transparent 50%);
+            animation: gradientShift 15s ease infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                background: 
+                    radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(42, 82, 152, 0.1) 0%, transparent 50%);
+            }
+            50% {
+                background: 
+                    radial-gradient(circle at 80% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(42, 82, 152, 0.1) 0%, transparent 50%);
+            }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .particle::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.6;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            background: linear-gradient(180deg, rgba(30, 60, 114, 0.8) 0%, transparent 100%);
+            border-bottom: 2px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: moveGrid 20s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent) 0%, #00ff88 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            animation: glowPulse 3s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { text-shadow: 0 0 30px rgba(0, 212, 255, 0.3); }
+            50% { text-shadow: 0 0 60px rgba(0, 212, 255, 0.6); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Tab Navigation */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            animation: slideInDown 0.8s ease;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tab-btn {
+            padding: 12px 30px;
+            border: 2px solid var(--accent);
+            background: rgba(30, 60, 114, 0.6);
+            color: var(--accent);
+            cursor: pointer;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            transition: left 0.6s;
+        }
+
+        .tab-btn:hover::before {
+            left: 100%;
+        }
+
+        .tab-btn:hover {
+            background: rgba(0, 212, 255, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+            color: var(--dark);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeInScale 0.6s ease;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards and Panels */
+        .card {
+            background: linear-gradient(135deg, rgba(30, 60, 114, 0.8) 0%, rgba(42, 82, 152, 0.6) 100%);
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            animation: slideInUp 0.8s ease;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(0, 212, 255, 0.1);
+            border-color: var(--success);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .card h2 {
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Input Grid */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .input-group {
+            position: relative;
+            z-index: 1;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            color: var(--accent);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3), inset 0 0 10px rgba(0, 212, 255, 0.05);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(0, 212, 255, 0.4);
+        }
+
+        .unit {
+            display: block;
+            font-size: 0.85rem;
+            color: rgba(0, 212, 255, 0.6);
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* Equation Blocks */
+        .equation-block {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .equation-block:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .equation-title {
+            color: var(--success);
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .equation-content {
+            display: none;
+            margin-top: 15px;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+
+        .equation-content.show {
+            display: block;
+        }
+
+        .formula, .calculation, .result-eq {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 3px solid var(--accent);
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+
+        .formula {
+            border-left-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .calculation {
+            border-left-color: var(--warning);
+            color: #ffdd99;
+        }
+
+        .result-eq {
+            border-left-color: var(--success);
+            color: var(--success);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* Result Boxes */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 255, 136, 0.1) 100%);
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+            animation: popIn 0.6s ease;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .result-box:hover::before {
+            left: 100%;
+        }
+
+        .result-box:hover {
+            transform: translateY(-10px) scale(1.05);
+            border-color: var(--success);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.4), inset 0 0 20px rgba(0, 255, 136, 0.1);
+        }
+
+        .result-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .result-unit {
+            color: rgba(0, 212, 255, 0.6);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Progress Bars */
+        .progress-item {
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--success) 100%);
+            border-radius: 10px;
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Summary Section */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.15) 0%, rgba(0, 255, 136, 0.05) 100%);
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.8s ease 0.2s both;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.2) 0%, transparent 70%);
+            animation: rotate 15s linear infinite;
+        }
+
+        .summary-card h3 {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-value {
+            font-size: 2.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-unit {
+            color: rgba(0, 212, 255, 0.6);
+            font-size: 0.9rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Total CI Highlight */
+        .total-ci-box {
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 255, 136, 0.1) 100%);
+            border: 3px solid var(--accent);
+            border-radius: 20px;
+            padding: 60px 40px;
+            text-align: center;
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+            animation: slideInUp 0.8s ease;
+        }
+
+        .total-ci-box::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(0, 212, 255, 0.1), transparent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .total-ci-label {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .total-ci-value {
+            font-size: 5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--success) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+            animation: scaleUp 0.8s ease;
+        }
+
+        @keyframes scaleUp {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .total-ci-unit {
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+        }
+
+        /* Performance Badge */
+        .performance-badge {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+            animation: fadeInScale 0.6s ease 0.3s both;
+        }
+
+        .badge-excellent {
+            background: linear-gradient(135deg, var(--success) 0%, #00dd77 100%);
+            color: var(--dark);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .badge-good {
+            background: linear-gradient(135deg, var(--accent) 0%, #00ddff 100%);
+            color: var(--dark);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .badge-higher {
+            background: linear-gradient(135deg, var(--warning) 0%, var(--danger) 100%);
+            color: var(--dark);
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .total-ci-value {
+                font-size: 3rem;
+            }
+
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Particles -->
+    <script>
+        function createParticles() {
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `float ${5 + Math.random() * 10}s infinite ease-in-out`;
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                document.body.appendChild(particle);
+            }
+        }
+        createParticles();
+    </script>
+
+    <header>
+        <h1>⚡ CARBON FOOTPRINT CALCULATOR ⚡</h1>
+        <p class="subtitle">Saudi Arabian Onshore Oil Field - Scope 1 Emissions Analysis</p>
+    </header>
+
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('inputs')">Inputs</button>
+            <button class="tab-btn" onclick="switchTab('mass')">Mass Balance</button>
+            <button class="tab-btn" onclick="switchTab('energy')">Energy Balance</button>
+            <button class="tab-btn" onclick="switchTab('emissions')">Emissions</button>
+            <button class="tab-btn" onclick="switchTab('summary')">Summary</button>
+        </div>
+
+        <!-- INPUTS TAB -->
+        <div id="inputs" class="tab-content active">
+            <div class="card">
+                <h2>🛢️ Field Parameters</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Daily Oil Production</label>
+                        <input type="number" id="q_oil" value="100000" min="10000" max="500000">
+                        <span class="unit">bbl/day</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Gas-to-Oil Ratio</label>
+                        <input type="number" id="gor" value="800" min="200" max="2000">
+                        <span class="unit">scf/bbl</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Water Cut</label>
+                        <input type="number" id="wc" value="30" min="0" max="80">
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Oil Gravity</label>
+                        <input type="number" id="api" value="30" min="10" max="50" step="0.1">
+                        <span class="unit">°API</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Days per Year</label>
+                        <input type="number" id="days" value="365" min="300" max="365">
+                        <span class="unit">days</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>💨 Gas Disposition</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Gas Utilization</label>
+                        <input type="number" id="util" value="98" min="50" max="100">
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Flaring Rate</label>
+                        <input type="number" id="flaring" value="2" min="0" max="20">
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="input-group">
+                        <label>Fugitive Loss Rate</label>
+                        <input type="number" id="fugitive" value="0.5" min="0" max="5" step="0.1">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>⚙️ Energy & Emissions Settings</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label>Turbine Efficiency</label>
+                        <input type="number" id="turbine_eff" value="30" min="20" max="40" step="0.1">
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="input-group">
+                        <label>CH₄ Composition</label>
+                        <input type="number" id="ch4_mole" value="75" min="60" max="85" step="0.1">
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="input-group">
+                        <label>C₂H₆ Composition</label>
+                        <input type="number" id="c2h6_mole" value="12" min="5" max="20" step="0.1">
+                        <span class="unit">%</span>
+                    </div>
+                    <div class="input-group">
+                        <label>EF CO₂</label>
+                        <input type="number" id="ef_co2" value="53.06" min="50" max="55" step="0.01">
+                        <span class="unit">kg CO₂/MMBTU</span>
+                    </div>
+                    <div class="input-group">
+                        <label>GWP CH₄ (AR6)</label>
+                        <input type="number" id="gwp_ch4" value="28" min="25" max="34" step="0.1">
+                        <span class="unit"></span>
+                    </div>
+                    <div class="input-group">
+                        <label>Flare Efficiency</label>
+                        <input type="number" id="flare_eff" value="95" min="85" max="99" step="0.1">
+                        <span class="unit">%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MASS BALANCE TAB -->
+        <div id="mass" class="tab-content">
+            <div class="card">
+                <h2>📊 Section 2: Mass Balance Calculations</h2>
+                
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Annual Oil Production
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Annual Oil = Q_oil × D_year</div>
+                        <div class="calculation" id="calc_annual_oil"></div>
+                        <div class="result-eq" id="result_annual_oil"></div>
+                    </div>
+                </div>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Oil Density from API Gravity
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">ρ_oil = [141.5 / (API + 131.5)] × 1000</div>
+                        <div class="calculation" id="calc_oil_density"></div>
+                        <div class="result-eq" id="result_oil_density"></div>
+                    </div>
+                </div>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Raw Gas Volume Production
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Raw Gas Vol = Q_oil × GOR × (1/1e6)</div>
+                        <div class="calculation" id="calc_raw_gas_vol"></div>
+                        <div class="result-eq" id="result_raw_gas_vol"></div>
+                    </div>
+                </div>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Raw Gas Mass (All Disposition Routes)
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Raw Gas Mass = Vol × 1e6 × ρ_gas / 1000</div>
+                        <div class="calculation" id="calc_raw_gas_mass"></div>
+                        <div class="result-eq" id="result_raw_gas_mass"></div>
+                    </div>
+                </div>
+
+                <div class="results-grid">
+                    <div class="result-box">
+                        <div class="result-label">Utilized Gas</div>
+                        <div class="result-value" id="util_gas">0</div>
+                        <div class="result-unit">tonnes/day</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Flared Gas</div>
+                        <div class="result-value" id="flare_gas">0</div>
+                        <div class="result-unit">tonnes/day</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Fugitive Gas</div>
+                        <div class="result-value" id="fugitive_gas">0</div>
+                        <div class="result-unit">tonnes/day</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ENERGY BALANCE TAB -->
+        <div id="energy" class="tab-content">
+            <div class="card">
+                <h2>🔥 Section 3: Energy Balance Calculations</h2>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Weighted Higher Heating Value (HHV)
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">HHV = Σ(Mole% × HHV_component) / 100</div>
+                        <div class="calculation" id="calc_hhv"></div>
+                        <div class="result-eq" id="result_hhv"></div>
+                    </div>
+                </div>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Daily Thermal Energy Input
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Daily Thermal = Util Gas Vol × HHV</div>
+                        <div class="calculation" id="calc_thermal"></div>
+                        <div class="result-eq" id="result_thermal"></div>
+                    </div>
+                </div>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Net Electrical Work Output
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Elec Work = Daily Thermal × η_turbine</div>
+                        <div class="calculation" id="calc_elec"></div>
+                        <div class="result-eq" id="result_elec"></div>
+                    </div>
+                </div>
+
+                <div class="results-grid">
+                    <div class="result-box">
+                        <div class="result-label">HHV</div>
+                        <div class="result-value" id="hhv_display">0</div>
+                        <div class="result-unit">Btu/scf</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Daily Thermal Energy</div>
+                        <div class="result-value" id="thermal_display">0</div>
+                        <div class="result-unit">MMBTU/day</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Electrical Output</div>
+                        <div class="result-value" id="elec_display">0</div>
+                        <div class="result-unit">MMBTU/day</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EMISSIONS TAB -->
+        <div id="emissions" class="tab-content">
+            <div class="card">
+                <h2>💨 Section 4: Scope 1 GHG Emissions</h2>
+
+                <h3 style="color: var(--accent); margin-top: 30px; font-size: 1.3rem;">4A: COMBUSTION EMISSIONS</h3>
+                
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Daily CO₂ from Combustion
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Daily CO₂ = Daily Thermal × EF_CO₂</div>
+                        <div class="calculation" id="calc_co2_comb"></div>
+                        <div class="result-eq" id="result_co2_comb"></div>
+                    </div>
+                </div>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        CH₄ Emissions in CO₂-equivalent
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">CH₄ CO₂e = (Daily Thermal × EF_CH₄) × GWP_CH₄</div>
+                        <div class="calculation" id="calc_ch4_comb"></div>
+                        <div class="result-eq" id="result_ch4_comb"></div>
+                    </div>
+                </div>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Total Combustion per Barrel
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Comb CO₂e/bbl = (CO₂ + CH₄·GWP + N₂O·GWP) / Q_oil</div>
+                        <div class="calculation" id="calc_comb_total"></div>
+                        <div class="result-eq" id="result_comb_total"></div>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--warning); margin-top: 30px; font-size: 1.3rem;">4B: FLARING EMISSIONS</h3>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Flare Energy Content
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Flare Energy = Flared Vol × HHV / 1e6</div>
+                        <div class="calculation" id="calc_flare_energy"></div>
+                        <div class="result-eq" id="result_flare_energy"></div>
+                    </div>
+                </div>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Total Flaring per Barrel
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Flare CO₂e/bbl = (CO₂ + Uncombusted CH₄·GWP) / Q_oil</div>
+                        <div class="calculation" id="calc_flare_total"></div>
+                        <div class="result-eq" id="result_flare_total"></div>
+                    </div>
+                </div>
+
+                <h3 style="color: #ffdd00; margin-top: 30px; font-size: 1.3rem;">4C: FUGITIVE EMISSIONS</h3>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Fugitive Emissions per Barrel
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Fugitive CO₂e/bbl = (Fugitive Mass × 0.75 × GWP) / Q_oil</div>
+                        <div class="calculation" id="calc_fugitive_total"></div>
+                        <div class="result-eq" id="result_fugitive_total"></div>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--danger); margin-top: 30px; font-size: 1.3rem;">4D: VENTING EMISSIONS</h3>
+
+                <div class="equation-block" onclick="toggleEq(this)">
+                    <div class="equation-title">
+                        Venting Emissions per Barrel
+                        <span>▼</span>
+                    </div>
+                    <div class="equation-content">
+                        <div class="formula">Vent CO₂e/bbl = (Breathing × 0.65 × GWP) / Q_oil</div>
+                        <div class="calculation" id="calc_venting_total"></div>
+                        <div class="result-eq" id="result_venting_total"></div>
+                    </div>
+                </div>
+
+                <div class="results-grid">
+                    <div class="result-box">
+                        <div class="result-label">Combustion</div>
+                        <div class="result-value" id="comb_display">0</div>
+                        <div class="result-unit">kg CO₂e/bbl</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Flaring</div>
+                        <div class="result-value" id="flare_display">0</div>
+                        <div class="result-unit">kg CO₂e/bbl</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Fugitive</div>
+                        <div class="result-value" id="fugitive_display">0</div>
+                        <div class="result-unit">kg CO₂e/bbl</div>
+                    </div>
+                    <div class="result-box">
+                        <div class="result-label">Venting</div>
+                        <div class="result-value" id="venting_display">0</div>
+                        <div class="result-unit">kg CO₂e/bbl</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMMARY TAB -->
+        <div id="summary" class="tab-content">
+            <div class="total-ci-box">
+                <div class="total-ci-label">🎯 Total Carbon Intensity</div>
+                <div class="total-ci-value" id="total_ci">0.00</div>
+                <div class="total-ci-unit">kg CO₂e/bbl oil</div>
+                <div class="performance-badge" id="badge"></div>
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Annual Scope 1 Emissions</h3>
+                    <div class="summary-value" id="annual_emissions">0.00</div>
+                    <div class="summary-unit">Mtonne CO₂e/year</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Annual Oil Production</h3>
+                    <div class="summary-value" id="annual_oil_display">0.00</div>
+                    <div class="summary-unit">MMbbl/year</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Performance Tier</h3>
+                    <div class="summary-value" id="perf_tier">—</div>
+                    <div class="summary-unit">vs Global Average</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📈 Emissions Breakdown by Source</h2>
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>Combustion</span>
+                        <span id="comb_pct">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="comb_bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>Flaring</span>
+                        <span id="flare_pct">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="flare_bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>Fugitive</span>
+                        <span id="fugitive_pct">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="fugitive_bar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="progress-item">
+                    <div class="progress-label">
+                        <span>Venting</span>
+                        <span id="venting_pct">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="venting_bar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📋 Scenario Summary</h2>
+                <div class="input-grid">
+                    <div style="position: relative; z-index: 1;">
+                        <p style="color: var(--accent); font-weight: 600; margin-bottom: 10px;">Daily Production</p>
+                        <p style="font-size: 1.3rem; color: var(--success);" id="summary_q_oil">100,000 bbl/day</p>
+                    </div>
+                    <div style="position: relative; z-index: 1;">
+                        <p style="color: var(--accent); font-weight: 600; margin-bottom: 10px;">Gas-to-Oil Ratio</p>
+                        <p style="font-size: 1.3rem; color: var(--success);" id="summary_gor">800 scf/bbl</p>
+                    </div>
+                    <div style="position: relative; z-index: 1;">
+                        <p style="color: var(--accent); font-weight: 600; margin-bottom: 10px;">Utilization Rate</p>
+                        <p style="font-size: 1.3rem; color: var(--success);" id="summary_util">98%</p>
+                    </div>
+                    <div style="position: relative; z-index: 1;">
+                        <p style="color: var(--accent); font-weight: 600; margin-bottom: 10px;">Flaring Rate</p>
+                        <p style="font-size: 1.3rem; color: var(--success);" id="summary_flaring">2%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GAS_DENSITY = 0.0424;
+        const CH4_MASS_FRAC_GAS = 0.73;
+        const CH4_MASS_FRAC_FUGITIVE = 0.75;
+        const BREATHING_CH4_EQUIV = 0.65;
+        const LB_TO_KG = 0.453592;
+        const SCF_TO_MMscf = 1e-6;
+
+        function getInputs() {
+            return {
+                q_oil: parseFloat(document.getElementById('q_oil').value),
+                gor: parseFloat(document.getElementById('gor').value),
+                wc: parseFloat(document.getElementById('wc').value),
+                api: parseFloat(document.getElementById('api').value),
+                util: parseFloat(document.getElementById('util').value),
+                flaring: parseFloat(document.getElementById('flaring').value),
+                fugitive: parseFloat(document.getElementById('fugitive').value),
+                days: parseFloat(document.getElementById('days').value),
+                turbine_eff: parseFloat(document.getElementById('turbine_eff').value),
+                ch4_mole: parseFloat(document.getElementById('ch4_mole').value),
+                c2h6_mole: parseFloat(document.getElementById('c2h6_mole').value),
+                c3h8_mole: parseFloat(document.getElementById('c3h8_mole').value),
+                ef_co2: parseFloat(document.getElementById('ef_co2').value),
+                gwp_ch4: parseFloat(document.getElementById('gwp_ch4').value),
+                flare_eff: parseFloat(document.getElementById('flare_eff').value),
+            };
+        }
+
+        function calculate() {
+            const inp = getInputs();
+
+            // Section 2: Mass Balance
+            const annualOil = inp.q_oil * inp.days;
+            const oilDensity = (141.5 / (inp.api + 131.5)) * 1000;
+            const rawGasVolume = inp.q_oil * inp.gor * SCF_TO_MMscf;
+            const rawGasMass = rawGasVolume * 1e6 * GAS_DENSITY / 1000;
+            const utilGas = rawGasMass * (inp.util / 100);
+            const flareGas = rawGasMass * (inp.flaring / 100);
+            const fugitiveGas = rawGasMass * (inp.fugitive / 100);
+
+            // Section 3: Energy
+            const hhv = (inp.ch4_mole * 1011 + inp.c2h6_mole * 1770 + inp.c3h8_mole * 2516) / 100;
+            const utilGasVolume = inp.q_oil * inp.gor * inp.util / 100 * SCF_TO_MMscf;
+            const dailyThermalEnergy = utilGasVolume * 1e6 * hhv / 1e6;
+            const electricalWork = dailyThermalEnergy * (inp.turbine_eff / 100);
+
+            // Section 4: Emissions
+            const dailyCO2_comb = dailyThermalEnergy * inp.ef_co2;
+            const comb_co2e_day = dailyCO2_comb;
+            const comb_co2e_bbl = comb_co2e_day / inp.q_oil;
+
+            const flareEnergy = (inp.q_oil * inp.gor * inp.flaring / 100) * hhv / 1e6;
+            const combustedEnergy = flareEnergy * (inp.flare_eff / 100);
+            const flare_co2_kg = combustedEnergy * inp.ef_co2;
+            const uncombusted = 1 - inp.flare_eff / 100;
+            const flare_ch4_kg = flareGas * CH4_MASS_FRAC_GAS * uncombusted;
+            const flare_co2e_day = flare_co2_kg + (flare_ch4_kg * inp.gwp_ch4);
+            const flare_co2e_bbl = flare_co2e_day / inp.q_oil;
+
+            const fugitive_ch4_kg = fugitiveGas * CH4_MASS_FRAC_FUGITIVE;
+            const fugitive_co2e_day = fugitive_ch4_kg * inp.gwp_ch4;
+            const fugitive_co2e_bbl = fugitive_co2e_day / inp.q_oil;
+
+            const breathing_loss_kg = inp.q_oil * 0.0015 * LB_TO_KG;
+            const venting_ch4_kg = breathing_loss_kg * BREATHING_CH4_EQUIV;
+            const venting_co2e_day = venting_ch4_kg * inp.gwp_ch4;
+            const venting_co2e_bbl = venting_co2e_day / inp.q_oil;
+
+            const totalCI = comb_co2e_bbl + flare_co2e_bbl + fugitive_co2e_bbl + venting_co2e_bbl;
+            const annualEmissions = totalCI * annualOil / 1000;
+
+            // Update Mass Balance Display
+            document.getElementById('calc_annual_oil').textContent = `${inp.q_oil.toLocaleString()} × ${inp.days} = ${(inp.q_oil * inp.days).toLocaleString()}`;
+            document.getElementById('result_annual_oil').textContent = `Result: ${annualOil.toLocaleString()} bbl/year`;
+            document.getElementById('util_gas').textContent = utilGas.toFixed(2);
+            document.getElementById('flare_gas').textContent = flareGas.toFixed(2);
+            document.getElementById('fugitive_gas').textContent = fugitiveGas.toFixed(2);
+
+            // Update Energy Display
+            document.getElementById('calc_hhv').textContent = `[${inp.ch4_mole}% × 1011 + ${inp.c2h6_mole}% × 1770 + ${inp.c3h8_mole}% × 2516] / 100`;
+            document.getElementById('result_hhv').textContent = `Result: ${hhv.toFixed(1)} Btu/scf`;
+            document.getElementById('hhv_display').textContent = hhv.toFixed(1);
+            document.getElementById('thermal_display').textContent = dailyThermalEnergy.toFixed(0);
+            document.getElementById('elec_display').textContent = electricalWork.toFixed(0);
+
+            // Update Emissions Display
+            document.getElementById('calc_co2_comb').textContent = `${dailyThermalEnergy.toFixed(0)} × ${inp.ef_co2}`;
+            document.getElementById('result_co2_comb').textContent = `Result: ${dailyCO2_comb.toFixed(0)} kg CO₂/day`;
+            document.getElementById('comb_display').textContent = comb_co2e_bbl.toFixed(2);
+            document.getElementById('flare_display').textContent = flare_co2e_bbl.toFixed(2);
+            document.getElementById('fugitive_display').textContent = fugitive_co2e_bbl.toFixed(2);
+            document.getElementById('venting_display').textContent = venting_co2e_bbl.toFixed(2);
+
+            // Update Summary
+            document.getElementById('total_ci').textContent = totalCI.toFixed(2);
+            document.getElementById('annual_emissions').textContent = annualEmissions.toFixed(2);
+            document.getElementById('annual_oil_display').textContent = (annualOil / 1e6).toFixed(1);
+            document.getElementById('summary_q_oil').textContent = inp.q_oil.toLocaleString() + ' bbl/day';
+            document.getElementById('summary_gor').textContent = inp.gor + ' scf/bbl';
+            document.getElementById('summary_util').textContent = inp.util + '%';
+            document.getElementById('summary_flaring').textContent = inp.flaring + '%';
+
+            // Performance tier
+            let tier, badgeClass;
+            if (totalCI < 8) {
+                tier = 'EXCELLENT';
+                badgeClass = 'badge-excellent';
+            } else if (totalCI < 12) {
+                tier = 'GOOD';
+                badgeClass = 'badge-good';
+            } else {
+                tier = 'HIGHER';
+                badgeClass = 'badge-higher';
+            }
+            document.getElementById('perf_tier').textContent = tier;
+            const badge = document.getElementById('badge');
+            badge.textContent = tier;
+            badge.className = 'performance-badge ' + badgeClass;
+
+            // Progress bars
+            const total = comb_co2e_bbl + flare_co2e_bbl + fugitive_co2e_bbl + venting_co2e_bbl;
+            document.getElementById('comb_bar').style.width = ((comb_co2e_bbl / total) * 100) + '%';
+            document.getElementById('flare_bar').style.width = ((flare_co2e_bbl / total) * 100) + '%';
+            document.getElementById('fugitive_bar').style.width = ((fugitive_co2e_bbl / total) * 100) + '%';
+            document.getElementById('venting_bar').style.width = ((venting_co2e_bbl / total) * 100) + '%';
+            document.getElementById('comb_pct').textContent = ((comb_co2e_bbl / total) * 100).toFixed(1) + '%';
+            document.getElementById('flare_pct').textContent = ((flare_co2e_bbl / total) * 100).toFixed(1) + '%';
+            document.getElementById('fugitive_pct').textContent = ((fugitive_co2e_bbl / total) * 100).toFixed(1) + '%';
+            document.getElementById('venting_pct').textContent = ((venting_co2e_bbl / total) * 100).toFixed(1) + '%';
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function toggleEq(element) {
+            const content = element.querySelector('.equation-content');
+            content.classList.toggle('show');
+            const arrow = element.querySelector('.equation-title span');
+            arrow.style.transform = content.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0)';
+        }
+
+        // Event listeners
+        ['q_oil', 'gor', 'wc', 'api', 'util', 'flaring', 'fugitive', 'days', 'turbine_eff', 'ch4_mole', 'c2h6_mole', 'c3h8_mole', 'ef_co2', 'gwp_ch4', 'flare_eff'].forEach(id => {
+            document.getElementById(id).addEventListener('input', calculate);
+        });
+
+        calculate();
+    </script>
+</body>
+</html>
