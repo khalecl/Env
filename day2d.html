@@ -55,6 +55,83 @@
             }
         }
 
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) translateY(50px);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.95);
+            }
+            100% {
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes glow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(30, 64, 175, 0.3), 0 4px 12px rgba(0,0,0,0.08);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(30, 64, 175, 0.6), 0 8px 24px rgba(0,0,0,0.12);
+            }
+        }
+
+        @keyframes pulse-intense {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes flip {
+            from {
+                opacity: 0;
+                transform: rotateY(90deg);
+            }
+            to {
+                opacity: 1;
+                transform: rotateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
         .header-content {
             max-width: 1400px;
             margin: 0 auto;
@@ -94,6 +171,21 @@
             font-size: 1.5rem;
             color: var(--border);
             font-weight: 300;
+        }
+
+        /* Animated Badge */
+        .animated-badge {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            animation: pulse-intense 1.5s ease-in-out infinite, slideInRight 0.8s ease-out;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+            text-transform: uppercase;
         }
 
         .nav-menu {
@@ -209,6 +301,25 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border-left: 4px solid var(--border);
             animation: fadeInUp 0.6s ease-out both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .topic-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
         }
 
         @for $i from 1 to 6 {
@@ -218,8 +329,8 @@
         }
 
         .topic-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            transform: translateY(-12px) rotateX(5deg);
+            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.2);
             border-left-color: var(--primary);
         }
 
@@ -242,6 +353,8 @@
             font-weight: 700;
             margin-bottom: 1rem;
             font-size: 1.2rem;
+            animation: glow 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(30, 64, 175, 0.4);
         }
 
         .topic-card.active .topic-number {
@@ -265,7 +378,16 @@
             color: rgba(255,255,255,0.9);
         }
 
-        /* Content Section */
+        @keyframes countUp {
+            from {
+                counter-increment: count 0;
+            }
+            to {
+                counter-increment: count var(--count);
+            }
+        }
+
+        /* Enhanced Content Section */
         .content-section {
             background: var(--white);
             border-radius: 12px;
@@ -274,6 +396,7 @@
             margin-bottom: 2rem;
             display: none;
             animation: fadeIn 0.4s ease-out;
+            border-top: 4px solid var(--primary);
         }
 
         @keyframes fadeIn {
@@ -325,6 +448,25 @@
             border-radius: 8px;
             padding: 2rem;
             margin: 2rem 0;
+            animation: slideInRight 0.6s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .activity::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(8, 145, 178, 0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(20px, -20px); }
         }
 
         .activity-title {
@@ -335,6 +477,9 @@
             font-weight: 600;
             color: var(--primary);
             margin-bottom: 1rem;
+            animation: bounceIn 0.6s ease-out;
+            position: relative;
+            z-index: 1;
         }
 
         .activity-icon {
@@ -347,6 +492,13 @@
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
+            animation: spin 2s linear infinite;
+            flex-shrink: 0;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         /* Form Elements */
@@ -380,7 +532,8 @@
         select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1), 0 0 20px rgba(30, 64, 175, 0.3);
+            transform: scale(1.01);
         }
 
         textarea {
@@ -406,6 +559,39 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+        }
+
+        .btn-primary:active::after {
+            width: 300px;
+            height: 300px;
+            animation: ripple 0.6s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
+            }
         }
 
         .btn-primary:hover {
@@ -480,6 +666,7 @@
             display: flex;
             align-items: flex-start;
             gap: 1rem;
+            animation: slideInRight 0.5s ease-out;
         }
 
         .alert-icon {
@@ -512,6 +699,25 @@
             padding: 1.5rem;
             border-radius: 8px;
             margin: 2rem 0;
+            animation: slideInRight 0.6s ease-out;
+            box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+            position: relative;
+        }
+
+        .deliverable::before {
+            content: '★';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            font-size: 2.5rem;
+            color: var(--warning);
+            opacity: 0.3;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
         }
 
         .deliverable h4 {
@@ -765,9 +971,13 @@
         <!-- Overview Section -->
         <section class="content-section active" id="topic-0">
             <div class="hero">
-                <h1>Water Transmission Pump Training</h1>
-                <p>Failure Analysis, Reliability Engineering & Maintenance Strategy</p>
-                <p style="font-size: 0.95rem; color: var(--text-light);">Day 3 Curriculum: Managing Multiple OMs for Water Operations</p>
+                <div style="margin-bottom: 1.5rem;">
+                    <div class="animated-badge">⚡ INTENSIVE TRAINING</div>
+                </div>
+                <h1 style="font-size: 3.5rem; animation: bounceIn 0.8s ease-out;">Water Transmission Pump Training</h1>
+                <p style="font-size: 1.3rem; margin-bottom: 0.5rem; animation: fadeInDown 0.8s ease-out 0.2s both;">Failure Analysis, Reliability Engineering & Maintenance Strategy</p>
+                <p style="font-size: 1.1rem; color: var(--accent); font-weight: 600; animation: fadeInDown 0.8s ease-out 0.3s both;">⏱️ 90 Minutes to Complete (Accelerated Path)</p>
+                <p style="font-size: 0.95rem; color: var(--text-light); animation: fadeInDown 0.8s ease-out 0.4s both;">Master all 5 topics with hands-on activities</p>
                 <div class="progress-indicator" id="progressIndicator"></div>
             </div>
 
@@ -780,32 +990,32 @@
                     </div>
                 </div>
 
-                <h3 style="margin-top: 2rem;">Training Path (6 Hours)</h3>
+                <h3 style="margin-top: 2rem;">Accelerated Training Path (90 Minutes)</h3>
                 <div class="topics-grid">
                     <div class="topic-card" data-topic="1">
                         <div class="topic-number">1</div>
-                        <div class="topic-title">Failure Analysis (45 min)</div>
-                        <div class="topic-desc">Why do water pumps fail? Learn cavitation, corrosion, and pressure cycling failures specific to water systems.</div>
+                        <div class="topic-title">Failure Analysis</div>
+                        <div class="topic-desc"><strong>12 min:</strong> Why water pumps fail. Cavitation, corrosion, pressure cycling.</div>
                     </div>
                     <div class="topic-card" data-topic="2">
                         <div class="topic-number">2</div>
-                        <div class="topic-title">Reliability Concepts (45 min)</div>
-                        <div class="topic-desc">Measure reliability: MTBF, MTTR, Availability, and Criticality. Understand why consequence matters.</div>
+                        <div class="topic-title">Reliability Concepts</div>
+                        <div class="topic-desc"><strong>12 min:</strong> MTBF, MTTR, Availability, Criticality—measure YOUR system.</div>
                     </div>
                     <div class="topic-card" data-topic="3">
                         <div class="topic-number">3</div>
-                        <div class="topic-title">Root Cause Analysis (30 min)</div>
-                        <div class="topic-desc">Go beyond symptoms to find root causes using Five Whys methodology.</div>
+                        <div class="topic-title">Root Cause Analysis</div>
+                        <div class="topic-desc"><strong>10 min:</strong> Five Whys method—find multi-layer causes.</div>
                     </div>
                     <div class="topic-card" data-topic="4">
                         <div class="topic-number">4</div>
-                        <div class="topic-title">FMEA (60 min)</div>
-                        <div class="topic-desc">Identify which failures matter most using RPN scoring.</div>
+                        <div class="topic-title">FMEA</div>
+                        <div class="topic-desc"><strong>20 min:</strong> RPN scoring—which failures matter most.</div>
                     </div>
                     <div class="topic-card" data-topic="5">
                         <div class="topic-number">5</div>
-                        <div class="topic-title">RCM Methodology (90 min)</div>
-                        <div class="topic-desc">Build a unified maintenance strategy that bridges multiple OMs.</div>
+                        <div class="topic-title">RCM Methodology</div>
+                        <div class="topic-desc"><strong>24 min:</strong> Build unified maintenance strategy.</div>
                     </div>
                 </div>
 
@@ -1448,28 +1658,28 @@ Equipment: _________________ OM Manufacturer: __________________
 
             <h3 style="margin-top: 2rem;">Your Deliverables Checklist</h3>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
-                <div style="padding: 1.5rem; border: 2px solid var(--success); border-radius: 8px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">✓</div>
+                <div style="padding: 1.5rem; border: 2px solid var(--success); border-radius: 8px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); animation: slideInRight 0.5s ease-out; transform-origin: left;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem; animation: bounce 1s ease-in-out infinite;">✓</div>
                     <div style="font-weight: 600; color: var(--success);">Failure Analysis Worksheet</div>
                     <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">Identify YOUR failure modes</div>
                 </div>
-                <div style="padding: 1.5rem; border: 2px solid var(--success); border-radius: 8px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">✓</div>
+                <div style="padding: 1.5rem; border: 2px solid var(--success); border-radius: 8px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); animation: slideInRight 0.5s ease-out 0.1s both; transform-origin: left;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem; animation: bounce 1s ease-in-out infinite 0.2s;">✓</div>
                     <div style="font-weight: 600; color: var(--success);">Criticality Matrix</div>
                     <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">Understand YOUR pump priorities</div>
                 </div>
-                <div style="padding: 1.5rem; border: 2px solid var(--success); border-radius: 8px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">✓</div>
+                <div style="padding: 1.5rem; border: 2px solid var(--success); border-radius: 8px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); animation: slideInRight 0.5s ease-out 0.2s both; transform-origin: left;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem; animation: bounce 1s ease-in-out infinite 0.4s;">✓</div>
                     <div style="font-weight: 600; color: var(--success);">RCA Report</div>
                     <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">Find multi-layer root causes</div>
                 </div>
-                <div style="padding: 1.5rem; border: 2px solid var(--success); border-radius: 8px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">✓</div>
+                <div style="padding: 1.5rem; border: 2px solid var(--success); border-radius: 8px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); animation: slideInRight 0.5s ease-out 0.3s both; transform-origin: left;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem; animation: bounce 1s ease-in-out infinite 0.6s;">✓</div>
                     <div style="font-weight: 600; color: var(--success);">FMEA Matrix</div>
                     <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">Score YOUR risk priorities</div>
                 </div>
-                <div style="padding: 1.5rem; border: 2px solid var(--success); border-radius: 8px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">✓</div>
+                <div style="padding: 1.5rem; border: 2px solid var(--success); border-radius: 8px; background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); animation: slideInRight 0.5s ease-out 0.4s both; transform-origin: left;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem; animation: bounce 1s ease-in-out infinite 0.8s;">✓</div>
                     <div style="font-weight: 600; color: var(--success);">RCM Strategy Document</div>
                     <div style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.5rem;">Unified maintenance approach</div>
                 </div>
