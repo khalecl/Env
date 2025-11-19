@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activity 1: Function ESG Diagnostic - Data Collection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #004972 0%, #005a94 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .logo-bar {
+            background: white;
+            padding: 12px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .logo-bar img {
+            height: 45px;
+            object-fit: contain;
+        }
+        
+        .main-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .panel-header {
+            background: linear-gradient(135deg, #004972 0%, #005a94 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .panel-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 8px;
+        }
+        
+        .panel-header .subtitle {
+            font-size: 1.2em;
+            color: #FFC000;
+            margin-bottom: 15px;
+        }
+        
+        .panel-header .description {
+            font-size: 0.95em;
+            color: #e0e0e0;
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .panel-content {
+            padding: 35px;
+        }
+        
+        .step-container {
+            display: none;
+        }
+        
+        .step-container.active {
+            display: block;
+        }
+        
+        .step-header {
+            background: linear-gradient(135deg, #004972 0%, #005a94 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            font-size: 1.6em;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 18px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+        
+        .info-title {
+            color: #004972;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            color: #004972;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+        
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #004972;
+            border-radius: 6px;
+            font-size: 0.95em;
+            font-family: inherit;
+        }
+        
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #FFC000;
+            box-shadow: 0 0 5px rgba(255, 192, 0, 0.3);
+        }
+        
+        .member-checkboxes {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 6px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            padding: 0;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .checkbox-item label {
+            cursor: pointer;
+            margin: 0;
+            font-weight: normal;
+            color: #333;
+        }
+        
+        .team-summary-box {
+            background: #fff3cd;
+            border: 2px solid #FFC000;
+            padding: 18px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .team-summary-box.show {
+            display: block;
+        }
+        
+        .team-summary-title {
+            color: #004972;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+        
+        .team-summary-item {
+            color: #333;
+            margin: 6px 0;
+            font-size: 0.95em;
+        }
+        
+        .questions-container {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .part-header {
+            color: #004972;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 25px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #FFC000;
+        }
+        
+        .question-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 18px;
+        }
+        
+        .q-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: #FFC000;
+            color: #004972;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+        
+        .q-text {
+            color: #004972;
+            font-weight: bold;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+        
+        .q-hint {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            font-style: italic;
+        }
+        
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 28px;
+            font-size: 0.95em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-primary {
+            background: #004972;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #003555;
+            transform: translateY(-2px);
+        }
+        
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .report-container {
+            background: #f0f8ff;
+            border: 3px solid #004972;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 25px;
+        }
+        
+        .report-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #FFC000;
+        }
+        
+        .report-title {
+            color: #004972;
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .report-subtitle {
+            color: #FFC000;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .report-meta {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .report-section {
+            background: white;
+            padding: 18px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border-left: 4px solid #FFC000;
+        }
+        
+        .report-label {
+            color: #FFC000;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+        
+        .report-content {
+            color: #333;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+        
+        .strength-gap-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .strength-box {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #4caf50;
+            color: #333;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .strength-box strong {
+            color: #2e7d32;
+        }
+        
+        .gap-box {
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #f44336;
+            color: #333;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+        
+        .gap-box strong {
+            color: #a93226;
+        }
+        
+        .insight-box {
+            background: #fff3cd;
+            border: 2px solid #FFC000;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .insight-label {
+            color: #004972;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .insight-quote {
+            color: #333;
+            font-size: 1.05em;
+            font-style: italic;
+            line-height: 1.6;
+        }
+        
+        .rating-section {
+            background: #f0f8ff;
+            border: 2px solid #004972;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+        }
+        
+        .rating-group {
+            margin-bottom: 20px;
+        }
+        
+        .rating-label {
+            color: #004972;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 0.95em;
+        }
+        
+        .stars {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .star {
+            font-size: 2.5em;
+            cursor: pointer;
+            color: #ddd;
+            transition: all 0.2s ease;
+            user-select: none;
+            display: inline-block;
+            line-height: 1;
+            padding: 3px;
+        }
+        
+        .star.selected {
+            color: #FFC000;
+            text-shadow: 0 0 8px rgba(255, 192, 0, 0.6);
+        }
+        
+        .star:hover {
+            color: #FFD700;
+            transform: scale(1.25);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .comments-section {
+            margin-top: 15px;
+        }
+        
+        .comments-section label {
+            display: block;
+            color: #004972;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+        
+        .comments-section textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #004972;
+            border-radius: 6px;
+            font-size: 0.9em;
+            min-height: 80px;
+        }
+        
+        .comments-section textarea:focus {
+            outline: none;
+            border-color: #FFC000;
+            box-shadow: 0 0 5px rgba(255, 192, 0, 0.3);
+        }
+        
+        .optional-note {
+            color: #666;
+            font-size: 0.85em;
+            font-style: italic;
+            margin-top: 3px;
+        }
+        
+        .message-area {
+            margin-top: 20px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border: 1px solid #c3e6cb;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #004972;
+            font-weight: bold;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #004972;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .team-reports-section {
+            background: #f0f8ff;
+            border: 2px solid #004972;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .team-reports-header {
+            color: #004972;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .team-reports-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .team-report-card {
+            background: white;
+            border: 2px solid #004972;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .team-report-card:hover {
+            background: #e3f2fd;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 73, 114, 0.2);
+        }
+
+        .team-report-function {
+            color: #FFC000;
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+
+        .team-report-members {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        .team-report-date {
+            color: #999;
+            font-size: 0.85em;
+        }
+
+        .team-report-ratings {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 15px;
+            justify-content: space-around;
+        }
+
+        .rating-display {
+            text-align: center;
+            font-size: 0.9em;
+        }
+
+        .rating-display-stars {
+            color: #FFC000;
+            font-size: 1.3em;
+        }
+
+        .full-report-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .full-report-overlay.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .full-report-modal {
+            background: white;
+            border-radius: 12px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-close {
+            position: sticky;
+            top: 0;
+            right: 0;
+            background: #004972;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1.5em;
+            border-radius: 0;
+            width: 100%;
+            text-align: right;
+            z-index: 10;
+        }
+
+        .modal-close:hover {
+            background: #003555;
+        }
+
+        .modal-content {
+            padding: 30px;
+        }
+
+        .no-reports-message {
+            text-align: center;
+            color: #666;
+            padding: 30px;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .strength-gap-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .team-reports-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .panel-header h1 {
+                font-size: 1.8em;
+            }
+            
+            .report-title {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-bar">
+            <img src="https://companieslogo.com/img/orig/2310.SR_BIG-7ac54b87.png?t=1720244490" alt="Sipchem" style="height: 45px;">
+            <div style="color: #004972; font-weight: bold; font-size: 0.9em; text-align: center;">
+                ESG Training | Activity 1: Function Diagnostic
+            </div>
+            <img src="https://futureskills.mcit.gov.sa/sites/default/files/2022-08/ICG_Academies%20Logo.jpg" alt="ICG" style="height: 45px;">
+        </div>
+        
+        <div class="main-panel">
+            <div class="panel-header">
+                <h1>🌍 Activity 1: Function ESG Diagnostic</h1>
+                <div class="subtitle">Data Collection & Team Assessment</div>
+                <div class="description">
+                    Help us understand your function's perspective on ESG (Environmental, Social, Governance) initiatives. Your honest insights will shape our 2030 strategy.
+                </div>
+            </div>
+            
+            <div class="panel-content">
+                <!-- STEP 1: Select Function and Members -->
+                <div class="step-container active" id="step-1">
+                    <div class="step-header">📋 Step 1: Who are you?</div>
+                    
+                    <div class="info-box">
+                        <div class="info-title">Function Selection</div>
+                        Select your function and the team members participating in this diagnostic.
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Select Your Function:</label>
+                        <select id="function-select" onchange="loadTeamMembers()">
+                            <option value="">-- Choose a Function --</option>
+                            <option value="digital">Digital Transformation</option>
+                            <option value="engineering">Engineering & Production</option>
+                            <option value="finance">Finance, Audit & Planning</option>
+                            <option value="culture">Culture, Security & OD</option>
+                        </select>
+                    </div>
+                    
+                    <div id="member-section" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">👥 Select Team Members (at least 1):</label>
+                            <div class="member-checkboxes" id="member-list"></div>
+                        </div>
+                        
+                        <div class="team-summary-box" id="team-summary">
+                            <div class="team-summary-title">✅ TEAM SELECTED</div>
+                            <div class="team-summary-item"><strong>Function:</strong> <span id="summary-function"></span></div>
+                            <div class="team-summary-item"><strong>Members:</strong> <span id="summary-members"></span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="next-btn" disabled onclick="goToStep('step-2')">
+                            Next Step →
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- STEP 2: Questions -->
+                <div class="step-container" id="step-2">
+                    <div class="step-header">❓ Step 2: Your Insights</div>
+                    
+                    <div class="info-box">
+                        <div class="info-title">Answer Each Question Thoughtfully</div>
+                        Please provide detailed answers. These will be presented to leadership exactly as you write them.
+                    </div>
+                    
+                    <div class="questions-container">
+                        <!-- PART A: Understanding -->
+                        <div class="part-header">PART A: ESG Understanding</div>
+                        
+                        <div class="question-card">
+                            <div class="q-number">1</div>
+                            <div class="q-text">What does ESG mean to your function?</div>
+                            <div class="q-hint">Think about E (Environmental), S (Social), and G (Governance) - what matters most to you?</div>
+                            <textarea id="q1" placeholder="Write your answer here..."></textarea>
+                        </div>
+                        
+                        <div class="question-card">
+                            <div class="q-number">2</div>
+                            <div class="q-text">How critical is your function to achieving our 2030 ESG targets?</div>
+                            <div class="q-hint">What's your role? How important is it?</div>
+                            <textarea id="q2" placeholder="Write your answer here..."></textarea>
+                        </div>
+                        
+                        <div class="question-card">
+                            <div class="q-number">3</div>
+                            <div class="q-text">What don't you understand about our ESG strategy?</div>
+                            <div class="q-hint">Be honest about gaps in your knowledge or clarity.</div>
+                            <textarea id="q3" placeholder="Write your answer here..."></textarea>
+                        </div>
+                        
+                        <!-- PART B: Capabilities -->
+                        <div class="part-header">PART B: Capabilities & Gaps</div>
+                        
+                        <div class="question-card">
+                            <div class="q-number">4</div>
+                            <div class="q-text">What are your function's STRENGTHS in ESG?</div>
+                            <div class="q-hint">What can you do well? What are your advantages?</div>
+                            <textarea id="q4" placeholder="Write your answer here..."></textarea>
+                        </div>
+                        
+                        <div class="question-card">
+                            <div class="q-number">5</div>
+                            <div class="q-text">What GAPS or challenges do you face?</div>
+                            <div class="q-hint">Where do you struggle? What's missing?</div>
+                            <textarea id="q5" placeholder="Write your answer here..."></textarea>
+                        </div>
+                        
+                        <!-- PART C: Contribution & Support -->
+                        <div class="part-header">PART C: What You Can Deliver</div>
+                        
+                        <div class="question-card">
+                            <div class="q-number">6</div>
+                            <div class="q-text">What could your function deliver to advance ESG?</div>
+                            <div class="q-hint">What are you willing to commit to?</div>
+                            <textarea id="q6" placeholder="Write your answer here..."></textarea>
+                        </div>
+                        
+                        <div class="question-card">
+                            <div class="q-number">7</div>
+                            <div class="q-text">What do you need FROM LEADERSHIP to succeed?</div>
+                            <div class="q-hint">Resources, clarity, support, decisions?</div>
+                            <textarea id="q7" placeholder="Write your answer here..."></textarea>
+                        </div>
+                        
+                        <!-- PART D: Key Insight -->
+                        <div class="part-header">PART D: The Big Picture</div>
+                        
+                        <div class="question-card">
+                            <div class="q-number">8</div>
+                            <div class="q-text">In one sentence, what's the most important thing about ESG for your function?</div>
+                            <div class="q-hint">Your key insight or biggest concern.</div>
+                            <textarea id="q8" placeholder="Write your answer here..." style="min-height: 60px;"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="goToStep('step-1')">← Back</button>
+                        <button class="btn btn-success" onclick="generateReport()">📊 Preview Report →</button>
+                    </div>
+                </div>
+                
+                <!-- STEP 3: Report Preview -->
+                <div class="step-container" id="step-3">
+                    <div class="step-header">📊 Your Report Preview</div>
+                    
+                    <div class="info-box">
+                        <div class="info-title">Review Before Submission</div>
+                        This is how your team's diagnostic will appear when presented to leadership. Copy this for your presentation if needed.
+                    </div>
+                    
+                    <div id="report-output"></div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="goToStep('step-2')">← Edit Answers</button>
+                        <button class="btn btn-success" onclick="goToStep('step-4')">✓ Continue to Rating →</button>
+                    </div>
+                </div>
+                
+                <!-- STEP 4: Rating & Submission -->
+                <div class="step-container" id="step-4">
+                    <div class="step-header">⭐ Step 4: Trainer Assessment</div>
+                    
+                    <div class="info-box">
+                        <div class="info-title">Rate the Diagnostic Quality</div>
+                        Please rate this team's honesty and the clarity of their insights.
+                    </div>
+                    
+                    <div class="rating-section">
+                        <div class="rating-group">
+                            <div class="rating-label">🎯 Honesty & Depth: How deeply did this team engage?</div>
+                            <div class="stars" id="honesty-stars">
+                                <span class="star" onclick="rateHonesty(1)">★</span>
+                                <span class="star" onclick="rateHonesty(2)">★</span>
+                                <span class="star" onclick="rateHonesty(3)">★</span>
+                                <span class="star" onclick="rateHonesty(4)">★</span>
+                                <span class="star" onclick="rateHonesty(5)">★</span>
+                            </div>
+                        </div>
+                        
+                        <div class="rating-group">
+                            <div class="rating-label">💡 Clarity of Insight: How clear and articulate were their answers?</div>
+                            <div class="stars" id="clarity-stars">
+                                <span class="star" onclick="rateClarity(1)">★</span>
+                                <span class="star" onclick="rateClarity(2)">★</span>
+                                <span class="star" onclick="rateClarity(3)">★</span>
+                                <span class="star" onclick="rateClarity(4)">★</span>
+                                <span class="star" onclick="rateClarity(5)">★</span>
+                            </div>
+                        </div>
+                        
+                        <div class="comments-section">
+                            <label for="trainer-comments">📝 Trainer Comments (Optional):</label>
+                            <textarea id="trainer-comments" placeholder="Add any additional observations or feedback..."></textarea>
+                            <div class="optional-note">💡 Optional: Leave blank if not needed</div>
+                        </div>
+                    </div>
+                    
+                    <div id="message-area" class="message-area"></div>
+                    
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="goToStep('step-3')">← Back to Report</button>
+                        <button class="btn btn-success" onclick="submitToFirebase()">🚀 Submit & Save to Database</button>
+                        <button class="btn btn-info" onclick="printWithRating()">🖨️ Print Report</button>
+                    </div>
+                </div>
+
+                <!-- STEP 6: Consolidated Team Report Console -->
+                <div class="step-container" id="step-6">
+                    <div class="step-header">📊 Consolidated Team Report Console</div>
+                    
+                    <div class="info-box">
+                        <div class="info-title">All Submissions at a Glance</div>
+                        View all team diagnostics in one comprehensive report. Filter by function, export to PDF, or print for presentations.
+                    </div>
+
+                    <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-primary" onclick="filterReportsByFunction('all')">📋 All Functions</button>
+                        <button class="btn btn-primary" onclick="filterReportsByFunction('digital')">💻 Digital</button>
+                        <button class="btn btn-primary" onclick="filterReportsByFunction('engineering')">⚙️ Engineering</button>
+                        <button class="btn btn-primary" onclick="filterReportsByFunction('finance')">💰 Finance</button>
+                        <button class="btn btn-primary" onclick="filterReportsByFunction('culture')">🤝 Culture</button>
+                        <button class="btn btn-success" onclick="exportConsoleToPDF()">📥 Export PDF</button>
+                        <button class="btn btn-info" onclick="window.print()">🖨️ Print</button>
+                    </div>
+
+                    <div id="console-report" style="background: #f5f5f5; border-radius: 8px; padding: 20px; max-height: 800px; overflow-y: auto; border: 2px solid #004972;">
+                        <div style="text-align: center; color: #666; padding: 40px;">Loading consolidated report...</div>
+                    </div>
+
+                    <div class="button-group" style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="goToStep('step-1')">← Start New Submission</button>
+                        <button class="btn btn-primary" onclick="goToStep('step-5')">👥 View Individual Reports</button>
+                    </div>
+                </div>
+                    <div class="step-header">👥 Team Submissions Overview</div>
+                    
+                    <div class="info-box">
+                        <div class="info-title">All Function Diagnostics</div>
+                        Click on any team below to view their full diagnostic report and assessment.
+                    </div>
+
+                    <div class="team-reports-section">
+                        <div class="team-reports-header">📋 Available Reports</div>
+                        <div class="team-reports-list" id="team-reports-list">
+                            <div class="no-reports-message">Loading submissions...</div>
+                        </div>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="goToStep('step-1')">← Start New Submission</button>
+                        <button class="btn btn-success" onclick="goToStep('step-6')">📊 View Console Report</button>
+                        <button class="btn btn-info" onclick="refreshTeamReports()">🔄 Refresh</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Report Modal -->
+    <div class="full-report-overlay" id="full-report-modal">
+        <div class="full-report-modal">
+            <button class="modal-close" onclick="closeReportModal()">✕ Close</button>
+            <div class="modal-content" id="full-report-content"></div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Compat Version) -->
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-database-compat.js"></script>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAqogoxcPUGH2F0ENLzsBhhkuIZ6m6Phk",
+            authDomain: "test-7f3ce.firebaseapp.com",
+            databaseURL: "https://test-7f3ce-default-rtdb.firebaseio.com",
+            projectId: "test-7f3ce",
+            storageBucket: "test-7f3ce.firebasestorage.app",
+            messagingSenderId: "839624642570",
+            appId: "1:839624642570:web:93e195012ffe4ee5374ff3",
+            measurementId: "G-CH7JVZBXMS"
+        };
+        
+        // Initialize Firebase - waits for SDK to load
+        window.firebaseReady = false;
+        
+        // Wait for Firebase SDK to load
+        setTimeout(() => {
+            try {
+                if (typeof firebase !== 'undefined' && firebase.initializeApp) {
+                    // Check if already initialized
+                    if (!firebase.apps || firebase.apps.length === 0) {
+                        firebase.initializeApp(firebaseConfig);
+                    }
+                    window.db = firebase.database();
+                    window.firebaseReady = true;
+                    console.log('✅ Firebase initialized successfully');
+                    // Auto-load reports
+                    loadTeamReportsData();
+                } else {
+                    console.warn('⚠️ Firebase SDK not loaded');
+                }
+            } catch (error) {
+                console.error('Firebase init error:', error.message);
+            }
+        }, 1000);
+
+        window.teamMembers = {
+            digital: ['Maryam A Al-Mutairi', 'Maha H Al-Shammari', 'Sarah M Al-Shehri', 'Samirah E Al-Kholaif', 'Saif A. Al-Jaafari'],
+            engineering: ['Falah A. Al-Sahli', 'Abdulaziz A. Al-Ghamdi', 'Muhammad A. Al-Shamali', 'Abdullah Al-Salehi', 'Rashed Al-Hajri'],
+            finance: ['Laila W. Al-Kulaibi', 'Salem F. Al-Matrafi', 'Sara Z. Al-Shammary', 'Sultan A. Al Ghamdi', 'Bader M Al Muqbil'],
+            culture: ['Ahmed B Al-Moftee', 'Rayof A Al-Muhaisen', 'Ibrahim A Al-Oqayli', 'Hamad F. Al-Maglouth', 'Saif A. Al-Jaafari']
+        };
+
+        window.functionNames = {
+            digital: 'Digital Transformation',
+            engineering: 'Engineering & Production',
+            finance: 'Finance, Audit & Planning',
+            culture: 'Culture, Security & OD'
+        };
+
+        window.selectedFunction = null;
+        window.selectedMembers = [];
+        window.honestRating = 0;
+        window.clarityRating = 0;
+        window.allSubmissions = [];
+    </script>
+
+    <script>
+        function goToStep(stepId) {
+            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+            document.getElementById(stepId).classList.add('active');
+            window.scrollTo(0, 0);
+            
+            if (stepId === 'step-5' || stepId === 'step-6') {
+                loadTeamReports();
+            }
+        }
+        
+        function loadTeamMembers() {
+            const select = document.getElementById('function-select');
+            window.selectedFunction = select.value;
+            
+            if (!window.selectedFunction) {
+                document.getElementById('member-section').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('member-section').style.display = 'block';
+            
+            const list = document.getElementById('member-list');
+            list.innerHTML = '';
+            
+            window.teamMembers[window.selectedFunction].forEach(member => {
+                const div = document.createElement('div');
+                div.className = 'checkbox-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="m-${member}" value="${member}" onchange="updateTeamSummary()">
+                    <label for="m-${member}">${member}</label>
+                `;
+                list.appendChild(div);
+            });
+        }
+        
+        function updateTeamSummary() {
+            const checked = document.querySelectorAll('#member-list input:checked');
+            window.selectedMembers = Array.from(checked).map(el => el.value);
+            
+            const summary = document.getElementById('team-summary');
+            const nextBtn = document.getElementById('next-btn');
+            
+            if (window.selectedMembers.length > 0) {
+                document.getElementById('summary-function').textContent = window.functionNames[window.selectedFunction];
+                document.getElementById('summary-members').textContent = window.selectedMembers.join(', ');
+                summary.classList.add('show');
+                nextBtn.disabled = false;
+            } else {
+                summary.classList.remove('show');
+                nextBtn.disabled = true;
+            }
+        }
+        
+        function generateReport() {
+            const answers = {};
+            for (let i = 1; i <= 8; i++) {
+                const val = document.getElementById('q' + i).value;
+                if (!val) {
+                    alert('❌ Please answer ALL 8 questions');
+                    return;
+                }
+                answers['q' + i] = val;
+            }
+            
+            const html = `
+                <div class="report-container">
+                    <div class="report-header">
+                        <div class="report-title">ESG Diagnostic Report</div>
+                        <div class="report-subtitle">${window.functionNames[window.selectedFunction]}</div>
+                        <div class="report-meta">
+                            <div>Team: ${window.selectedMembers.join(', ')}</div>
+                            <div>Date: ${new Date().toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <div class="report-label">Current State Assessment</div>
+                        <div class="report-content">
+                            <p><strong>What ESG means to us:</strong><br>${answers.q1}</p>
+                            <p style="margin-top: 12px;"><strong>How critical we are to 2030:</strong><br>${answers.q2}</p>
+                            <p style="margin-top: 12px;"><strong>What we don't understand:</strong><br>${answers.q3}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <div class="report-label">Strengths & Gaps</div>
+                        <div class="strength-gap-grid">
+                            <div class="strength-box"><strong>💪 STRENGTHS</strong><br><br>${answers.q4}</div>
+                            <div class="gap-box"><strong>⚠️ GAPS</strong><br><br>${answers.q5}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <div class="report-label">What We Could Deliver</div>
+                        <div class="report-content">${answers.q6}</div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <div class="report-label">What We Need from Leadership</div>
+                        <div class="report-content">${answers.q7}</div>
+                    </div>
+                    
+                    <div class="insight-box">
+                        <div class="insight-label">🎯 KEY INSIGHT</div>
+                        <div class="insight-quote">"${answers.q8}"</div>
+                    </div>
+                </div>
+            `;
+            
+            window.currentAnswers = answers;
+            document.getElementById('report-output').innerHTML = html;
+            goToStep('step-3');
+        }
+        
+        function rateHonesty(rating) {
+            window.honestRating = rating;
+            document.querySelectorAll('#honesty-stars .star').forEach((s, i) => {
+                if (i < rating) {
+                    s.classList.add('selected');
+                } else {
+                    s.classList.remove('selected');
+                }
+            });
+        }
+        
+        function rateClarity(rating) {
+            window.clarityRating = rating;
+            document.querySelectorAll('#clarity-stars .star').forEach((s, i) => {
+                if (i < rating) {
+                    s.classList.add('selected');
+                } else {
+                    s.classList.remove('selected');
+                }
+            });
+        }
+        
+        function submitToFirebase() {
+            const messageArea = document.getElementById('message-area');
+            
+            if (!window.firebaseReady) {
+                messageArea.innerHTML = '<div class="error-message">❌ ERROR: Firebase not initialized. Please check your Firebase configuration and reload the page.</div>';
+                return;
+            }
+            
+            if (window.honestRating === 0 || window.clarityRating === 0) {
+                messageArea.innerHTML = '<div class="error-message">❌ Please rate honesty and clarity before submitting</div>';
+                return;
+            }
+            
+            messageArea.innerHTML = '<div class="loading"><div class="spinner"></div>Submitting to database...</div>';
+            
+            const dataToSave = {
+                function: window.selectedFunction,
+                functionName: window.functionNames[window.selectedFunction],
+                members: window.selectedMembers,
+                q1: window.currentAnswers.q1,
+                q2: window.currentAnswers.q2,
+                q3: window.currentAnswers.q3,
+                q4: window.currentAnswers.q4,
+                q5: window.currentAnswers.q5,
+                q6: window.currentAnswers.q6,
+                q7: window.currentAnswers.q7,
+                q8: window.currentAnswers.q8,
+                honesty_rating: window.honestRating,
+                clarity_rating: window.clarityRating,
+                trainer_comments: document.getElementById('trainer-comments').value || '',
+                timestamp: new Date().toISOString(),
+                submittedAt: new Date().toLocaleString()
+            };
+            
+            firebase.database().ref('activity1/submissions').push(dataToSave)
+                .then(() => {
+                    messageArea.innerHTML = `
+                        <div class="success-message">
+                            ✅ SUCCESS! Your diagnostic has been saved to the database.<br>
+                            <strong>${window.functionNames[window.selectedFunction]}</strong> | 
+                            <strong>${window.selectedMembers.length} participants</strong>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    messageArea.innerHTML = `
+                        <div class="error-message">
+                            ❌ ERROR: ${error.message}<br>
+                            <small>Check Firebase config and database URL.</small>
+                        </div>
+                    `;
+                    console.error('Firebase error:', error);
+                });
+        }
+        
+        function printWithRating() {
+            const ratingHTML = `
+                <div class="report-container" style="margin-top: 20px;">
+                    <div class="report-header">
+                        <div class="report-title">Trainer Assessment</div>
+                    </div>
+                    <div class="report-section">
+                        <div class="report-label">Honesty & Depth</div>
+                        <div class="report-content">${'⭐'.repeat(window.honestRating)}</div>
+                    </div>
+                    <div class="report-section">
+                        <div class="report-label">Clarity of Insight</div>
+                        <div class="report-content">${'⭐'.repeat(window.clarityRating)}</div>
+                    </div>
+                    ${document.getElementById('trainer-comments').value ? `<div class="report-section"><div class="report-label">Comments</div><div class="report-content">${document.getElementById('trainer-comments').value}</div></div>` : ''}
+                </div>
+            `;
+            document.getElementById('report-output').innerHTML += ratingHTML;
+            setTimeout(() => window.print(), 100);
+        }
+
+        function loadTeamReportsData() {
+            if (!window.firebaseReady) {
+                console.log('Waiting for Firebase...');
+                return;
+            }
+            
+            firebase.database().ref('activity1/submissions').on('value', (snapshot) => {
+                const data = snapshot.val();
+                window.allSubmissions = [];
+                
+                if (!data) {
+                    console.log('No submissions found');
+                    return;
+                }
+                
+                Object.entries(data).forEach(([key, submission]) => {
+                    window.allSubmissions.push({
+                        id: key,
+                        ...submission
+                    });
+                });
+                
+                console.log('✅ Loaded', window.allSubmissions.length, 'submissions');
+            }, (error) => {
+                console.error('Error loading data:', error.message);
+            });
+        }
+
+        function loadTeamReports() {
+            const listContainer = document.getElementById('team-reports-list');
+            
+            if (!window.firebaseReady) {
+                listContainer.innerHTML = '<div class="error-message">Firebase is not initialized. Please check your configuration and reload the page.</div>';
+                return;
+            }
+            
+            if (!window.allSubmissions || window.allSubmissions.length === 0) {
+                listContainer.innerHTML = '<div class="no-reports-message">No submissions yet. Be the first to submit! 🚀</div>';
+                return;
+            }
+            
+            renderTeamReports();
+            renderConsolReport('all');
+        }
+
+        let currentFilter = 'all';
+
+        function filterReportsByFunction(func) {
+            currentFilter = func;
+            renderConsolReport(func);
+        }
+
+        function renderConsolReport(filterFunc) {
+            const consoleDiv = document.getElementById('console-report');
+            
+            if (!window.allSubmissions || window.allSubmissions.length === 0) {
+                consoleDiv.innerHTML = '<div style="text-align: center; color: #666; padding: 40px;">No submissions yet.</div>';
+                return;
+            }
+
+            const filtered = filterFunc === 'all' 
+                ? window.allSubmissions 
+                : window.allSubmissions.filter(s => s.function === filterFunc);
+
+            if (filtered.length === 0) {
+                consoleDiv.innerHTML = `<div style="text-align: center; color: #666; padding: 40px;">No submissions for this function.</div>`;
+                return;
+            }
+
+            let html = `
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="color: #004972; font-size: 1.3em; font-weight: bold; margin-bottom: 15px;">
+                        📊 CONSOLIDATED TEAM DIAGNOSTIC REPORT
+                    </div>
+                    <div style="color: #666; font-size: 0.9em; margin-bottom: 20px;">
+                        <strong>Total Submissions:</strong> ${filtered.length} | 
+                        <strong>Generated:</strong> ${new Date().toLocaleString()} |
+                        <strong>Filter:</strong> ${filterFunc === 'all' ? 'All Functions' : window.functionNames[filterFunc]}
+                    </div>
+                </div>
+            `;
+
+            // Summary Statistics
+            html += `
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <div style="color: #FFC000; font-size: 1.2em; font-weight: bold; margin-bottom: 15px;">📈 SUMMARY STATISTICS</div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="background: #e3f2fd; padding: 12px; border-radius: 6px;">
+                            <div style="color: #666; font-size: 0.9em;">Average Honesty Rating</div>
+                            <div style="color: #FFC000; font-size: 1.5em; font-weight: bold;">
+                                ${(filtered.reduce((sum, s) => sum + (s.honesty_rating || 0), 0) / filtered.length).toFixed(1)} ⭐
+                            </div>
+                        </div>
+                        <div style="background: #e3f2fd; padding: 12px; border-radius: 6px;">
+                            <div style="color: #666; font-size: 0.9em;">Average Clarity Rating</div>
+                            <div style="color: #FFC000; font-size: 1.5em; font-weight: bold;">
+                                ${(filtered.reduce((sum, s) => sum + (s.clarity_rating || 0), 0) / filtered.length).toFixed(1)} ⭐
+                            </div>
+                        </div>
+                        <div style="background: #e3f2fd; padding: 12px; border-radius: 6px;">
+                            <div style="color: #666; font-size: 0.9em;">Total Participants</div>
+                            <div style="color: #FFC000; font-size: 1.5em; font-weight: bold;">
+                                ${filtered.reduce((sum, s) => sum + (s.members ? s.members.length : 0), 0)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Function Breakdown
+            const functionBreakdown = {};
+            filtered.forEach(submission => {
+                if (!functionBreakdown[submission.function]) {
+                    functionBreakdown[submission.function] = [];
+                }
+                functionBreakdown[submission.function].push(submission);
+            });
+
+            Object.entries(functionBreakdown).forEach(([func, submissions]) => {
+                html += `
+                    <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #FFC000;">
+                        <div style="color: #004972; font-size: 1.2em; font-weight: bold; margin-bottom: 15px;">
+                            🏢 ${window.functionNames[func]} (${submissions.length} submission${submissions.length > 1 ? 's' : ''})
+                        </div>
+                `;
+
+                submissions.forEach((sub, idx) => {
+                    html += `
+                        <div style="background: #f9f9f9; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 3px solid #004972;">
+                            <div style="color: #004972; font-weight: bold; margin-bottom: 8px;">
+                                Submission ${idx + 1} - ${new Date(sub.timestamp).toLocaleDateString()}
+                            </div>
+                            <div style="color: #666; font-size: 0.9em; margin-bottom: 10px;">
+                                <strong>Team:</strong> ${sub.members.join(', ')}
+                            </div>
+                            
+                            <div style="background: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                                <div style="color: #004972; font-weight: bold; margin-bottom: 5px;">❓ What does ESG mean to your function?</div>
+                                <div style="color: #333; font-size: 0.9em;">${sub.q1}</div>
+                            </div>
+
+                            <div style="background: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                                <div style="color: #004972; font-weight: bold; margin-bottom: 5px;">❓ Critical to 2030?</div>
+                                <div style="color: #333; font-size: 0.9em;">${sub.q2}</div>
+                            </div>
+
+                            <div style="background: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                                <div style="color: #004972; font-weight: bold; margin-bottom: 5px;">❓ What don't you understand?</div>
+                                <div style="color: #333; font-size: 0.9em;">${sub.q3}</div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                                <div style="background: #e8f5e9; padding: 10px; border-radius: 4px;">
+                                    <div style="color: #2e7d32; font-weight: bold; margin-bottom: 5px;">💪 STRENGTHS</div>
+                                    <div style="color: #333; font-size: 0.9em;">${sub.q4}</div>
+                                </div>
+                                <div style="background: #ffebee; padding: 10px; border-radius: 4px;">
+                                    <div style="color: #a93226; font-weight: bold; margin-bottom: 5px;">⚠️ GAPS</div>
+                                    <div style="color: #333; font-size: 0.9em;">${sub.q5}</div>
+                                </div>
+                            </div>
+
+                            <div style="background: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                                <div style="color: #004972; font-weight: bold; margin-bottom: 5px;">❓ What could you deliver?</div>
+                                <div style="color: #333; font-size: 0.9em;">${sub.q6}</div>
+                            </div>
+
+                            <div style="background: white; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                                <div style="color: #004972; font-weight: bold; margin-bottom: 5px;">❓ What do you need from leadership?</div>
+                                <div style="color: #333; font-size: 0.9em;">${sub.q7}</div>
+                            </div>
+
+                            <div style="background: #fff3cd; padding: 10px; border-radius: 4px; border-left: 3px solid #FFC000; margin-bottom: 10px;">
+                                <div style="color: #004972; font-weight: bold; margin-bottom: 5px;">🎯 KEY INSIGHT</div>
+                                <div style="color: #333; font-size: 0.9em; font-style: italic;">"${sub.q8}"</div>
+                            </div>
+
+                            <div style="display: flex; gap: 15px; padding-top: 10px; border-top: 1px solid #ddd;">
+                                <div style="text-align: center;">
+                                    <div style="color: #666; font-size: 0.85em;">Honesty & Depth</div>
+                                    <div style="color: #FFC000; font-size: 1.3em;">${'⭐'.repeat(sub.honesty_rating)}</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="color: #666; font-size: 0.85em;">Clarity of Insight</div>
+                                    <div style="color: #FFC000; font-size: 1.3em;">${'⭐'.repeat(sub.clarity_rating)}</div>
+                                </div>
+                            </div>
+
+                            ${sub.trainer_comments ? `
+                                <div style="background: #e3f2fd; padding: 10px; border-radius: 4px; margin-top: 10px; border-left: 3px solid #2196F3;">
+                                    <div style="color: #1565c0; font-weight: bold; margin-bottom: 5px;">💬 Trainer Comments</div>
+                                    <div style="color: #333; font-size: 0.9em;">${sub.trainer_comments}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            });
+
+            consoleDiv.innerHTML = html;
+        }
+
+        function exportConsoleToPDF() {
+            alert('📥 Click "Print" and select "Save as PDF" from your browser print dialog.');
+            window.print();
+        }
+
+        function renderTeamReports() {
+            const listContainer = document.getElementById('team-reports-list');
+            
+            if (window.allSubmissions.length === 0) {
+                listContainer.innerHTML = '<div class="no-reports-message">No submissions yet. Be the first to submit! 🚀</div>';
+                return;
+            }
+            
+            listContainer.innerHTML = window.allSubmissions.map(submission => `
+                <div class="team-report-card" onclick="showFullReport('${submission.id}')">
+                    <div class="team-report-function">${submission.functionName}</div>
+                    <div class="team-report-members">${submission.members.slice(0, 2).join(', ')}${submission.members.length > 2 ? ` +${submission.members.length - 2}` : ''}</div>
+                    <div class="team-report-date">${new Date(submission.timestamp).toLocaleDateString()}</div>
+                    <div class="team-report-ratings">
+                        <div class="rating-display">
+                            <div style="font-size: 0.85em; color: #666;">Honesty</div>
+                            <div class="rating-display-stars">${'★'.repeat(submission.honesty_rating)}</div>
+                        </div>
+                        <div class="rating-display">
+                            <div style="font-size: 0.85em; color: #666;">Clarity</div>
+                            <div class="rating-display-stars">${'★'.repeat(submission.clarity_rating)}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showFullReport(submissionId) {
+            const submission = window.allSubmissions.find(s => s.id === submissionId);
+            if (!submission) return;
+            
+            const html = `
+                <div class="report-container">
+                    <div class="report-header">
+                        <div class="report-title">ESG Diagnostic Report</div>
+                        <div class="report-subtitle">${submission.functionName}</div>
+                        <div class="report-meta">
+                            <div>Team: ${submission.members.join(', ')}</div>
+                            <div>Date: ${new Date(submission.timestamp).toLocaleDateString()}</div>
+                            <div>Submitted: ${submission.submittedAt}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <div class="report-label">Current State Assessment</div>
+                        <div class="report-content">
+                            <p><strong>What ESG means to us:</strong><br>${submission.q1}</p>
+                            <p style="margin-top: 12px;"><strong>How critical we are to 2030:</strong><br>${submission.q2}</p>
+                            <p style="margin-top: 12px;"><strong>What we don't understand:</strong><br>${submission.q3}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <div class="report-label">Strengths & Gaps</div>
+                        <div class="strength-gap-grid">
+                            <div class="strength-box"><strong>💪 STRENGTHS</strong><br><br>${submission.q4}</div>
+                            <div class="gap-box"><strong>⚠️ GAPS</strong><br><br>${submission.q5}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <div class="report-label">What We Could Deliver</div>
+                        <div class="report-content">${submission.q6}</div>
+                    </div>
+                    
+                    <div class="report-section">
+                        <div class="report-label">What We Need from Leadership</div>
+                        <div class="report-content">${submission.q7}</div>
+                    </div>
+                    
+                    <div class="insight-box">
+                        <div class="insight-label">🎯 KEY INSIGHT</div>
+                        <div class="insight-quote">"${submission.q8}"</div>
+                    </div>
+
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #FFC000;">
+                        <div class="report-header">
+                            <div class="report-title" style="font-size: 1.5em;">Trainer Assessment</div>
+                        </div>
+                        <div class="report-section">
+                            <div class="report-label">Honesty & Depth</div>
+                            <div class="report-content" style="font-size: 1.5em; letter-spacing: 5px;">${'⭐'.repeat(submission.honesty_rating)}</div>
+                        </div>
+                        <div class="report-section">
+                            <div class="report-label">Clarity of Insight</div>
+                            <div class="report-content" style="font-size: 1.5em; letter-spacing: 5px;">${'⭐'.repeat(submission.clarity_rating)}</div>
+                        </div>
+                        ${submission.trainer_comments ? `<div class="report-section"><div class="report-label">Comments</div><div class="report-content">${submission.trainer_comments}</div></div>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('full-report-content').innerHTML = html;
+            document.getElementById('full-report-modal').classList.add('show');
+        }
+
+        function closeReportModal() {
+            document.getElementById('full-report-modal').classList.remove('show');
+        }
+
+        function refreshTeamReports() {
+            loadTeamReports();
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('full-report-modal');
+            if (e.target === modal) {
+                closeReportModal();
+            }
+        });
+    </script>
+</body>
+</html>
