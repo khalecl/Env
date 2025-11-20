@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESG Quest - Leadership Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f1419;
+            --secondary: #1a1f2e;
+            --tertiary: #252d3d;
+            --accent: #2dd4bf;
+            --accent-dark: #14b8a6;
+            --accent-light: #5eead4;
+            --text-primary: #f5f5f5;
+            --text-secondary: #b0b0b0;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #2a3142;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, #0d0f15 50%, var(--secondary) 100%);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            cursor: none;
+            min-height: 100vh;
+        }
+
+        /* Top bar */
+        .top-bar {
+            background: linear-gradient(90deg, var(--secondary) 0%, var(--tertiary) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 900;
+            font-size: 1.1em;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            box-shadow: 0 4px 15px rgba(45, 212, 191, 0.2);
+        }
+
+        .player-badge {
+            background: var(--tertiary);
+            border: 1px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Name Selector Modal */
+        .name-selector {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .name-selector.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .name-selector-box {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 40px;
+            max-width: 700px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        .name-selector h2 {
+            font-size: 2em;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .name-selector-subtitle {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 28px;
+            font-weight: 500;
+        }
+
+        .name-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .name-btn {
+            padding: 16px;
+            background: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.85em;
+            text-align: center;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .name-btn:hover {
+            border-color: var(--accent);
+            background: rgba(45, 212, 191, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .name-btn.selected {
+            border-color: var(--accent);
+            background: rgba(45, 212, 191, 0.15);
+            color: var(--accent);
+            font-weight: 700;
+            box-shadow: 0 0 20px rgba(45, 212, 191, 0.2);
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            border: none;
+            color: var(--primary);
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .start-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(45, 212, 191, 0.3);
+        }
+
+        .start-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px 28px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 2.4em;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        .header-sub {
+            color: var(--text-secondary);
+            font-size: 1em;
+            margin-bottom: 24px;
+            font-weight: 500;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent);
+            background: rgba(45, 212, 191, 0.05);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .stat-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
+            transition: width 0.5s ease;
+        }
+
+        /* Nav tabs */
+        .nav-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 28px;
+        }
+
+        .nav-btn {
+            padding: 14px 20px;
+            background: var(--tertiary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            border-color: var(--accent);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Challenge grid */
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .challenge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .challenge-card {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+            position: relative;
+            overflow: hidden;
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .challenge-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(45, 212, 191, 0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .challenge-card:hover {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, var(--tertiary) 0%, #303d4f 100%);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(45, 212, 191, 0.15);
+        }
+
+        .challenge-card:hover::before {
+            opacity: 1;
+        }
+
+        .challenge-card.completed {
+            opacity: 0.6;
+            border-color: var(--success);
+        }
+
+        .challenge-card.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 1.5em;
+            color: var(--success);
+        }
+
+        .challenge-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .challenge-title {
+            font-weight: 700;
+            font-size: 0.95em;
+            color: var(--accent);
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .challenge-points {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 40px;
+            max-width: 600px;
+            width: 95%;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .modal-icon {
+            font-size: 4em;
+            margin-bottom: 12px;
+        }
+
+        .modal-title {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+
+        .modal-question {
+            font-size: 1.1em;
+            color: var(--text-primary);
+            font-weight: 500;
+            line-height: 1.6;
+            margin-bottom: 28px;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .option {
+            padding: 16px;
+            background: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            font-size: 0.95em;
+        }
+
+        .option:hover {
+            border-color: var(--accent);
+            background: rgba(45, 212, 191, 0.05);
+        }
+
+        .option.selected {
+            border-color: var(--accent);
+            background: rgba(45, 212, 191, 0.1);
+            color: var(--accent);
+        }
+
+        .option.correct {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .option.incorrect {
+            border-color: var(--danger);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .feedback {
+            padding: 16px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+            border-left: 4px solid;
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: rgba(16, 185, 129, 0.1);
+            border-left-color: var(--success);
+            color: var(--success);
+        }
+
+        .feedback.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            border-left-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .modal-buttons {
+            display: grid;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color: var(--primary);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(45, 212, 191, 0.3);
+        }
+
+        .btn-next {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Leaderboard */
+        .leaderboard-section {
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+            margin-top: 36px;
+            margin-bottom: 36px;
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .leaderboard-title {
+            font-size: 1.6em;
+            font-weight: 900;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sync-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .sync-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .leaderboard-list {
+            list-style: none;
+            display: grid;
+            gap: 12px;
+        }
+
+        .leaderboard-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 100px;
+            gap: 16px;
+            align-items: center;
+            padding: 16px;
+            background: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leaderboard-item::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(45, 212, 191, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .leaderboard-item:hover {
+            border-color: var(--accent);
+            background: rgba(45, 212, 191, 0.02);
+        }
+
+        .leaderboard-item:hover::before {
+            opacity: 1;
+        }
+
+        .leaderboard-item.top-1 {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.08);
+        }
+
+        .leaderboard-item.top-2 {
+            border-color: #a0a0a0;
+            background: rgba(160, 160, 160, 0.05);
+        }
+
+        .leaderboard-item.top-3 {
+            border-color: #dc9f6f;
+            background: rgba(220, 159, 111, 0.05);
+        }
+
+        .leaderboard-item.player {
+            border-color: var(--accent);
+            background: rgba(45, 212, 191, 0.08);
+        }
+
+        .rank {
+            font-size: 1.4em;
+            font-weight: 900;
+            text-align: center;
+        }
+
+        .rank-1 { color: #fbbf24; }
+        .rank-2 { color: #a0a0a0; }
+        .rank-3 { color: #dc9f6f; }
+
+        .player-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-name {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .player-status {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .player-score {
+            font-size: 1.5em;
+            font-weight: 900;
+            color: var(--accent);
+            text-align: right;
+        }
+
+        .leaderboard-item.player .player-name::after {
+            content: ' (YOU)';
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Mouse trail */
+        .cursor-trail {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            font-size: 1.2em;
+            animation: trailFade 0.8s ease-out forwards;
+        }
+
+        @keyframes trailFade {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+        }
+
+        /* Party effect */
+        .party-emoji {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            font-size: 2em;
+            animation: partyFall 1.5s ease-out forwards;
+        }
+
+        @keyframes partyFall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(80px) rotate(720deg) scale(0);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-light);
+        }
+
+        @media (max-width: 768px) {
+            .header { padding: 20px; }
+            .header h1 { font-size: 1.8em; }
+            .nav-tabs { grid-template-columns: 1fr; }
+            .challenge-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+            .leaderboard-item { grid-template-columns: 40px 1fr 80px; }
+            .name-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Top bar -->
+    <div class="top-bar">
+        <div class="brand">
+            <div class="brand-icon">⚡</div>
+            <span>ESG QUEST</span>
+        </div>
+        <div class="player-badge" id="playerBadge">Player: <span id="playerName">Select Name</span></div>
+    </div>
+
+    <!-- Name Selector Modal -->
+    <div class="name-selector active" id="nameSelector">
+        <div class="name-selector-box">
+            <h2>🎮 Select Your Name</h2>
+            <p class="name-selector-subtitle">Choose your identity to begin the ESG Leadership Challenge</p>
+            <div class="name-grid" id="nameGrid"></div>
+            <button class="start-btn" id="startBtn" disabled onclick="startGame()">START GAME</button>
+        </div>
+    </div>
+
+    <!-- Main container -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>ESG Leadership Challenge</h1>
+                <p class="header-sub">Master sustainable business practices and compete for the top position</p>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">🎯 Points</div>
+                        <div class="stat-value" id="playerPoints">0</div>
+                        <div class="stat-bar">
+                            <div class="stat-bar-fill" id="pointsBar"></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">✓ Completed</div>
+                        <div class="stat-value" id="completed">0/36</div>
+                        <div class="stat-bar">
+                            <div class="stat-bar-fill" id="completedBar"></div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">📊 Rank</div>
+                        <div class="stat-value" id="playerRank">—</div>
+                        <div class="stat-bar">
+                            <div class="stat-bar-fill" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="switchTab('module4')">📚 Fundamentals</button>
+            <button class="nav-btn" onclick="switchTab('module5')">🌱 Mastery</button>
+            <button class="nav-btn" onclick="switchTab('module6')">🚀 Execution</button>
+        </div>
+
+        <!-- Module 4 -->
+        <div class="content active" id="module4">
+            <div class="challenge-grid" id="grid4"></div>
+        </div>
+
+        <!-- Module 5 -->
+        <div class="content" id="module5">
+            <div class="challenge-grid" id="grid5"></div>
+        </div>
+
+        <!-- Module 6 -->
+        <div class="content" id="module6">
+            <div class="challenge-grid" id="grid6"></div>
+        </div>
+
+        <!-- Live Leaderboard -->
+        <div class="leaderboard-section">
+            <div class="leaderboard-header">
+                <div class="leaderboard-title">🏆 Live Leaderboard</div>
+                <div class="sync-indicator">
+                    <div class="sync-dot"></div>
+                    <span>Real-time Sync</span>
+                </div>
+            </div>
+            <ul class="leaderboard-list" id="leaderboard"></ul>
+        </div>
+    </div>
+
+    <!-- Challenge Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon" id="modalIcon">🎯</div>
+                <div class="modal-title" id="modalTitle">Challenge Title</div>
+            </div>
+            <div class="modal-question" id="modalQuestion">Question?</div>
+            <div class="options" id="optionsContainer"></div>
+            <div class="feedback" id="feedback"></div>
+            <div class="modal-buttons" id="buttonContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const participants = ['Maryam A Al-Mutairi', 'Maha H Al-Shammari', 'Sarah M Al-Shehri', 'Samirah E Al-Kholaif', 'Laila W. Al-Kulaibi', 'Ahmed B Al-Moftee', 'Salem F. Al-Matrafi', 'Sara Z. Al-Shammary', 'Rayof A Al-Muhaisen', 'Ibrahim A Al-Oqayli', 'Falah A. Al-Sahli', 'Abdulaziz A. Al-Ghamdi', 'Hamad F. Al-Maglouth', 'Sultan A. Al Ghamdi', 'Bader M Al Muqbil', 'Muhammad A. Al-Shamali', 'Abdullah Al-Salehi', 'Saif A. Al-Jaafari', 'Adel Alanazi', 'Rashed Al-Hajri'];
+
+        const challenges = [
+            {id:'m4c1',m:4,i:'🌍',t:'ESG Scope',q:'What does ESG stand for?',o:['Environmental, Social, Gov','Electric, Solar, Gas','None of above'],c:0,f:'ESG = Environmental, Social & Governance - the foundation of sustainable business!',p:100},
+            {id:'m4c2',m:4,i:'🏭',t:'Scope 1-3',q:'Scope 1 emissions are?',o:['Direct from operations','Purchased energy','Supply chain & use'],c:0,f:'Scope 1 = Direct emissions from owned sources!',p:125},
+            {id:'m4c3',m:4,i:'♻️',t:'Net-Zero Path',q:'Why net-zero matters?',o:['Marketing tool','Climate necessity','Optional goal'],c:1,f:'Net-zero is essential for climate stability!',p:150},
+            {id:'m4c4',m:4,i:'🎓',t:'2030 Goal',q:'Sipchem 2030 GHG reduction?',o:['-10% reduction','-15% reduction','-20% reduction'],c:1,f:'15% intensity reduction by 2030!',p:125},
+            {id:'m4c5',m:4,i:'💨',t:'2024 GHG',q:'Sipchem 2024 GHG intensity?',o:['0.812 tCO2e/ton','1.2 tCO2e/ton','0.650 tCO2e/ton'],c:0,f:'0.812 tCO2e/ton is our baseline!',p:125},
+            {id:'m4c6',m:4,i:'📊',t:'Net-Zero',q:'Net-Zero emissions by?',o:['2040','2050','2060'],c:1,f:'2050 long-term commitment!',p:100},
+            {id:'m4c7',m:4,i:'🌍',t:'Decarbonization',q:'Key to decarbonization?',o:['Marketing campaigns','Real action & measurement','Just set targets'],c:1,f:'Execution drives real results!',p:125},
+            {id:'m4c8',m:4,i:'⚡',t:'Energy',q:'Renewable energy focus?',o:['Solar only','Mixed renewable sources','No commitment'],c:1,f:'Diverse renewable strategy matters!',p:100},
+            {id:'m4c9',m:4,i:'📈',t:'GHG Tracking',q:'Measure GHG emissions how often?',o:['Yearly only','Monthly/Quarterly','Never'],c:1,f:'Real-time monitoring enables action!',p:125},
+            {id:'m4c10',m:4,i:'🔬',t:'Carbon Offsets',q:'Carbon offset strategy?',o:['Primary solution','Supplement to reduction','Not needed'],c:1,f:'Offsets complement emissions reduction!',p:100},
+            {id:'m4c11',m:4,i:'🌳',t:'Nature-Based',q:'Tree planting impact?',o:['Symbolic only','Long-term carbon sink','Waste of resources'],c:1,f:'Nature-based solutions matter!',p:125},
+            {id:'m4c12',m:4,i:'🎯',t:'Science Target',q:'Our targets align to?',o:['Company goals','Climate science (1.5°C)','Competitor targets'],c:1,f:'Science-based targets!',p:150},
+            {id:'m5c1',m:5,i:'♻️',t:'Waste Goal',q:'Waste diversion target by 2035?',o:['50% diversion','75% diversion','85% diversion'],c:2,f:'85% waste diversion from landfill goal!',p:100},
+            {id:'m5c2',m:5,i:'💧',t:'Water Critical',q:'Why water conservation critical?',o:['Not important','Cooling & processing','Only compliance'],c:1,f:'Water vital for operations & ecosystems!',p:100},
+            {id:'m5c3',m:5,i:'👥',t:'Saudization',q:'Saudization workforce target?',o:['70% Saudi','85% by 2030','90% Saudi'],c:1,f:'85% supports Vision 2030!',p:150},
+            {id:'m5c4',m:5,i:'🔐',t:'Zero Corruption',q:'2024 corruption incidents?',o:['5-10 yearly','Zero incidents','1-2 incidents'],c:1,f:'Zero corruption maintained through governance!',p:125},
+            {id:'m5c5',m:5,i:'🎓',t:'Training Hours',q:'Training hours per employee 2024?',o:['20 hours','42 hours','60 hours'],c:1,f:'42 hours development investment!',p:100},
+            {id:'m5c6',m:5,i:'🛡️',t:'IT Security',q:'IT risks resolved in 2024?',o:['50 risks','122 IT risks','200 risks'],c:1,f:'122 risks secured!',p:125},
+            {id:'m5c7',m:5,i:'🌾',t:'Biodiversity',q:'Biodiversity initiatives?',o:['Nice to have','Core strategy','Too costly'],c:1,f:'Biodiversity is essential!',p:125},
+            {id:'m5c8',m:5,i:'🏭',t:'Efficiency',q:'Energy efficiency improvement by 2030?',o:['5% improvement','15% improvement','30% improvement'],c:1,f:'15% improvement target!',p:100},
+            {id:'m5c9',m:5,i:'🚚',t:'Green Fleet',q:'Fleet electrification status?',o:['No plans','Active EV transition','Impossible'],c:1,f:'EV transition underway!',p:125},
+            {id:'m5c10',m:5,i:'♻️',t:'Circular Economy',q:'Product lifecycle approach?',o:['Linear model','Circular design','No plan'],c:1,f:'Circular economy focus!',p:100},
+            {id:'m5c11',m:5,i:'💼',t:'Supplier ESG',q:'Supplier ESG standards?',o:['No requirement','Mandatory audits','Optional'],c:1,f:'Suppliers must align with our values!',p:125},
+            {id:'m5c12',m:5,i:'📊',t:'ESG Report',q:'Reporting frequency?',o:['Never reported','Annually published','Secretive'],c:1,f:'Transparent annual reporting!',p:150},
+            {id:'m6c1',m:6,i:'🎯',t:'90-Day Action',q:'Your action plan should be?',o:['Vague & flexible','Specific & measurable','Super ambitious'],c:1,f:'Specific, measurable actions drive results!',p:200},
+            {id:'m6c2',m:6,i:'📋',t:'Success Metrics',q:'Good metric has?',o:['Feeling good','Specific deadline','Just wishes'],c:1,f:'Metrics drive accountability!',p:150},
+            {id:'m6c3',m:6,i:'🤝',t:'Manager Role',q:'Manager should?',o:['Just sign off','Support & remove blockers','Judge success'],c:1,f:'Partnership not compliance!',p:150},
+            {id:'m6c4',m:6,i:'✍️',t:'Sign Commitment',q:'Why sign commitment?',o:['Just formality','Performance review impact','Sipchem ignores'],c:1,f:'Real accountability matters!',p:250},
+            {id:'m6c5',m:6,i:'🌍',t:'Vision 2030',q:'Sipchem supports Vision 2030 how?',o:['Donations only','Saudization & training','Marketing only'],c:1,f:'Core to our strategy!',p:125},
+            {id:'m6c6',m:6,i:'🏢',t:'Saudization Rate',q:'2024 Saudization rate?',o:['75%','84.6%','90%'],c:1,f:'84.6% progress toward 85% target!',p:150},
+            {id:'m6c7',m:6,i:'🎓',t:'Skill Focus',q:'Best ESG skill for your role?',o:['Ignore ESG','Deep role expertise','Basic knowledge'],c:1,f:'Deep role expertise matters most!',p:125},
+            {id:'m6c8',m:6,i:'🔄',t:'90-Day Check',q:'Progress checkpoints?',o:['None needed','Day 30, 60, 90','Annual only'],c:1,f:'Regular check-ins are crucial!',p:100},
+            {id:'m6c9',m:6,i:'🏆',t:'Team Influence',q:'Your impact on team?',o:['Individual only','Influence & inspire','Not relevant'],c:1,f:'Leaders multiply impact!',p:125},
+            {id:'m6c10',m:6,i:'🌟',t:'Learning Path',q:'ESG knowledge should?',o:['Stop after training','Grow continuously','Decrease over time'],c:1,f:'Keep learning forever!',p:100},
+            {id:'m6c11',m:6,i:'🚀',t:'Innovation',q:'New ESG solutions?',o:['Status quo','Test & improve','Impossible'],c:1,f:'Innovation drives change!',p:125},
+            {id:'m6c12',m:6,i:'💚',t:'Purpose-Driven',q:'Why ESG commitment matters?',o:['Just job','Create better future','Compliance only'],c:1,f:'Purpose is everything!',p:250}
+        ];
+
+        let gameState = {
+            playerName: '',
+            playerScore: 0,
+            completedChallenges: new Set(),
+            currentChallenge: null,
+            selectedOption: null,
+            leaderboardData: []
+        };
+
+        function initNameSelector() {
+            const nameGrid = document.getElementById('nameGrid');
+            nameGrid.innerHTML = participants.map(name => 
+                `<button class="name-btn" onclick="selectName('${name}')">${name}</button>`
+            ).join('');
+        }
+
+        function selectName(name) {
+            document.querySelectorAll('.name-btn').forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            gameState.playerName = name;
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        function startGame() {
+            if (!gameState.playerName) return;
+            document.getElementById('nameSelector').classList.remove('active');
+            document.getElementById('playerName').textContent = gameState.playerName;
+            renderChallenges();
+            initLeaderboard();
+            setInterval(updateLeaderboard, 2000);
+        }
+
+        function initLeaderboard() {
+            gameState.leaderboardData = participants.map(name => ({
+                name,
+                score: Math.floor(Math.random() * 2500) + 500,
+                completed: Math.floor(Math.random() * 36)
+            }));
+            updateLeaderboard();
+        }
+
+        function updateLeaderboard() {
+            gameState.leaderboardData.forEach(p => {
+                p.score += Math.floor(Math.random() * 50) - 20;
+                if (p.score < 0) p.score = 0;
+            });
+
+            let playerEntry = gameState.leaderboardData.find(p => p.name === gameState.playerName);
+            if (!playerEntry) {
+                playerEntry = { name: gameState.playerName, score: gameState.playerScore, completed: gameState.completedChallenges.size };
+                gameState.leaderboardData.push(playerEntry);
+            } else {
+                playerEntry.score = gameState.playerScore;
+                playerEntry.completed = gameState.completedChallenges.size;
+            }
+
+            gameState.leaderboardData.sort((a, b) => b.score - a.score);
+            renderLeaderboard();
+            updatePlayerRank();
+        }
+
+        function renderLeaderboard() {
+            const lb = document.getElementById('leaderboard');
+            lb.innerHTML = gameState.leaderboardData.slice(0, 10).map((p, idx) => {
+                let rankClass = '';
+                let medal = idx + 1;
+                if (idx === 0) rankClass = 'top-1';
+                else if (idx === 1) rankClass = 'top-2';
+                else if (idx === 2) rankClass = 'top-3';
+
+                const isPlayer = p.name === gameState.playerName;
+                return `
+                    <li class="leaderboard-item ${rankClass} ${isPlayer ? 'player' : ''}">
+                        <div class="rank rank-${idx + 1}">${medal}</div>
+                        <div class="player-info">
+                            <div class="player-name">${p.name}</div>
+                            <div class="player-status">${p.completed} challenges completed</div>
+                        </div>
+                        <div class="player-score">${p.score}</div>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        function updatePlayerRank() {
+            let rank = gameState.leaderboardData.findIndex(p => p.name === gameState.playerName) + 1;
+            document.getElementById('playerRank').textContent = rank > 0 ? `#${rank}` : '—';
+        }
+
+        function renderChallenges() {
+            [4, 5, 6].forEach(mod => {
+                const grid = document.getElementById(`grid${mod}`);
+                const modChallenges = challenges.filter(c => c.m === mod);
+                grid.innerHTML = modChallenges.map(ch => `
+                    <div class="challenge-card ${gameState.completedChallenges.has(ch.id) ? 'completed' : ''}" onclick="openChallenge('${ch.id}')">
+                        <div class="challenge-icon">${ch.i}</div>
+                        <div class="challenge-title">${ch.t}</div>
+                        <div class="challenge-points">+${ch.p} pts</div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function openChallenge(id) {
+            const ch = challenges.find(c => c.id === id);
+            gameState.currentChallenge = ch;
+            gameState.selectedOption = null;
+
+            document.getElementById('modalIcon').textContent = ch.i;
+            document.getElementById('modalTitle').textContent = ch.t;
+            document.getElementById('modalQuestion').textContent = ch.q;
+            
+            const opts = document.getElementById('optionsContainer');
+            opts.innerHTML = ch.o.map((opt, idx) => `
+                <div class="option" onclick="selectOption(${idx})">${opt}</div>
+            `).join('');
+
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('buttonContainer').innerHTML = '<button class="btn btn-submit" onclick="submitAnswer()">SUBMIT ANSWER</button>';
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function selectOption(idx) {
+            gameState.selectedOption = idx;
+            document.querySelectorAll('.option').forEach((el, i) => {
+                el.classList.toggle('selected', i === idx);
+            });
+        }
+
+        function submitAnswer() {
+            if (gameState.selectedOption === null) {
+                alert('Select an option first');
+                return;
+            }
+
+            const ch = gameState.currentChallenge;
+            const correct = gameState.selectedOption === ch.c;
+            
+            document.querySelectorAll('.option').forEach((el, i) => {
+                el.classList.remove('selected');
+                if (i === gameState.selectedOption) {
+                    el.classList.add(correct ? 'correct' : 'incorrect');
+                }
+            });
+
+            const fb = document.getElementById('feedback');
+            fb.textContent = ch.f;
+            fb.className = `feedback show ${correct ? 'correct' : 'incorrect'}`;
+
+            if (correct && !gameState.completedChallenges.has(ch.id)) {
+                gameState.completedChallenges.add(ch.id);
+                gameState.playerScore += ch.p;
+                updateStats();
+                renderChallenges();
+                updateLeaderboard();
+                celebrateWin();
+            }
+
+            document.getElementById('buttonContainer').innerHTML = '<button class="btn btn-next" onclick="closeModal()">CONTINUE</button>';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function updateStats() {
+            document.getElementById('playerPoints').textContent = gameState.playerScore;
+            document.getElementById('completed').textContent = `${gameState.completedChallenges.size}/36`;
+            document.getElementById('pointsBar').style.width = Math.min((gameState.playerScore / 3000) * 100, 100) + '%';
+            document.getElementById('completedBar').style.width = (gameState.completedChallenges.size / 36) * 100 + '%';
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function celebrateWin() {
+            const emojis = ['🎉', '✨', '🔥', '⭐', '🏆', '💪'];
+            for (let i = 0; i < 8; i++) {
+                const el = document.createElement('div');
+                el.className = 'party-emoji';
+                el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                el.style.left = Math.random() * 100 + '%';
+                el.style.top = Math.random() * 50 + '%';
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1500);
+            }
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.85) {
+                const trail = document.createElement('div');
+                trail.className = 'cursor-trail';
+                trail.textContent = '·';
+                trail.style.color = 'var(--accent)';
+                trail.style.left = e.pageX + 'px';
+                trail.style.top = e.pageY + 'px';
+                document.body.appendChild(trail);
+                setTimeout(() => trail.remove(), 800);
+            }
+        });
+
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') closeModal();
+        });
+
+        window.addEventListener('load', initNameSelector);
+    </script>
+</body>
+</html>
