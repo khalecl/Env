@@ -4,813 +4,368 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ESG Quest - Leadership Challenge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
 
         :root {
-            --primary: #0f1419;
-            --secondary: #1a1f2e;
-            --tertiary: #252d3d;
-            --accent: #2dd4bf;
-            --accent-dark: #14b8a6;
-            --accent-light: #5eead4;
-            --text-primary: #f5f5f5;
-            --text-secondary: #b0b0b0;
-            --success: #10b981;
-            --danger: #ef4444;
-            --border: #2a3142;
+            --bg-0:#0b0416;           /* deepest */
+            --bg-1:#150a29;           /* panel */
+            --bg-2:#1e0f3a;           /* raised */
+            --glass:rgba(45,20,80,0.55);
+            --violet:#a855f7;
+            --violet-bright:#c084fc;
+            --lime:#c4f542;
+            --pink:#ff5eae;
+            --cyan:#22d3ee;
+            --text:#f4ecff;
+            --text-dim:#b9a9d6;
+            --line:rgba(168,85,247,0.22);
+            --line-bright:rgba(196,245,66,0.5);
+            --good:#c4f542;
+            --bad:#ff5e7e;
+            --display:'Space Grotesk', sans-serif;
+            --body:'Inter', sans-serif;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, var(--primary) 0%, #0d0f15 50%, var(--secondary) 100%);
-            color: var(--text-primary);
-            overflow-x: hidden;
-            cursor: none;
-            min-height: 100vh;
+            font-family:var(--body);
+            color:var(--text);
+            background:var(--bg-0);
+            min-height:100vh;
+            overflow-x:hidden;
+            cursor:auto;
+            position:relative;
         }
 
-        /* Top bar */
+        /* Animated aurora background */
+        body::before {
+            content:""; position:fixed; inset:-20% -10% -10% -10%; z-index:-2;
+            background:
+                radial-gradient(40% 40% at 15% 20%, rgba(168,85,247,0.35), transparent 60%),
+                radial-gradient(35% 35% at 85% 15%, rgba(255,94,174,0.25), transparent 60%),
+                radial-gradient(45% 45% at 75% 85%, rgba(34,211,238,0.22), transparent 60%),
+                radial-gradient(40% 40% at 25% 90%, rgba(196,245,66,0.18), transparent 60%);
+            filter:blur(20px);
+            animation:aurora 18s ease-in-out infinite alternate;
+        }
+        @keyframes aurora {
+            0%   { transform:translate(0,0) scale(1); }
+            50%  { transform:translate(2%,-2%) scale(1.08); }
+            100% { transform:translate(-2%,2%) scale(1.04); }
+        }
+        /* faint grid overlay */
+        body::after {
+            content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+            background-image:
+                linear-gradient(rgba(168,85,247,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168,85,247,0.06) 1px, transparent 1px);
+            background-size:44px 44px;
+            mask-image:radial-gradient(circle at 50% 40%, black, transparent 85%);
+        }
+
+        /* ---------- Top bar ---------- */
         .top-bar {
-            background: linear-gradient(90deg, var(--secondary) 0%, var(--tertiary) 100%);
-            border-bottom: 1px solid var(--border);
-            padding: 16px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            display:flex; justify-content:space-between; align-items:center;
+            padding:16px 24px; position:sticky; top:0; z-index:100;
+            background:rgba(11,4,22,0.72);
+            backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+            border-bottom:1px solid var(--line);
         }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-weight: 900;
-            font-size: 1.1em;
-            letter-spacing: 0.5px;
-        }
-
+        .brand { display:flex; align-items:center; gap:12px; font-family:var(--display); font-weight:700; font-size:1.15em; letter-spacing:0.5px; }
         .brand-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3em;
-            box-shadow: 0 4px 15px rgba(45, 212, 191, 0.2);
+            width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:1.3em;
+            background:linear-gradient(135deg,var(--violet),var(--pink));
+            box-shadow:0 0 22px rgba(168,85,247,0.6);
+            animation:floaty 3s ease-in-out infinite;
         }
-
+        @keyframes floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
         .player-badge {
-            background: var(--tertiary);
-            border: 1px solid var(--accent);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.85em;
-            font-weight: 600;
-            color: var(--accent);
+            padding:8px 16px; border-radius:10px; font-size:0.85em; font-weight:700; color:var(--lime);
+            background:var(--glass); border:1px solid var(--line-bright);
         }
+        .player-badge span { color:var(--text); }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 24px;
-        }
+        .container { max-width:1300px; margin:0 auto; padding:26px 24px 60px; }
 
-        /* Name Selector Modal */
+        /* ---------- Name selector ---------- */
         .name-selector {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            display:none; position:fixed; inset:0; z-index:2000; align-items:center; justify-content:center;
+            background:rgba(6,2,14,0.86); backdrop-filter:blur(10px); padding:20px;
         }
-
-        .name-selector.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
+        .name-selector.active { display:flex; animation:fadeIn .3s ease; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes slideUp { from{transform:translateY(24px); opacity:0} to{transform:none; opacity:1} }
         .name-selector-box {
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 40px;
-            max-width: 700px;
-            width: 95%;
-            max-height: 85vh;
-            overflow-y: auto;
-            animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+            background:linear-gradient(160deg,var(--bg-2),var(--bg-1));
+            border:1px solid var(--line-bright); border-radius:22px; padding:36px;
+            max-width:720px; width:100%; max-height:88vh; overflow-y:auto;
+            box-shadow:0 0 60px rgba(168,85,247,0.3), inset 0 1px 0 rgba(255,255,255,0.06);
+            animation:slideUp .45s cubic-bezier(.23,1,.32,1);
         }
-
-        .name-selector h2 {
-            font-size: 2em;
-            font-weight: 900;
-            color: var(--accent);
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .name-selector-subtitle {
-            color: var(--text-secondary);
-            text-align: center;
-            margin-bottom: 28px;
-            font-weight: 500;
-        }
-
-        .name-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
+        .name-selector h2 { font-family:var(--display); font-size:1.9em; font-weight:700; margin-bottom:6px;
+            background:linear-gradient(120deg,var(--lime),var(--cyan)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+        .name-selector-subtitle { color:var(--text-dim); margin-bottom:20px; font-size:0.95em; }
+        .name-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:6px; }
         .name-btn {
-            padding: 16px;
-            background: var(--primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            font-size: 0.85em;
-            text-align: center;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            padding:14px 12px; border-radius:12px; font-size:0.9em; font-weight:600; cursor:pointer;
+            color:var(--text); background:rgba(255,255,255,0.03);
+            border:1px solid var(--line); transition:all .18s ease; text-align:left;
         }
-
-        .name-btn:hover {
-            border-color: var(--accent);
-            background: rgba(45, 212, 191, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .name-btn.selected {
-            border-color: var(--accent);
-            background: rgba(45, 212, 191, 0.15);
-            color: var(--accent);
-            font-weight: 700;
-            box-shadow: 0 0 20px rgba(45, 212, 191, 0.2);
-        }
-
+        .name-btn:hover { border-color:var(--violet-bright); background:rgba(168,85,247,0.14); transform:translateY(-2px); box-shadow:0 6px 18px rgba(168,85,247,0.25); }
+        .name-btn.selected { border-color:var(--lime); background:rgba(196,245,66,0.14); color:var(--lime); box-shadow:0 0 20px rgba(196,245,66,0.3); }
         .start-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-            border: none;
-            color: var(--primary);
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 1em;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            margin-top: 20px;
+            width:100%; margin-top:22px; padding:16px; border:none; border-radius:14px; cursor:pointer;
+            font-family:var(--display); font-weight:700; font-size:1.05em; letter-spacing:0.5px; color:#1a0733;
+            background:linear-gradient(120deg,var(--lime),var(--cyan));
+            box-shadow:0 8px 26px rgba(196,245,66,0.35); transition:transform .15s, box-shadow .2s;
         }
+        .start-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 12px 34px rgba(196,245,66,0.5); }
+        .start-btn:disabled { opacity:0.4; cursor:not-allowed; filter:grayscale(0.4); }
 
-        .start-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(45, 212, 191, 0.3);
-        }
-
-        .start-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Header */
+        /* ---------- Header ---------- */
         .header {
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 32px 28px;
-            margin-bottom: 32px;
-            position: relative;
-            overflow: hidden;
+            position:relative; overflow:hidden; border-radius:24px; padding:34px 30px;
+            background:linear-gradient(150deg, rgba(45,15,80,0.7), rgba(21,10,41,0.7));
+            border:1px solid var(--line-bright);
+            box-shadow:0 20px 50px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+            margin-bottom:26px;
         }
-
         .header::before {
-            content: '';
-            position: absolute;
-            top: -100px;
-            right: -100px;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(45, 212, 191, 0.08) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+            content:""; position:absolute; top:-60%; right:-10%; width:420px; height:420px;
+            background:radial-gradient(circle, rgba(196,245,66,0.16), transparent 70%);
+            animation:floaty 6s ease-in-out infinite;
         }
-
-        .header-content {
-            position: relative;
-            z-index: 1;
-        }
-
+        .header-content { position:relative; z-index:1; }
         .header h1 {
-            font-size: 2.4em;
-            font-weight: 900;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -1px;
+            font-family:var(--display); font-size:2.6em; font-weight:700; line-height:1.05; margin-bottom:8px;
+            background:linear-gradient(110deg, #fff 10%, var(--violet-bright) 55%, var(--lime) 100%);
+            -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
         }
+        .header-sub { color:var(--text-dim); font-size:1.02em; margin-bottom:22px; max-width:640px; }
 
-        .header-sub {
-            color: var(--text-secondary);
-            font-size: 1em;
-            margin-bottom: 24px;
-            font-weight: 500;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-        }
-
+        .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
         .stat-card {
-            background: var(--primary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 16px;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            padding:18px 20px; border-radius:16px;
+            background:var(--glass); border:1px solid var(--line);
+            transition:transform .2s, border-color .2s, box-shadow .2s;
         }
+        .stat-card:hover { transform:translateY(-4px); border-color:var(--line-bright); box-shadow:0 12px 30px rgba(168,85,247,0.25); }
+        .stat-label { font-size:0.82em; color:var(--text-dim); font-weight:600; margin-bottom:6px; }
+        .stat-value { font-family:var(--display); font-size:2em; font-weight:700; color:var(--text); }
+        .stat-bar { height:7px; border-radius:99px; background:rgba(255,255,255,0.08); margin-top:12px; overflow:hidden; }
+        .stat-bar-fill { height:100%; width:0; border-radius:99px;
+            background:linear-gradient(90deg,var(--violet),var(--lime)); box-shadow:0 0 12px rgba(196,245,66,0.5);
+            transition:width .6s cubic-bezier(.23,1,.32,1); }
 
-        .stat-card:hover {
-            border-color: var(--accent);
-            background: rgba(45, 212, 191, 0.05);
-        }
+        /* streak */
+        .streak-wrap { display:flex; align-items:center; gap:12px; margin-top:18px; padding:12px 18px;
+            border-radius:14px; background:rgba(255,94,174,0.08); border:1px solid rgba(255,94,174,0.28); }
+        .streak-flame { font-size:1.5em; filter:grayscale(1); opacity:0.5; transition:.3s; }
+        .streak-flame.hot { filter:none; opacity:1; animation:pulse .6s ease; }
+        .streak-text { font-size:0.9em; color:var(--text-dim); font-weight:600; }
+        .streak-text b { color:var(--pink); font-size:1.15em; font-family:var(--display); }
+        .multiplier-badge { margin-left:auto; padding:5px 14px; border-radius:99px; font-family:var(--display); font-weight:700; font-size:0.9em;
+            color:#1a0733; background:linear-gradient(120deg,var(--lime),var(--cyan)); opacity:0; transform:scale(0.8); transition:.3s; }
+        .multiplier-badge.show { opacity:1; transform:scale(1); box-shadow:0 0 18px rgba(196,245,66,0.5); }
+        @keyframes pulse { 0%{transform:scale(1)} 50%{transform:scale(1.4)} 100%{transform:scale(1)} }
 
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.85em;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 2em;
-            font-weight: 900;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-
-        .stat-bar {
-            height: 6px;
-            background: var(--border);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .stat-bar-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%);
-            transition: width 0.5s ease;
-        }
-
-        /* Nav tabs */
-        .nav-tabs {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 28px;
-        }
-
+        /* ---------- Nav tabs ---------- */
+        .nav-tabs { display:flex; gap:12px; margin-bottom:24px; flex-wrap:wrap; }
         .nav-btn {
-            padding: 14px 20px;
-            background: var(--tertiary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-            font-family: 'Inter', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            padding:12px 22px; border-radius:99px; cursor:pointer; font-family:var(--body); font-weight:700; font-size:0.92em;
+            color:var(--text-dim); background:var(--glass); border:1px solid var(--line); transition:all .2s;
         }
+        .nav-btn:hover { color:var(--text); border-color:var(--violet-bright); transform:translateY(-2px); }
+        .nav-btn.active { color:#1a0733; background:linear-gradient(120deg,var(--violet-bright),var(--lime));
+            border-color:transparent; box-shadow:0 8px 22px rgba(168,85,247,0.4); }
 
-        .nav-btn:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-        }
+        .content { display:none; }
+        .content.active { display:block; animation:fadeIn .35s ease; }
 
-        .nav-btn.active {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-            border-color: var(--accent);
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        /* Challenge grid */
-        .content {
-            display: none;
-        }
-
-        .content.active {
-            display: block;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .challenge-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 14px;
-            margin-bottom: 28px;
-        }
-
+        /* ---------- Challenge cards ---------- */
+        .challenge-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:16px; }
         .challenge-card {
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
-            position: relative;
-            overflow: hidden;
-            min-height: 160px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            position:relative; overflow:hidden; cursor:pointer; padding:22px 18px; border-radius:18px; text-align:center;
+            background:linear-gradient(160deg, rgba(45,15,80,0.6), rgba(21,10,41,0.6));
+            border:1px solid var(--line); transition:transform .22s cubic-bezier(.23,1,.32,1), box-shadow .22s, border-color .22s;
         }
-
         .challenge-card::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(135deg, rgba(45, 212, 191, 0.1) 0%, transparent 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            content:""; position:absolute; inset:0; opacity:0; transition:opacity .25s;
+            background:radial-gradient(circle at 50% 0%, rgba(196,245,66,0.18), transparent 70%);
         }
-
-        .challenge-card:hover {
-            border-color: var(--accent);
-            background: linear-gradient(135deg, var(--tertiary) 0%, #303d4f 100%);
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(45, 212, 191, 0.15);
-        }
-
-        .challenge-card:hover::before {
-            opacity: 1;
-        }
-
-        .challenge-card.completed {
-            opacity: 0.6;
-            border-color: var(--success);
-        }
-
+        .challenge-card:hover { transform:translateY(-6px) scale(1.02); border-color:var(--line-bright);
+            box-shadow:0 18px 40px rgba(168,85,247,0.35), 0 0 22px rgba(196,245,66,0.15); }
+        .challenge-card:hover::before { opacity:1; }
+        .challenge-card.completed { border-color:var(--lime); background:linear-gradient(160deg, rgba(196,245,66,0.14), rgba(21,10,41,0.6)); }
         .challenge-card.completed::after {
-            content: '✓';
-            position: absolute;
-            top: 8px;
-            right: 12px;
-            font-size: 1.5em;
-            color: var(--success);
+            content:"✓"; position:absolute; top:10px; right:12px; width:26px; height:26px; border-radius:50%;
+            background:var(--lime); color:#1a0733; font-weight:900; font-size:0.85em; display:flex; align-items:center; justify-content:center;
+            box-shadow:0 0 14px rgba(196,245,66,0.6);
         }
+        .challenge-icon { font-size:2.6em; margin-bottom:10px; position:relative; z-index:1; filter:drop-shadow(0 4px 10px rgba(0,0,0,0.4)); }
+        .challenge-title { font-family:var(--display); font-weight:600; font-size:1em; margin-bottom:8px; position:relative; z-index:1; }
+        .challenge-points { display:inline-block; font-size:0.78em; font-weight:700; color:var(--lime); position:relative; z-index:1;
+            padding:3px 10px; border-radius:99px; background:rgba(196,245,66,0.12); }
 
-        .challenge-icon {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
+        /* ---------- Badges ---------- */
+        .badges-section { margin-top:28px; padding:24px; border-radius:20px;
+            background:linear-gradient(150deg, rgba(45,15,80,0.5), rgba(21,10,41,0.5)); border:1px solid var(--line); }
+        .badges-title { font-family:var(--display); font-weight:700; font-size:1.15em; margin-bottom:18px; }
+        .badges-strip { display:flex; gap:20px; flex-wrap:wrap; }
+        .badge { display:flex; flex-direction:column; align-items:center; gap:8px; width:100px; text-align:center; }
+        .badge-medal { width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2em;
+            background:rgba(255,255,255,0.04); border:2px dashed var(--line); filter:grayscale(1); opacity:0.45; transition:.4s; }
+        .badge.earned .badge-medal { filter:none; opacity:1; border:2px solid var(--lime);
+            background:radial-gradient(circle, rgba(196,245,66,0.2), transparent);
+            box-shadow:0 0 26px rgba(196,245,66,0.5); animation:badgePop .6s cubic-bezier(.23,1,.32,1); }
+        .badge-name { font-size:0.76em; color:var(--text-dim); font-weight:600; }
+        .badge.earned .badge-name { color:var(--lime); }
+        @keyframes badgePop { 0%{transform:scale(0) rotate(-25deg)} 70%{transform:scale(1.25)} 100%{transform:scale(1)} }
 
-        .challenge-title {
-            font-weight: 700;
-            font-size: 0.95em;
-            color: var(--accent);
-            margin-bottom: 8px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .challenge-points {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(8px);
-        }
-
-        .modal.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .modal-content {
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 40px;
-            max-width: 600px;
-            width: 95%;
-            max-height: 85vh;
-            overflow-y: auto;
-            animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.320, 1);
-        }
-
-        @keyframes slideUp {
-            from {
-                transform: translateY(40px);
-                opacity: 0;
-            }
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-header {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-
-        .modal-icon {
-            font-size: 4em;
-            margin-bottom: 12px;
-        }
-
-        .modal-title {
-            font-size: 1.8em;
-            font-weight: 900;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-
-        .modal-question {
-            font-size: 1.1em;
-            color: var(--text-primary);
-            font-weight: 500;
-            line-height: 1.6;
-            margin-bottom: 28px;
-        }
-
-        .options {
-            display: grid;
-            gap: 10px;
-            margin-bottom: 24px;
-        }
-
-        .option {
-            padding: 16px;
-            background: var(--primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            font-size: 0.95em;
-        }
-
-        .option:hover {
-            border-color: var(--accent);
-            background: rgba(45, 212, 191, 0.05);
-        }
-
-        .option.selected {
-            border-color: var(--accent);
-            background: rgba(45, 212, 191, 0.1);
-            color: var(--accent);
-        }
-
-        .option.correct {
-            border-color: var(--success);
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success);
-        }
-
-        .option.incorrect {
-            border-color: var(--danger);
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--danger);
-        }
-
-        .feedback {
-            padding: 16px;
-            border-radius: 8px;
-            margin-top: 20px;
-            display: none;
-            border-left: 4px solid;
-            font-weight: 500;
-            line-height: 1.5;
-        }
-
-        .feedback.show {
-            display: block;
-        }
-
-        .feedback.correct {
-            background: rgba(16, 185, 129, 0.1);
-            border-left-color: var(--success);
-            color: var(--success);
-        }
-
-        .feedback.incorrect {
-            background: rgba(239, 68, 68, 0.1);
-            border-left-color: var(--danger);
-            color: var(--danger);
-        }
-
-        .modal-buttons {
-            display: grid;
-            gap: 10px;
-            margin-top: 24px;
-        }
-
-        .btn {
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .btn-submit {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-            color: var(--primary);
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(45, 212, 191, 0.3);
-        }
-
-        .btn-next {
-            background: var(--success);
-            color: white;
-        }
-
-        .btn-next:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-        }
-
-        /* Leaderboard */
-        .leaderboard-section {
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 28px;
-            margin-top: 36px;
-            margin-bottom: 36px;
-        }
-
-        .leaderboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .leaderboard-title {
-            font-size: 1.6em;
-            font-weight: 900;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .sync-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            font-weight: 600;
-        }
-
-        .sync-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--success);
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .leaderboard-list {
-            list-style: none;
-            display: grid;
-            gap: 12px;
-        }
-
+        /* ---------- Leaderboard ---------- */
+        .leaderboard-section { margin-top:28px; padding:24px; border-radius:20px;
+            background:linear-gradient(150deg, rgba(45,15,80,0.5), rgba(21,10,41,0.5)); border:1px solid var(--line-bright); }
+        .leaderboard-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+        .leaderboard-title { font-family:var(--display); font-weight:700; font-size:1.3em; }
+        .sync-indicator { display:flex; align-items:center; gap:8px; font-size:0.82em; color:var(--text-dim); font-weight:600; }
+        .sync-dot { width:9px; height:9px; border-radius:50%; background:var(--lime); box-shadow:0 0 10px var(--lime); animation:blink 1.5s ease-in-out infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+        .leaderboard-list { list-style:none; display:flex; flex-direction:column; gap:10px; }
         .leaderboard-item {
-            display: grid;
-            grid-template-columns: 50px 1fr 100px;
-            gap: 16px;
-            align-items: center;
-            padding: 16px;
-            background: var(--primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            display:grid; grid-template-columns:48px 1fr 90px; align-items:center; gap:14px; padding:14px 18px; border-radius:14px;
+            background:rgba(255,255,255,0.03); border:1px solid var(--line); transition:.25s;
         }
+        .leaderboard-item:hover { transform:translateX(4px); border-color:var(--violet-bright); }
+        .leaderboard-item.player { border-color:var(--lime); background:rgba(196,245,66,0.1); box-shadow:0 0 20px rgba(196,245,66,0.2); }
+        .leaderboard-item.top-1 { background:linear-gradient(100deg, rgba(255,215,0,0.16), rgba(255,255,255,0.03)); border-color:rgba(255,215,0,0.5); }
+        .leaderboard-item.top-2 { background:linear-gradient(100deg, rgba(196,214,235,0.14), rgba(255,255,255,0.03)); border-color:rgba(196,214,235,0.4); }
+        .leaderboard-item.top-3 { background:linear-gradient(100deg, rgba(205,127,50,0.16), rgba(255,255,255,0.03)); border-color:rgba(205,127,50,0.45); }
+        .rank { font-family:var(--display); font-weight:700; font-size:1.3em; text-align:center; color:var(--text-dim); }
+        .rank-1 { color:#ffd700; text-shadow:0 0 12px rgba(255,215,0,0.6); }
+        .rank-2 { color:#dfe7f0; }
+        .rank-3 { color:#e09a54; }
+        .player-info { min-width:0; }
+        .player-name { font-weight:700; font-size:0.98em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .player-status { font-size:0.8em; color:var(--text-dim); margin-top:2px; }
+        .player-score { font-family:var(--display); font-weight:700; font-size:1.25em; text-align:right; color:var(--lime); }
+        .rank-delta { font-size:0.7em; margin-left:6px; }
+        .rank-delta.up { color:var(--good); }
+        .rank-delta.down { color:var(--bad); }
 
-        .leaderboard-item::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(45, 212, 191, 0.05), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
+        /* ---------- Modal ---------- */
+        .modal { display:none; position:fixed; inset:0; z-index:1500; align-items:center; justify-content:center; padding:20px;
+            background:rgba(6,2,14,0.8); backdrop-filter:blur(8px); }
+        .modal.active { display:flex; animation:fadeIn .25s ease; }
+        .modal-content {
+            background:linear-gradient(160deg,var(--bg-2),var(--bg-1)); border:1px solid var(--line-bright);
+            border-radius:24px; padding:34px; max-width:560px; width:100%;
+            box-shadow:0 0 60px rgba(168,85,247,0.35); animation:slideUp .4s cubic-bezier(.23,1,.32,1);
         }
-
-        .leaderboard-item:hover {
-            border-color: var(--accent);
-            background: rgba(45, 212, 191, 0.02);
+        .modal-header { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
+        .modal-icon { font-size:3em; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4)); }
+        .modal-title { font-family:var(--display); font-weight:700; font-size:1.5em; }
+        .modal-question { font-size:1.15em; font-weight:600; margin-bottom:22px; line-height:1.4; }
+        .options { display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
+        .option {
+            padding:16px 18px; border-radius:14px; cursor:pointer; font-weight:500; font-size:0.98em;
+            background:rgba(255,255,255,0.03); border:1.5px solid var(--line); transition:all .18s;
         }
+        .option:hover { border-color:var(--violet-bright); background:rgba(168,85,247,0.12); transform:translateX(4px); }
+        .option.selected { border-color:var(--cyan); background:rgba(34,211,238,0.14); }
+        .option.correct { border-color:var(--good); background:rgba(196,245,66,0.18); color:var(--good); font-weight:700; }
+        .option.incorrect { border-color:var(--bad); background:rgba(255,94,126,0.16); color:var(--bad); }
+        .feedback { display:none; padding:16px 18px; border-radius:14px; font-size:0.92em; line-height:1.5; margin-bottom:18px; }
+        .feedback.show { display:block; animation:slideUp .3s ease; }
+        .feedback.correct { background:rgba(196,245,66,0.12); border:1px solid var(--good); color:var(--good); }
+        .feedback.incorrect { background:rgba(255,94,126,0.12); border:1px solid var(--bad); color:var(--bad); }
+        .modal-buttons { display:flex; justify-content:flex-end; gap:12px; }
+        .btn { padding:13px 26px; border:none; border-radius:12px; cursor:pointer; font-family:var(--display); font-weight:700; font-size:0.92em; transition:transform .15s, box-shadow .2s; }
+        .btn:hover { transform:translateY(-2px); }
+        .btn-submit { color:#1a0733; background:linear-gradient(120deg,var(--lime),var(--cyan)); box-shadow:0 6px 20px rgba(196,245,66,0.35); }
+        .btn-next { color:#fff; background:linear-gradient(120deg,var(--violet),var(--pink)); box-shadow:0 6px 20px rgba(168,85,247,0.4); }
 
-        .leaderboard-item:hover::before {
-            opacity: 1;
+        /* ---------- Level system (top bar chip + overlay) ---------- */
+        .level-chip { display:flex; align-items:center; gap:10px; padding:6px 14px 6px 8px; border-radius:99px;
+            background:var(--glass); border:1px solid var(--line-bright); font-family:var(--display); font-weight:700; font-size:0.82em; color:var(--lime); }
+        .level-ring { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+            background:conic-gradient(var(--lime) 0deg, rgba(255,255,255,0.1) 0deg); transition:background .6s; }
+        .level-ring span { width:28px; height:28px; border-radius:50%; background:var(--bg-1); display:flex; align-items:center; justify-content:center; font-size:0.95em; color:var(--text); }
+
+        .levelup-overlay { display:none; position:fixed; inset:0; z-index:4000; align-items:center; justify-content:center;
+            background:rgba(6,2,14,0.85); backdrop-filter:blur(8px); }
+        .levelup-overlay.show { display:flex; animation:fadeIn .3s ease; }
+        .levelup-card { text-align:center; animation:slideUp .5s cubic-bezier(.23,1,.32,1); }
+        .lu-ring { font-size:5em; animation:floaty 2s ease-in-out infinite; filter:drop-shadow(0 0 30px rgba(196,245,66,0.6)); }
+        .levelup-card h2 { font-family:var(--display); font-size:2.6em; font-weight:700; margin:12px 0;
+            background:linear-gradient(120deg,var(--lime),var(--cyan)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+        .levelup-card p { color:var(--text-dim); font-size:1.15em; }
+        .levelup-card button { margin-top:24px; }
+
+        /* ---------- Extra name entry ---------- */
+        .name-search { width:100%; padding:13px 16px; margin-bottom:16px; border-radius:12px; font-size:0.95em;
+            color:var(--text); background:rgba(255,255,255,0.03); border:1px solid var(--line); }
+        .name-search:focus { outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(34,211,238,0.2); }
+        .name-divider { text-align:center; color:var(--text-dim); font-size:0.78em; letter-spacing:1.5px; margin:20px 0 12px; font-weight:600; }
+        .custom-name-row { display:flex; gap:10px; }
+        .custom-name-row input { flex:1; padding:14px 16px; border-radius:12px; font-size:0.95em; color:var(--text);
+            background:rgba(255,255,255,0.03); border:1px solid var(--line); }
+        .custom-name-row input:focus { outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(34,211,238,0.2); }
+
+        /* ---------- Toasts ---------- */
+        .toast-stack { position:fixed; top:80px; right:20px; z-index:3000; display:flex; flex-direction:column; gap:10px; }
+        .toast { padding:13px 20px; border-radius:12px; font-size:0.9em; font-weight:600; max-width:320px;
+            background:var(--bg-2); border-left:3px solid var(--lime); box-shadow:0 12px 34px rgba(0,0,0,0.5);
+            animation:toastIn .4s ease, toastOut .4s ease 2.6s forwards; }
+        @keyframes toastIn { from{transform:translateX(120%); opacity:0} to{transform:none; opacity:1} }
+        @keyframes toastOut { to{transform:translateX(120%); opacity:0} }
+
+        /* ---------- FX layers ---------- */
+        .party-emoji { position:fixed; font-size:1.8em; pointer-events:none; z-index:5000; animation:party 1.5s ease-out forwards; }
+        @keyframes party { 0%{transform:translateY(0) scale(0.5); opacity:1} 100%{transform:translateY(-120px) scale(1.3) rotate(30deg); opacity:0} }
+        .cursor-trail { position:absolute; font-size:1.4em; pointer-events:none; z-index:4999; animation:trailFade .8s ease-out forwards; }
+        @keyframes trailFade { from{opacity:0.8; transform:scale(1)} to{opacity:0; transform:scale(0.3)} }
+
+        @media (max-width:720px) {
+            .stats-grid { grid-template-columns:1fr; }
+            .name-grid { grid-template-columns:repeat(2,1fr); }
+            .header h1 { font-size:2em; }
+            .leaderboard-item { grid-template-columns:40px 1fr 72px; }
         }
-
-        .leaderboard-item.top-1 {
-            border-color: #fbbf24;
-            background: rgba(251, 191, 36, 0.08);
-        }
-
-        .leaderboard-item.top-2 {
-            border-color: #a0a0a0;
-            background: rgba(160, 160, 160, 0.05);
-        }
-
-        .leaderboard-item.top-3 {
-            border-color: #dc9f6f;
-            background: rgba(220, 159, 111, 0.05);
-        }
-
-        .leaderboard-item.player {
-            border-color: var(--accent);
-            background: rgba(45, 212, 191, 0.08);
-        }
-
-        .rank {
-            font-size: 1.4em;
-            font-weight: 900;
-            text-align: center;
-        }
-
-        .rank-1 { color: #fbbf24; }
-        .rank-2 { color: #a0a0a0; }
-        .rank-3 { color: #dc9f6f; }
-
-        .player-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .player-name {
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .player-status {
-            font-size: 0.85em;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .player-score {
-            font-size: 1.5em;
-            font-weight: 900;
-            color: var(--accent);
-            text-align: right;
-        }
-
-        .leaderboard-item.player .player-name::after {
-            content: ' (YOU)';
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        /* Mouse trail */
-        .cursor-trail {
-            position: fixed;
-            pointer-events: none;
-            z-index: 999;
-            font-size: 1.2em;
-            animation: trailFade 0.8s ease-out forwards;
-        }
-
-        @keyframes trailFade {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-        }
-
-        /* Party effect */
-        .party-emoji {
-            position: fixed;
-            pointer-events: none;
-            z-index: 999;
-            font-size: 2em;
-            animation: partyFall 1.5s ease-out forwards;
-        }
-
-        @keyframes partyFall {
-            0% {
-                opacity: 1;
-                transform: translateY(0) rotate(0deg) scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(80px) rotate(720deg) scale(0);
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--primary);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--accent);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-light);
-        }
-
-        @media (max-width: 768px) {
-            .header { padding: 20px; }
-            .header h1 { font-size: 1.8em; }
-            .nav-tabs { grid-template-columns: 1fr; }
-            .challenge-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-            .leaderboard-item { grid-template-columns: 40px 1fr 80px; }
-            .name-grid { grid-template-columns: repeat(2, 1fr); }
+        @media (prefers-reduced-motion:reduce) {
+            body::before, .brand-icon, .header::before, .lu-ring, .sync-dot { animation:none; }
+            * { transition-duration:.01ms !important; }
         }
     </style>
 </head>
 <body>
+    <div class="toast-stack" id="toastStack"></div>
+
+    <!-- Level-up overlay -->
+    <div class="levelup-overlay" id="levelupOverlay">
+        <div class="levelup-card">
+            <div class="lu-ring" id="luIcon">⭐</div>
+            <h2 id="luTitle">LEVEL UP!</h2>
+            <p id="luText">You reached Level 2</p>
+            <button class="btn btn-next" onclick="closeLevelup()">CONTINUE</button>
+        </div>
+    </div>
+
     <!-- Top bar -->
     <div class="top-bar">
         <div class="brand">
             <div class="brand-icon">⚡</div>
             <span>ESG QUEST</span>
         </div>
-        <div class="player-badge" id="playerBadge">Player: <span id="playerName">Select Name</span></div>
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div class="level-chip" id="levelChip" style="display:none;">
+                <div class="level-ring" id="levelRing"><span id="levelNum">1</span></div>
+                <span id="levelLabel">Rookie</span>
+            </div>
+            <div class="player-badge" id="playerBadge">Player: <span id="playerName">Select Name</span></div>
+        </div>
     </div>
 
     <!-- Name Selector Modal -->
@@ -818,14 +373,20 @@
         <div class="name-selector-box">
             <h2>🎮 Select Your Name</h2>
             <p class="name-selector-subtitle">Choose your identity to begin the ESG Leadership Challenge</p>
+            <input type="text" class="name-search" id="nameSearch" placeholder="🔍 Search your name…" oninput="filterNames()">
             <div class="name-grid" id="nameGrid"></div>
+            <div class="name-divider">— OR ENTER A NEW NAME —</div>
+            <div class="custom-name-row">
+                <input type="text" id="customName" placeholder="Type your name…"
+                    onkeydown="if(event.key==='Enter')useCustomName()">
+                <button class="btn btn-submit" onclick="useCustomName()" style="white-space:nowrap;">USE THIS</button>
+            </div>
             <button class="start-btn" id="startBtn" disabled onclick="startGame()">START GAME</button>
         </div>
     </div>
 
     <!-- Main container -->
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="header-content">
                 <h1>ESG Leadership Challenge</h1>
@@ -834,48 +395,41 @@
                     <div class="stat-card">
                         <div class="stat-label">🎯 Points</div>
                         <div class="stat-value" id="playerPoints">0</div>
-                        <div class="stat-bar">
-                            <div class="stat-bar-fill" id="pointsBar"></div>
-                        </div>
+                        <div class="stat-bar"><div class="stat-bar-fill" id="pointsBar"></div></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">✓ Completed</div>
                         <div class="stat-value" id="completed">0/36</div>
-                        <div class="stat-bar">
-                            <div class="stat-bar-fill" id="completedBar"></div>
-                        </div>
+                        <div class="stat-bar"><div class="stat-bar-fill" id="completedBar"></div></div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-label">📊 Rank</div>
                         <div class="stat-value" id="playerRank">—</div>
-                        <div class="stat-bar">
-                            <div class="stat-bar-fill" style="width: 0%;"></div>
-                        </div>
+                        <div class="stat-bar"><div class="stat-bar-fill" id="rankBar" style="width:0%;"></div></div>
                     </div>
+                </div>
+                <div class="streak-wrap">
+                    <div class="streak-flame" id="streakFlame">🔥</div>
+                    <div class="streak-text">Streak: <b id="streakCount">0</b> in a row</div>
+                    <div class="multiplier-badge" id="multBadge">×1</div>
                 </div>
             </div>
         </div>
 
-        <!-- Navigation -->
         <div class="nav-tabs">
             <button class="nav-btn active" onclick="switchTab('module4')">📚 Fundamentals</button>
             <button class="nav-btn" onclick="switchTab('module5')">🌱 Mastery</button>
             <button class="nav-btn" onclick="switchTab('module6')">🚀 Execution</button>
         </div>
 
-        <!-- Module 4 -->
-        <div class="content active" id="module4">
-            <div class="challenge-grid" id="grid4"></div>
-        </div>
+        <div class="content active" id="module4"><div class="challenge-grid" id="grid4"></div></div>
+        <div class="content" id="module5"><div class="challenge-grid" id="grid5"></div></div>
+        <div class="content" id="module6"><div class="challenge-grid" id="grid6"></div></div>
 
-        <!-- Module 5 -->
-        <div class="content" id="module5">
-            <div class="challenge-grid" id="grid5"></div>
-        </div>
-
-        <!-- Module 6 -->
-        <div class="content" id="module6">
-            <div class="challenge-grid" id="grid6"></div>
+        <!-- Badges -->
+        <div class="badges-section">
+            <div class="badges-title">🏅 Achievements</div>
+            <div class="badges-strip" id="badgesStrip"></div>
         </div>
 
         <!-- Live Leaderboard -->
@@ -884,7 +438,7 @@
                 <div class="leaderboard-title">🏆 Live Leaderboard</div>
                 <div class="sync-indicator">
                     <div class="sync-dot"></div>
-                    <span>Real-time Sync</span>
+                    <span id="syncLabel">Connecting…</span>
                 </div>
             </div>
             <ul class="leaderboard-list" id="leaderboard"></ul>
@@ -905,6 +459,9 @@
         </div>
     </div>
 
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-database-compat.js"></script>
     <script>
         const participants = ['Maryam A Al-Mutairi', 'Maha H Al-Shammari', 'Sarah M Al-Shehri', 'Samirah E Al-Kholaif', 'Laila W. Al-Kulaibi', 'Ahmed B Al-Moftee', 'Salem F. Al-Matrafi', 'Sara Z. Al-Shammary', 'Rayof A Al-Muhaisen', 'Ibrahim A Al-Oqayli', 'Falah A. Al-Sahli', 'Abdulaziz A. Al-Ghamdi', 'Hamad F. Al-Maglouth', 'Sultan A. Al Ghamdi', 'Bader M Al Muqbil', 'Muhammad A. Al-Shamali', 'Abdullah Al-Salehi', 'Saif A. Al-Jaafari', 'Adel Alanazi', 'Rashed Al-Hajri'];
 
@@ -956,18 +513,166 @@
             leaderboardData: []
         };
 
-        function initNameSelector() {
-            const nameGrid = document.getElementById('nameGrid');
-            nameGrid.innerHTML = participants.map(name => 
-                `<button class="name-btn" onclick="selectName('${name}')">${name}</button>`
-            ).join('');
+        // ---------- Firebase (same project as Activity 1, separate node) ----------
+        const firebaseConfig = {
+            apiKey: "AIzaSyBAqogoxcPUGH2F0ENLzsBhhkuIZ6m6Phk",
+            authDomain: "test-7f3ce.firebaseapp.com",
+            databaseURL: "https://test-7f3ce-default-rtdb.firebaseio.com",
+            projectId: "test-7f3ce",
+            storageBucket: "test-7f3ce.firebasestorage.app",
+            messagingSenderId: "839624642570",
+            appId: "1:839624642570:web:93e195012ffe4ee5374ff3"
+        };
+        let dbReady = false, lbRef = null;
+        setTimeout(() => {
+            try {
+                if (typeof firebase !== 'undefined' && firebase.initializeApp) {
+                    if (!firebase.apps || !firebase.apps.length) firebase.initializeApp(firebaseConfig);
+                    lbRef = firebase.database().ref('activity2/leaderboard');
+                    dbReady = true;
+                    document.getElementById('syncLabel').textContent = 'Real-time Sync';
+                    lbRef.on('value', snap => { remoteBoard = snap.val() || {}; renderLeaderboard(); }, e => console.error(e.message));
+                } else { document.getElementById('syncLabel').textContent = 'Offline'; }
+            } catch (e) { console.error('FB init', e.message); document.getElementById('syncLabel').textContent = 'Offline'; }
+        }, 700);
+
+        let remoteBoard = {};
+        const keyFor = n => n.replace(/[.#$/\[\]]/g, '_');
+
+        function pushScore() {
+            if (!dbReady || !lbRef || !gameState.playerName) return;
+            lbRef.child(keyFor(gameState.playerName)).set({
+                name: gameState.playerName,
+                score: gameState.playerScore,
+                completed: gameState.completedChallenges.size,
+                level: currentLevel(),
+                updatedAt: new Date().toISOString()
+            });
         }
 
-        function selectName(name) {
-            document.querySelectorAll('.name-btn').forEach(btn => btn.classList.remove('selected'));
-            event.target.classList.add('selected');
+        // ---------- Game state additions ----------
+        gameState.streak = 0;
+        gameState.bestStreak = 0;
+        let lastRank = null;
+
+        // ---------- XP / Levels ----------
+        const LEVELS = [
+            {min:0,    name:'Rookie',    icon:'🌱'},
+            {min:500,  name:'Analyst',   icon:'📊'},
+            {min:1200, name:'Strategist',icon:'🎯'},
+            {min:2200, name:'Leader',    icon:'🚀'},
+            {min:3500, name:'ESG Champion',icon:'👑'}
+        ];
+        function currentLevel() { let l=0; LEVELS.forEach((L,i)=>{ if(gameState.playerScore>=L.min) l=i; }); return l; }
+        function refreshLevel(prevScore) {
+            const before = LEVELS.reduce((a,L,i)=> gameState.playerScore-0>=0 && prevScore>=L.min ? i : a, 0);
+            const now = currentLevel();
+            const L = LEVELS[now];
+            document.getElementById('levelChip').style.display = 'flex';
+            document.getElementById('levelNum').textContent = now+1;
+            document.getElementById('levelLabel').textContent = L.name;
+            // ring progress toward next level
+            const next = LEVELS[now+1];
+            const pct = next ? Math.min(100, ((gameState.playerScore-L.min)/(next.min-L.min))*100) : 100;
+            document.getElementById('levelRing').style.background =
+                `conic-gradient(var(--accent) ${pct*3.6}deg, var(--border) ${pct*3.6}deg)`;
+            if (now > before) showLevelup(L);
+        }
+        function showLevelup(L) {
+            document.getElementById('luIcon').textContent = L.icon;
+            document.getElementById('luText').textContent = `You are now a ${L.name}`;
+            document.getElementById('levelupOverlay').classList.add('show');
+            beep(660,0.15); setTimeout(()=>beep(880,0.2),140); setTimeout(()=>beep(1100,0.25),300);
+            burst(24);
+        }
+        function closeLevelup(){ document.getElementById('levelupOverlay').classList.remove('show'); }
+
+        // ---------- Badges (finish each module) ----------
+        const BADGES = [
+            {id:'m4', icon:'📚', name:'Fundamentals', mod:4},
+            {id:'m5', icon:'🌱', name:'Mastery',      mod:5},
+            {id:'m6', icon:'🚀', name:'Execution',    mod:6},
+            {id:'all',icon:'👑', name:'Completionist', mod:'all'}
+        ];
+        gameState.earnedBadges = new Set();
+        function renderBadges() {
+            document.getElementById('badgesStrip').innerHTML = BADGES.map(b => `
+                <div class="badge ${gameState.earnedBadges.has(b.id)?'earned':''}">
+                    <div class="badge-medal">${b.icon}</div>
+                    <div class="badge-name">${b.name}</div>
+                </div>`).join('');
+        }
+        function checkBadges() {
+            BADGES.forEach(b => {
+                if (gameState.earnedBadges.has(b.id)) return;
+                let done;
+                if (b.mod === 'all') done = gameState.completedChallenges.size === 36;
+                else {
+                    const ids = challenges.filter(c=>c.m===b.mod).map(c=>c.id);
+                    done = ids.every(id => gameState.completedChallenges.has(id));
+                }
+                if (done) {
+                    gameState.earnedBadges.add(b.id);
+                    toast(`🏅 Badge unlocked: ${b.name}!`);
+                    beep(784,0.2); burst(16);
+                }
+            });
+            renderBadges();
+        }
+
+        // ---------- Sound + haptics + confetti ----------
+        let audioCtx = null;
+        function beep(freq, dur) {
+            try {
+                audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.frequency.value = freq; o.type = 'triangle';
+                o.connect(g); g.connect(audioCtx.destination);
+                g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+dur);
+                o.start(); o.stop(audioCtx.currentTime+dur);
+            } catch(e){}
+        }
+        function buzz(ms){ if(navigator.vibrate) navigator.vibrate(ms); }
+        function burst(n) {
+            const emojis = ['🎉','✨','🔥','⭐','🏆','💚'];
+            for (let i=0;i<n;i++){
+                const el=document.createElement('div'); el.className='party-emoji';
+                el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+                el.style.left=Math.random()*100+'%'; el.style.top=Math.random()*60+'%';
+                document.body.appendChild(el); setTimeout(()=>el.remove(),1500);
+            }
+        }
+        function toast(msg){
+            const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
+            document.getElementById('toastStack').appendChild(t); setTimeout(()=>t.remove(),3200);
+        }
+
+        // ---------- Name selection ----------
+        function initNameSelector() {
+            document.getElementById('nameGrid').innerHTML = participants.map(name =>
+                `<button class="name-btn" data-name="${name}" onclick="selectName('${name.replace(/'/g,"\\'")}', this)">${name}</button>`
+            ).join('');
+        }
+        function filterNames() {
+            const q = document.getElementById('nameSearch').value.toLowerCase();
+            document.querySelectorAll('.name-btn').forEach(b =>
+                b.style.display = b.dataset.name.toLowerCase().includes(q) ? '' : 'none');
+        }
+        function selectName(name, el) {
+            document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+            if (el) el.classList.add('selected');
+            document.getElementById('customName').value = '';
             gameState.playerName = name;
             document.getElementById('startBtn').disabled = false;
+        }
+        function useCustomName() {
+            const v = document.getElementById('customName').value.trim();
+            if (!v) return;
+            document.querySelectorAll('.name-btn').forEach(b => b.classList.remove('selected'));
+            gameState.playerName = v;
+            document.getElementById('startBtn').disabled = false;
+            toast(`Welcome, ${v}!`);
         }
 
         function startGame() {
@@ -975,187 +680,146 @@
             document.getElementById('nameSelector').classList.remove('active');
             document.getElementById('playerName').textContent = gameState.playerName;
             renderChallenges();
-            initLeaderboard();
-            setInterval(updateLeaderboard, 2000);
+            renderBadges();
+            refreshLevel(0);
+            pushScore();
         }
 
-        function initLeaderboard() {
-            gameState.leaderboardData = participants.map(name => ({
-                name,
-                score: Math.floor(Math.random() * 2500) + 500,
-                completed: Math.floor(Math.random() * 36)
-            }));
-            updateLeaderboard();
-        }
-
-        function updateLeaderboard() {
-            gameState.leaderboardData.forEach(p => {
-                p.score += Math.floor(Math.random() * 50) - 20;
-                if (p.score < 0) p.score = 0;
-            });
-
-            let playerEntry = gameState.leaderboardData.find(p => p.name === gameState.playerName);
-            if (!playerEntry) {
-                playerEntry = { name: gameState.playerName, score: gameState.playerScore, completed: gameState.completedChallenges.size };
-                gameState.leaderboardData.push(playerEntry);
-            } else {
-                playerEntry.score = gameState.playerScore;
-                playerEntry.completed = gameState.completedChallenges.size;
-            }
-
-            gameState.leaderboardData.sort((a, b) => b.score - a.score);
-            renderLeaderboard();
-            updatePlayerRank();
-        }
-
+        // ---------- Leaderboard (REAL, from Firebase) ----------
         function renderLeaderboard() {
+            const rows = Object.values(remoteBoard);
+            // ensure the current player shows even before first save
+            if (gameState.playerName && !rows.find(r=>r.name===gameState.playerName)) {
+                rows.push({name:gameState.playerName, score:gameState.playerScore, completed:gameState.completedChallenges.size});
+            }
+            rows.sort((a,b)=> (b.score||0)-(a.score||0));
             const lb = document.getElementById('leaderboard');
-            lb.innerHTML = gameState.leaderboardData.slice(0, 10).map((p, idx) => {
-                let rankClass = '';
-                let medal = idx + 1;
-                if (idx === 0) rankClass = 'top-1';
-                else if (idx === 1) rankClass = 'top-2';
-                else if (idx === 2) rankClass = 'top-3';
-
-                const isPlayer = p.name === gameState.playerName;
-                return `
-                    <li class="leaderboard-item ${rankClass} ${isPlayer ? 'player' : ''}">
-                        <div class="rank rank-${idx + 1}">${medal}</div>
-                        <div class="player-info">
-                            <div class="player-name">${p.name}</div>
-                            <div class="player-status">${p.completed} challenges completed</div>
-                        </div>
-                        <div class="player-score">${p.score}</div>
-                    </li>
-                `;
+            if (!rows.length) { lb.innerHTML='<li style="padding:20px;color:var(--text-secondary)">No players yet — be the first!</li>'; return; }
+            lb.innerHTML = rows.slice(0,10).map((p,idx)=>{
+                const rankClass = idx===0?'top-1':idx===1?'top-2':idx===2?'top-3':'';
+                const isPlayer = p.name===gameState.playerName;
+                return `<li class="leaderboard-item ${rankClass} ${isPlayer?'player':''}">
+                    <div class="rank rank-${idx+1}">${idx+1}</div>
+                    <div class="player-info">
+                        <div class="player-name">${p.name}${isPlayer?' (you)':''}</div>
+                        <div class="player-status">${p.completed||0} challenges • ${p.score||0} pts</div>
+                    </div>
+                    <div class="player-score">${p.score||0}</div>
+                </li>`;
             }).join('');
+            // player rank + delta
+            const rank = rows.findIndex(p=>p.name===gameState.playerName)+1;
+            const rankEl = document.getElementById('playerRank');
+            let delta='';
+            if (lastRank && rank>0 && rank!==lastRank) {
+                const up = rank<lastRank;
+                delta = `<span class="rank-delta ${up?'up':'down'}">${up?'▲':'▼'}</span>`;
+            }
+            rankEl.innerHTML = rank>0 ? `#${rank}${delta}` : '—';
+            if (rank>0) { document.getElementById('rankBar').style.width = Math.max(5,100-((rank-1)/Math.max(rows.length,1)*100))+'%'; lastRank=rank; }
         }
 
-        function updatePlayerRank() {
-            let rank = gameState.leaderboardData.findIndex(p => p.name === gameState.playerName) + 1;
-            document.getElementById('playerRank').textContent = rank > 0 ? `#${rank}` : '—';
-        }
-
+        // ---------- Challenges ----------
         function renderChallenges() {
-            [4, 5, 6].forEach(mod => {
-                const grid = document.getElementById(`grid${mod}`);
-                const modChallenges = challenges.filter(c => c.m === mod);
-                grid.innerHTML = modChallenges.map(ch => `
-                    <div class="challenge-card ${gameState.completedChallenges.has(ch.id) ? 'completed' : ''}" onclick="openChallenge('${ch.id}')">
+            [4,5,6].forEach(mod => {
+                const grid = document.getElementById('grid'+mod);
+                grid.innerHTML = challenges.filter(c=>c.m===mod).map(ch => `
+                    <div class="challenge-card ${gameState.completedChallenges.has(ch.id)?'completed':''}" onclick="openChallenge('${ch.id}')">
                         <div class="challenge-icon">${ch.i}</div>
                         <div class="challenge-title">${ch.t}</div>
                         <div class="challenge-points">+${ch.p} pts</div>
-                    </div>
-                `).join('');
+                    </div>`).join('');
             });
         }
-
         function openChallenge(id) {
-            const ch = challenges.find(c => c.id === id);
-            gameState.currentChallenge = ch;
-            gameState.selectedOption = null;
-
+            const ch = challenges.find(c=>c.id===id);
+            gameState.currentChallenge = ch; gameState.selectedOption = null;
             document.getElementById('modalIcon').textContent = ch.i;
             document.getElementById('modalTitle').textContent = ch.t;
             document.getElementById('modalQuestion').textContent = ch.q;
-            
-            const opts = document.getElementById('optionsContainer');
-            opts.innerHTML = ch.o.map((opt, idx) => `
-                <div class="option" onclick="selectOption(${idx})">${opt}</div>
-            `).join('');
-
+            document.getElementById('optionsContainer').innerHTML =
+                ch.o.map((opt,idx)=>`<div class="option" onclick="selectOption(${idx})">${opt}</div>`).join('');
             document.getElementById('feedback').className = 'feedback';
-            document.getElementById('buttonContainer').innerHTML = '<button class="btn btn-submit" onclick="submitAnswer()">SUBMIT ANSWER</button>';
+            document.getElementById('buttonContainer').innerHTML =
+                '<button class="btn btn-submit" onclick="submitAnswer()">SUBMIT ANSWER</button>';
             document.getElementById('modal').classList.add('active');
         }
-
         function selectOption(idx) {
             gameState.selectedOption = idx;
-            document.querySelectorAll('.option').forEach((el, i) => {
-                el.classList.toggle('selected', i === idx);
-            });
+            document.querySelectorAll('.option').forEach((el,i)=>el.classList.toggle('selected', i===idx));
+            beep(440,0.05);
         }
-
         function submitAnswer() {
-            if (gameState.selectedOption === null) {
-                alert('Select an option first');
-                return;
-            }
-
+            if (gameState.selectedOption === null) { alert('Select an option first'); return; }
             const ch = gameState.currentChallenge;
             const correct = gameState.selectedOption === ch.c;
-            
-            document.querySelectorAll('.option').forEach((el, i) => {
+            document.querySelectorAll('.option').forEach((el,i)=>{
                 el.classList.remove('selected');
-                if (i === gameState.selectedOption) {
-                    el.classList.add(correct ? 'correct' : 'incorrect');
-                }
+                if (i===gameState.selectedOption) el.classList.add(correct?'correct':'incorrect');
+                if (i===ch.c) el.classList.add('correct');
             });
-
             const fb = document.getElementById('feedback');
-            fb.textContent = ch.f;
-            fb.className = `feedback show ${correct ? 'correct' : 'incorrect'}`;
+            const first = !gameState.completedChallenges.has(ch.id);
 
-            if (correct && !gameState.completedChallenges.has(ch.id)) {
-                gameState.completedChallenges.add(ch.id);
-                gameState.playerScore += ch.p;
-                updateStats();
-                renderChallenges();
-                updateLeaderboard();
-                celebrateWin();
+            if (correct) {
+                gameState.streak++;
+                gameState.bestStreak = Math.max(gameState.bestStreak, gameState.streak);
+                const mult = gameState.streak>=5?3 : gameState.streak>=3?2 : 1;
+                updateStreakUI(mult);
+                beep(correct?880:220,0.15); buzz(30);
+                if (first) {
+                    const gained = ch.p*mult;
+                    const prev = gameState.playerScore;
+                    gameState.completedChallenges.add(ch.id);
+                    gameState.playerScore += gained;
+                    fb.textContent = `✅ ${ch.f}  (+${gained}${mult>1?` ×${mult} streak!`:''})`;
+                    updateStats(); renderChallenges(); refreshLevel(prev);
+                    checkBadges(); pushScore(); burst(mult>1?14:8);
+                    if (mult>1) toast(`🔥 ${mult}× multiplier! +${gained} pts`);
+                } else {
+                    fb.textContent = `✅ ${ch.f}  (already completed)`;
+                }
+                fb.className = 'feedback show correct';
+            } else {
+                gameState.streak = 0; updateStreakUI(1);
+                beep(180,0.25); buzz([40,40,40]);
+                fb.textContent = `❌ ${ch.f}`;
+                fb.className = 'feedback show incorrect';
             }
-
-            document.getElementById('buttonContainer').innerHTML = '<button class="btn btn-next" onclick="closeModal()">CONTINUE</button>';
+            document.getElementById('buttonContainer').innerHTML =
+                '<button class="btn btn-next" onclick="closeModal()">CONTINUE</button>';
         }
-
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
+        function updateStreakUI(mult) {
+            document.getElementById('streakCount').textContent = gameState.streak;
+            const flame = document.getElementById('streakFlame');
+            flame.classList.toggle('hot', gameState.streak>0);
+            if (gameState.streak>0){ flame.classList.remove('hot'); void flame.offsetWidth; flame.classList.add('hot'); }
+            const mb = document.getElementById('multBadge');
+            mb.textContent = '×'+mult; mb.classList.toggle('show', mult>1);
         }
-
+        function closeModal(){ document.getElementById('modal').classList.remove('active'); }
         function updateStats() {
             document.getElementById('playerPoints').textContent = gameState.playerScore;
             document.getElementById('completed').textContent = `${gameState.completedChallenges.size}/36`;
-            document.getElementById('pointsBar').style.width = Math.min((gameState.playerScore / 3000) * 100, 100) + '%';
-            document.getElementById('completedBar').style.width = (gameState.completedChallenges.size / 36) * 100 + '%';
+            document.getElementById('pointsBar').style.width = Math.min((gameState.playerScore/4000)*100,100)+'%';
+            document.getElementById('completedBar').style.width = (gameState.completedChallenges.size/36)*100+'%';
         }
-
         function switchTab(tab) {
-            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(el=>el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el=>el.classList.remove('active'));
             document.getElementById(tab).classList.add('active');
-            event.target.classList.add('active');
+            if (event && event.target) event.target.classList.add('active');
         }
 
-        function celebrateWin() {
-            const emojis = ['🎉', '✨', '🔥', '⭐', '🏆', '💪'];
-            for (let i = 0; i < 8; i++) {
-                const el = document.createElement('div');
-                el.className = 'party-emoji';
-                el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-                el.style.left = Math.random() * 100 + '%';
-                el.style.top = Math.random() * 50 + '%';
-                document.body.appendChild(el);
-                setTimeout(() => el.remove(), 1500);
-            }
-        }
-
+        // cursor trail (kept, but cursor stays visible on touch devices)
         document.addEventListener('mousemove', (e) => {
-            if (Math.random() > 0.85) {
-                const trail = document.createElement('div');
-                trail.className = 'cursor-trail';
-                trail.textContent = '·';
-                trail.style.color = 'var(--accent)';
-                trail.style.left = e.pageX + 'px';
-                trail.style.top = e.pageY + 'px';
-                document.body.appendChild(trail);
-                setTimeout(() => trail.remove(), 800);
+            if (Math.random() > 0.88) {
+                const t=document.createElement('div'); t.className='cursor-trail'; t.textContent='·';
+                t.style.color='var(--accent)'; t.style.left=e.pageX+'px'; t.style.top=e.pageY+'px';
+                document.body.appendChild(t); setTimeout(()=>t.remove(),800);
             }
         });
-
-        document.getElementById('modal').addEventListener('click', (e) => {
-            if (e.target.id === 'modal') closeModal();
-        });
-
+        document.getElementById('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
         window.addEventListener('load', initNameSelector);
     </script>
 </body>
