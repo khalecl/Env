@@ -333,8 +333,22 @@
         @media (max-width:720px) {
             .stats-grid { grid-template-columns:1fr; }
             .name-grid { grid-template-columns:repeat(2,1fr); }
-            .header h1 { font-size:2em; }
-            .leaderboard-item { grid-template-columns:40px 1fr 72px; }
+            .container { padding:16px 12px 48px; }
+            .top-bar { padding:12px 14px; }
+            .brand { font-size:1em; }
+            .header { padding:22px 18px; }
+            .header h1 { font-size:1.7em; }
+            .header-sub { font-size:0.9em; }
+            .nav-tabs { gap:8px; }
+            .nav-btn { padding:10px 14px; font-size:0.85em; flex:1; text-align:center; }
+            .challenge-grid { grid-template-columns:repeat(2,1fr); }
+            .leaderboard-item { grid-template-columns:40px 1fr 72px; padding:12px 14px; }
+            .modal { padding:0; align-items:flex-end; }
+            .modal-content { border-radius:22px 22px 0 0; max-width:100%; max-height:92vh; padding:24px 20px; }
+            .option { padding:16px; font-size:1em; }
+            .name-selector-box { padding:24px 18px; }
+            .toast-stack { left:12px; right:12px; top:auto; bottom:16px; }
+            .toast { max-width:none; }
         }
         @media (prefers-reduced-motion:reduce) {
             body::before, .brand-icon, .header::before, .lu-ring, .sync-dot { animation:none; }
@@ -366,20 +380,21 @@
                 <div class="level-ring" id="levelRing"><span id="levelNum">1</span></div>
                 <span id="levelLabel">Rookie</span>
             </div>
-            <div class="player-badge" id="playerBadge">Player: <span id="playerName">Select Name</span></div>
+            <div class="player-badge" id="playerBadge" role="button" tabindex="0" title="Change player" style="cursor:pointer;"
+                onclick="openNameSelector()" onkeydown="if(event.key==='Enter')openNameSelector()">Player: <span id="playerName">Select Name</span></div>
         </div>
     </div>
 
     <!-- Name Selector Modal -->
-    <div class="name-selector active" id="nameSelector">
+    <div class="name-selector active" id="nameSelector" role="dialog" aria-modal="true" aria-labelledby="nameSelectorTitle">
         <div class="name-selector-box">
-            <h2>🎮 Select Your Name</h2>
+            <h2 id="nameSelectorTitle">🎮 Select Your Name</h2>
             <p class="name-selector-subtitle">Choose your identity to begin the ESG Leadership Challenge</p>
-            <input type="text" class="name-search" id="nameSearch" placeholder="🔍 Search your name…" oninput="filterNames()">
+            <input type="text" class="name-search" id="nameSearch" placeholder="🔍 Search your name…" aria-label="Search your name" oninput="filterNames()">
             <div class="name-grid" id="nameGrid"></div>
             <div class="name-divider">— OR ENTER A NEW NAME —</div>
             <div class="custom-name-row">
-                <input type="text" id="customName" placeholder="Type your name…"
+                <input type="text" id="customName" placeholder="Type your name…" aria-label="Enter a new name"
                     onkeydown="if(event.key==='Enter')useCustomName()">
                 <button class="btn btn-submit" onclick="useCustomName()" style="white-space:nowrap;">USE THIS</button>
             </div>
@@ -392,7 +407,7 @@
         <div class="header">
             <div class="header-content">
                 <h1>ESG Leadership Challenge</h1>
-                <p class="header-sub">Master sustainable business practices and compete for the top position</p>
+                <p class="header-sub">👉 Pick a challenge card below, answer the question, earn points. Finish all 36 to top the leaderboard!</p>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-label">🎯 Points</div>
@@ -448,7 +463,7 @@
     </div>
 
     <!-- Challenge Modal -->
-    <div class="modal" id="modal">
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-icon" id="modalIcon">🎯</div>
@@ -926,12 +941,16 @@ const challenges = [
 
         function startGame() {
             if (!gameState.playerName) return;
+            try { localStorage.setItem('esg2_player', gameState.playerName); } catch(e){}
             document.getElementById('nameSelector').classList.remove('active');
             document.getElementById('playerName').textContent = gameState.playerName;
             renderChallenges();
             renderBadges();
             refreshLevel(0);
             pushScore();
+        }
+        function openNameSelector() {
+            document.getElementById('nameSelector').classList.add('active');
         }
 
         // ---------- Leaderboard (REAL, from Firebase) ----------
@@ -1070,7 +1089,23 @@ const challenges = [
             }
         });
         document.getElementById('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
-        window.addEventListener('load', initNameSelector);
+        window.addEventListener('load', () => {
+            initNameSelector();
+            // Returning player? Pre-fill their name and offer one-tap continue.
+            let saved = null;
+            try { saved = localStorage.getItem('esg2_player'); } catch(e){}
+            if (saved) {
+                gameState.playerName = saved;
+                document.getElementById('customName').value = saved;
+                const btn = document.getElementById('startBtn');
+                btn.disabled = false;
+                btn.textContent = `▶ CONTINUE AS ${saved.toUpperCase()}`;
+            }
+        });
+        // Accessibility: Escape closes modal / level-up overlay
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') { closeModal(); closeLevelup(); }
+        });
     </script>
 </body>
 </html>
