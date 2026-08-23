@@ -262,8 +262,10 @@
         .modal-content {
             background:linear-gradient(160deg,var(--bg-2),var(--bg-1)); border:1px solid var(--line-bright);
             border-radius:24px; padding:34px; max-width:560px; width:100%;
+            max-height:88vh; overflow-y:auto; overscroll-behavior:contain;
             box-shadow:0 0 60px rgba(168,85,247,0.35); animation:slideUp .4s cubic-bezier(.23,1,.32,1);
         }
+        body.modal-open { overflow:hidden; }
         .modal-header { display:flex; align-items:center; gap:16px; margin-bottom:20px; }
         .modal-icon { font-size:3em; filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4)); }
         .modal-title { font-family:var(--display); font-weight:700; font-size:1.5em; }
@@ -746,8 +748,12 @@ const challenges = [
                     lbRef = firebase.database().ref('activity2/leaderboard');
                     dbReady = true;
                     document.getElementById('syncLabel').textContent = 'Real-time Sync';
-                    lbRef.on('value', snap => { remoteBoard = snap.val() || {}; renderLeaderboard(); }, e => console.error(e.message));
-                } else { document.getElementById('syncLabel').textContent = 'Offline'; }
+                    lbRef.on('value',
+                        snap => { remoteBoard = snap.val() || {}; renderLeaderboard(); },
+                        e => { console.error('LB read denied:', e.message);
+                               document.getElementById('syncLabel').textContent = 'Offline (check DB rules)';
+                               renderLeaderboard(); });
+                } else { document.getElementById('syncLabel').textContent = 'Offline'; renderLeaderboard(); }
             } catch (e) { console.error('FB init', e.message); document.getElementById('syncLabel').textContent = 'Offline'; }
         }, 700);
 
@@ -755,6 +761,9 @@ const challenges = [
         const keyFor = n => n.replace(/[.#$/\[\]]/g, '_');
 
         function pushScore() {
+        // Render immediately with local data so the board is never blank,
+        // even before Firebase responds (or if it never does).
+        renderLeaderboard();
             if (!dbReady || !lbRef || !gameState.playerName) return;
             lbRef.child(keyFor(gameState.playerName)).set({
                 name: gameState.playerName,
@@ -909,7 +918,7 @@ const challenges = [
             }
             rows.sort((a,b)=> (b.score||0)-(a.score||0));
             const lb = document.getElementById('leaderboard');
-            if (!rows.length) { lb.innerHTML='<li style="padding:20px;color:var(--text-secondary)">No players yet — be the first!</li>'; return; }
+            if (!rows.length) { lb.innerHTML='<li style="padding:20px;color:var(--text-dim)">No players yet — be the first!</li>'; return; }
             lb.innerHTML = rows.slice(0,10).map((p,idx)=>{
                 const rankClass = idx===0?'top-1':idx===1?'top-2':idx===2?'top-3':'';
                 const isPlayer = p.name===gameState.playerName;
@@ -958,6 +967,7 @@ const challenges = [
             document.getElementById('buttonContainer').innerHTML =
                 '<button class="btn btn-submit" onclick="submitAnswer()">SUBMIT ANSWER</button>';
             document.getElementById('modal').classList.add('active');
+            document.body.classList.add('modal-open');
         }
         function selectOption(idx) {
             gameState.selectedOption = idx;
@@ -1012,7 +1022,7 @@ const challenges = [
             const mb = document.getElementById('multBadge');
             mb.textContent = '×'+mult; mb.classList.toggle('show', mult>1);
         }
-        function closeModal(){ document.getElementById('modal').classList.remove('active'); }
+        function closeModal(){ document.getElementById('modal').classList.remove('active'); document.body.classList.remove('modal-open'); }
         function updateStats() {
             document.getElementById('playerPoints').textContent = gameState.playerScore;
             document.getElementById('completed').textContent = `${gameState.completedChallenges.size}/36`;
