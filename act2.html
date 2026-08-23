@@ -867,6 +867,31 @@ const challenges = [
                 document.body.appendChild(el); setTimeout(()=>el.remove(),1500);
             }
         }
+        // ---------- Mario-style jingles ----------
+        function playNote(freq, start, dur, type, vol) {
+            try {
+                audioCtx = audioCtx || new (window.AudioContext||window.webkitAudioContext)();
+                const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+                o.frequency.value = freq; o.type = type || 'square';
+                o.connect(g); g.connect(audioCtx.destination);
+                const t0 = audioCtx.currentTime + start;
+                g.gain.setValueAtTime(vol || 0.08, t0);
+                g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+                o.start(t0); o.stop(t0 + dur);
+            } catch(e){}
+        }
+        function playCorrectJingle() {
+            // Mario coin + power-up style ascending arpeggio
+            const seq = [[659,0],[784,0.09],[1319,0.18],[1047,0.30],[1175,0.42],[1568,0.54]];
+            seq.forEach(([f,t]) => playNote(f, t, 0.12, 'square', 0.07));
+            playNote(1568, 0.54, 0.5, 'triangle', 0.1); // sustained finish
+        }
+        function playWrongJingle() {
+            // Mario "game over" style descending wah-wah
+            const seq = [[494,0],[466,0.18],[440,0.36],[415,0.54]];
+            seq.forEach(([f,t]) => playNote(f, t, 0.16, 'square', 0.07));
+            playNote(392, 0.72, 0.6, 'sawtooth', 0.06); // sad low finish
+        }
         function toast(msg){
             const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
             document.getElementById('toastStack').appendChild(t); setTimeout(()=>t.remove(),3200);
@@ -991,7 +1016,7 @@ const challenges = [
                 gameState.bestStreak = Math.max(gameState.bestStreak, gameState.streak);
                 const mult = gameState.streak>=5?3 : gameState.streak>=3?2 : 1;
                 updateStreakUI(mult);
-                beep(correct?880:220,0.15); buzz(30);
+                playCorrectJingle(); buzz(30);
                 if (first) {
                     const gained = ch.p*mult;
                     const prev = gameState.playerScore;
@@ -1007,7 +1032,7 @@ const challenges = [
                 fb.className = 'feedback show correct';
             } else {
                 gameState.streak = 0; updateStreakUI(1);
-                beep(180,0.25); buzz([40,40,40]);
+                playWrongJingle(); buzz([40,40,40]);
                 fb.textContent = `❌ ${ch.f}`;
                 fb.className = 'feedback show incorrect';
             }
