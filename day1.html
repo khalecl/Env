@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0E1520">
+<title>Why Prices Split — Day 1</title>
+<style>
+:root{
+  --bg:#0E1520;--panel:#16202E;--panel2:#1C283A;--rule:#26364F;
+  --ink:#DCE5F0;--dim:#8296AE;
+  --cool:#35C4B5;--warm:#E8A33D;--bind:#E05B4B;--ok:#4FB477;--violet:#7C8FE0;
+  --pad:14px;--drawer:0px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);
+  font-family:"Inter","Segoe UI",Roboto,system-ui,sans-serif;font-size:16px;line-height:1.45;
+  -webkit-font-smoothing:antialiased;padding:10px var(--pad) calc(var(--drawer) + 20px);
+  max-width:680px;margin:0 auto}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+.hide{display:none!important}
+
+/* progress */
+.top{display:flex;align-items:center;gap:10px;padding:2px 0 12px}
+.top .t{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cool);font-weight:700}
+.top .s{font-size:12.5px;color:var(--dim)}
+.grow{flex:1}
+.pips{display:flex;gap:5px}
+.pip{width:26px;height:5px;border-radius:3px;background:var(--rule)}
+.pip.on{background:var(--cool)}
+.pip.now{background:var(--warm)}
+
+/* ── STEP CARD: the teaching voice ── */
+.step{background:linear-gradient(180deg,#1B2942,#16202E);border:1px solid #33456A;
+  border-left:4px solid var(--warm);border-radius:16px;padding:16px;margin-bottom:12px}
+.step .lab{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--warm);font-weight:800;margin-bottom:8px}
+.step h2{font-size:19px;line-height:1.3;margin:0 0 8px;font-weight:650;letter-spacing:-.01em}
+.step p{margin:0;font-size:14.5px;color:var(--dim)}
+.step .todo{display:flex;align-items:center;gap:10px;margin-top:13px;padding:12px 14px;
+  background:rgba(232,163,61,.10);border:1px solid rgba(232,163,61,.35);border-radius:11px;
+  font-size:14.5px;font-weight:600;color:var(--warm)}
+.step .todo .h{font-size:19px}
+
+/* reveal */
+.reveal{background:linear-gradient(180deg,#152A20,#16202E);border:1px solid rgba(79,180,119,.45);
+  border-left:4px solid var(--ok);border-radius:16px;padding:16px;margin-bottom:12px;
+  animation:pop .35s ease}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.reveal .lab{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ok);font-weight:800;margin-bottom:9px}
+.reveal p{margin:0 0 10px;font-size:14.5px}
+.reveal p:last-of-type{margin-bottom:0}
+.reveal b{color:#fff}
+.reveal .eq{background:#0E1520;border:1px solid var(--rule);border-radius:10px;
+  padding:11px 13px;margin:11px 0;font-size:14px;text-align:center}
+.next{width:100%;min-height:52px;margin-top:14px;background:var(--ok);color:#08170E;
+  border:none;border-radius:12px;font-size:15.5px;font-weight:700;cursor:pointer}
+
+/* narrator — always on */
+.narr{background:var(--panel2);border:1px solid var(--rule);border-radius:14px;
+  padding:13px 15px;margin-bottom:12px;font-size:14px;display:flex;gap:11px;align-items:flex-start}
+.narr .ic{font-size:18px;flex:none;line-height:1.2}
+.narr span b{color:#fff}
+
+/* cards */
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:16px;
+  padding:14px 16px;margin-bottom:12px}
+.card h3{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);
+  margin:0 0 12px;font-weight:700;display:flex;gap:8px}
+.card h3 .r{margin-left:auto;color:var(--ink);letter-spacing:0;text-transform:none;font-size:13px}
+svg{display:block;width:100%;height:auto}
+
+/* price compare — the point of the whole activity */
+.prices{display:flex;gap:10px;align-items:stretch}
+.pbox{flex:1;background:var(--panel2);border:1px solid var(--rule);border-radius:13px;
+  padding:12px 10px;text-align:center;transition:all .25s}
+.pbox .who{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.pbox .amt{font-size:clamp(28px,9vw,38px);font-weight:700;letter-spacing:-.03em;margin:5px 0 2px}
+.pbox .unit{font-size:11px;color:var(--dim)}
+.pbox.hi{border-color:var(--warm);background:rgba(232,163,61,.10)}
+.pbox.lo{border-color:var(--cool);background:rgba(53,196,181,.09)}
+.vs{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-width:74px;font-size:11px;color:var(--dim);text-align:center}
+.vs .gap{font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+
+/* meters */
+.meter{margin-bottom:11px}.meter:last-child{margin-bottom:0}
+.mrow{display:flex;align-items:baseline;gap:8px;font-size:12.5px;color:var(--dim);margin-bottom:5px}
+.mrow b{color:var(--ink);font-size:15px}
+.mrow .tail{margin-left:auto;font-size:11px}
+.track{height:12px;border-radius:6px;background:var(--panel2);border:1px solid var(--rule);
+  overflow:hidden;position:relative}
+.bar{height:100%;border-radius:5px;transition:width .2s,background .2s}
+.cap-mark{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--dim)}
+
+.stat{font-size:clamp(32px,9.5vw,44px);font-weight:700;letter-spacing:-.03em;line-height:1}
+.stat i{font-style:normal;font-size:.44em;color:var(--dim);font-weight:500}
+.sub{font-size:12.5px;color:var(--dim);margin-top:8px}
+.calc{font-size:13px;color:var(--dim);margin-top:9px;padding-top:9px;border-top:1px solid var(--rule)}
+.calc b{color:var(--ink)}
+
+/* drawer */
+.drawer{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(22,32,46,.97);
+  backdrop-filter:blur(12px);border-top:1px solid var(--rule);border-radius:18px 18px 0 0;
+  padding:0 var(--pad) calc(10px + env(safe-area-inset-bottom));max-width:680px;margin:0 auto;
+  box-shadow:0 -10px 30px rgba(0,0,0,.45)}
+.handle{display:flex;align-items:center;gap:10px;padding:12px 0 9px;cursor:pointer;position:relative}
+.handle .grip{width:38px;height:4px;border-radius:2px;background:var(--rule);
+  position:absolute;left:50%;transform:translateX(-50%);top:5px}
+.handle .lbl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.handle .peek{margin-left:auto;font-size:12.5px;color:var(--dim)}
+.handle .peek b{color:var(--ink)}
+.dbody{max-height:52vh;overflow-y:auto;padding-bottom:6px}
+.drawer.min .dbody{display:none}
+.ctl{margin-bottom:13px}
+.ctl.focus{background:rgba(232,163,61,.09);border:1px solid rgba(232,163,61,.4);
+  border-radius:12px;padding:10px 12px;margin:0 -2px 13px}
+.ctl label{display:flex;justify-content:space-between;align-items:baseline;
+  font-size:12.5px;color:var(--dim);margin-bottom:2px}
+.ctl.focus label{color:var(--warm);font-weight:600}
+.ctl .v{color:var(--ink);font-size:17px;font-weight:650}
+.ctl .v s{text-decoration:none;color:var(--dim);font-size:11.5px;font-weight:400}
+input[type=range]{width:100%;-webkit-appearance:none;background:transparent;height:40px;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:var(--panel2);border:1px solid var(--rule)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:32px;height:32px;border-radius:50%;
+  background:var(--cool);border:4px solid var(--panel);margin-top:-14px;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.ctl.focus input[type=range]::-webkit-slider-thumb{background:var(--warm)}
+input[type=range]::-moz-range-track{height:6px;border-radius:3px;background:var(--panel2);border:1px solid var(--rule)}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--cool);border:4px solid var(--panel)}
+.reset{width:100%;min-height:44px;background:none;border:1px solid var(--rule);color:var(--dim);
+  border-radius:10px;font-size:12.5px;cursor:pointer}
+footer{font-size:11px;color:var(--dim);line-height:1.55;padding-top:12px;border-top:1px solid var(--rule)}
+@media(min-width:620px){:root{--pad:20px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div>
+    <div class="t">Day 1 · Guided activity</div>
+    <div class="s" id="stepLabel">Step 1 of 4</div>
+  </div>
+  <div class="grow"></div>
+  <div class="pips" id="pips"></div>
+</div>
+
+<!-- TEACHING VOICE -->
+<div class="step" id="stepCard">
+  <div class="lab" id="sLab">Step 1</div>
+  <h2 id="sTitle"></h2>
+  <p id="sBody"></p>
+  <div class="todo"><span class="h">👉</span><span id="sTodo"></span></div>
+</div>
+
+<div class="reveal hide" id="revealCard">
+  <div class="lab">✓ What just happened</div>
+  <div id="rBody"></div>
+  <button class="next" id="nextBtn">Continue</button>
+</div>
+
+<!-- LIVE NARRATOR -->
+<div class="narr" id="narr">
+  <span class="ic" id="nIc">🟢</span>
+  <span id="nTxt"></span>
+</div>
+
+<!-- THE POINT: two prices -->
+<div class="card">
+  <h3>What each side pays <span class="r mono" id="stateR">—</span></h3>
+  <div class="prices">
+    <div class="pbox lo" id="boxA">
+      <div class="who">Bus A · source</div>
+      <div class="amt mono" id="pAamt">$30</div>
+      <div class="unit">per MWh</div>
+    </div>
+    <div class="vs">
+      <span>gap</span>
+      <span class="gap mono" id="gapAmt">$0</span>
+    </div>
+    <div class="pbox lo" id="boxB">
+      <div class="who">Bus B · demand</div>
+      <div class="amt mono" id="pBamt">$30</div>
+      <div class="unit">per MWh</div>
+    </div>
+  </div>
+</div>
+
+<!-- NETWORK -->
+<div class="card">
+  <h3>The network</h3>
+  <svg viewBox="0 0 340 250" role="img" aria-label="Three bus network">
+    <line id="l1" x1="62" y1="58" x2="278" y2="58" stroke="#35C4B5" stroke-width="8" stroke-linecap="round"/>
+    <line id="l2" x1="110" y1="196" x2="278" y2="78" stroke="#26364F" stroke-width="8" stroke-linecap="round"/>
+    <line x1="62" y1="82" x2="104" y2="176" stroke="#26364F" stroke-width="2" stroke-dasharray="4 6"/>
+    <text id="l1flow" x="170" y="40" text-anchor="middle" fill="#DCE5F0" font-size="14" font-weight="700" font-family="ui-monospace,Menlo,monospace">—</text>
+    <text id="l2flow" x="230" y="150" text-anchor="middle" fill="#8296AE" font-size="12.5" font-family="ui-monospace,Menlo,monospace">—</text>
+    <circle cx="62" cy="58" r="25" fill="#1C283A" stroke="#35C4B5" stroke-width="2.5"/>
+    <text x="62" y="65" text-anchor="middle" fill="#DCE5F0" font-size="17" font-weight="700">A</text>
+    <text x="62" y="100" text-anchor="middle" fill="#8296AE" font-size="10.5">cheap plant</text>
+    <circle id="cRing" cx="110" cy="196" r="25" fill="#1C283A" stroke="#26364F" stroke-width="2.5"/>
+    <text x="110" y="203" text-anchor="middle" fill="#DCE5F0" font-size="17" font-weight="700">C</text>
+    <text x="110" y="238" text-anchor="middle" fill="#8296AE" font-size="10.5" id="cLbl">costly plant · idle</text>
+    <circle id="bRing" cx="278" cy="58" r="25" fill="#1C283A" stroke="#35C4B5" stroke-width="2.5"/>
+    <text x="278" y="65" text-anchor="middle" fill="#DCE5F0" font-size="17" font-weight="700">B</text>
+    <text x="278" y="100" text-anchor="middle" fill="#8296AE" font-size="10.5">all demand</text>
+  </svg>
+  <div class="meter" style="margin-top:4px">
+    <div class="mrow"><span>Flow on Line 1</span><b class="mono" id="m1v">—</b><span class="tail mono" id="m1c">—</span></div>
+    <div class="track"><div class="bar" id="m1b" style="width:0%;background:#35C4B5"></div><div class="cap-mark" id="m1cap"></div></div>
+  </div>
+  <div class="meter">
+    <div class="mrow"><span>Costly plant at C</span><b class="mono" id="m2v">—</b><span class="tail mono" id="m2s">—</span></div>
+    <div class="track"><div class="bar" id="m2b" style="width:0%;background:#E8A33D"></div></div>
+  </div>
+</div>
+
+<!-- RENT -->
+<div class="card">
+  <h3>Congestion rent</h3>
+  <div class="stat mono" id="rentH">$0<i>/hour</i></div>
+  <div class="calc" id="rentCalc"></div>
+  <div class="sub" id="rentYr"></div>
+</div>
+
+<footer>
+  Illustrative teaching values — not ZESCO, SAPP or PJM published prices.<br>
+  Advanced Transmission Tariff Design · Day 1 · runs offline.
+</footer>
+
+<div class="drawer" id="drawer">
+  <div class="handle" id="handle" role="button" tabindex="0" aria-expanded="true">
+    <span class="grip"></span><span class="lbl">Controls</span>
+    <span class="peek mono">Demand <b id="pkD">200</b> · Limit <b id="pkL">250</b></span>
+  </div>
+  <div class="dbody">
+    <div class="ctl" id="c_dem">
+      <label for="dem"><span>Demand at Bus B</span><span class="v mono"><span id="demV">200</span> <s>MW</s></span></label>
+      <input type="range" id="dem" min="100" max="350" step="10" value="200">
+    </div>
+    <div class="ctl" id="c_lim">
+      <label for="lim"><span>Line 1 limit</span><span class="v mono"><span id="limV">250</span> <s>MW</s></span></label>
+      <input type="range" id="lim" min="50" max="300" step="10" value="250">
+    </div>
+    <div class="ctl" id="c_mcC">
+      <label for="mcC"><span>Cost of the costly plant</span><span class="v mono"><s>$</s><span id="mcCV">80</span> <s>/MWh</s></span></label>
+      <input type="range" id="mcC" min="40" max="200" step="5" value="80">
+    </div>
+    <button class="reset" id="resetAll">Start the activity again</button>
+  </div>
+</div>
+
+<script>
+"use strict";
+const DATA={
+  _source:"Illustrative teaching values — not published market data",
+  _dated:"2026-08-30",
+  mcA:30,                       // cheap plant cost, fixed for the lesson
+  start:{dem:200,lim:250,mcC:80},
+  hours:8760
+};
+const $=id=>document.getElementById(id);
+const n0=v=>v.toLocaleString("en-US",{maximumFractionDigits:0});
+
+function solve(dem,lim,mcC){
+  const flow1=Math.min(dem,lim), genC=dem-flow1, bound=genC>0;
+  const pA=DATA.mcA, pB=bound?mcC:DATA.mcA;
+  const sep=pB-pA, rent=sep*flow1;
+  return {flow1,genC,bound,pA,pB,sep,rent};
+}
+
+/* ── the lesson ── */
+const STEPS=[
+ {
+  title:"Start with a line that has room to spare",
+  body:"Cheap power at Bus A costs $30/MWh. Costly plant at Bus C costs more. Right now the line from A to B is big enough to carry everything.",
+  todo:"Set Demand to 200 MW and Line 1 limit to 250 MW",
+  focus:"dem",
+  test:r=>!r.bound,
+  reveal:r=>`
+    <p>The line carries all <b>${r.flow1} MW</b>. Cheap power reaches Bus B, so the costly plant never starts.</p>
+    <p>Look at the two price boxes. They read the <b>same number</b>.</p>
+    <div class="eq">One price for everyone · <b>$${r.pA}/MWh</b> · congestion rent <b>$0</b></div>
+    <p>This is what a normal, unconstrained system looks like. Nothing interesting is happening yet — and that is the point of comparison.</p>`
+ },
+ {
+  title:"Now push demand past what the line can carry",
+  body:"Nothing about the generators changes. Only the amount of power customers want changes.",
+  todo:"Drag Demand up to 300 MW (limit stays at 250)",
+  focus:"dem",
+  test:r=>r.bound,
+  reveal:r=>`
+    <p>The line is full at <b>${r.flow1} MW</b> and cannot carry more. The missing <b>${r.genC} MW</b> must come from the costly plant at C.</p>
+    <p>So the last MW served at Bus B now costs <b>$${r.pB}</b>, not $${r.pA}. The price at Bus A stays at $${r.pA}, because cheap power there is still cheap.</p>
+    <div class="eq">Bus A <b>$${r.pA}</b> &nbsp;·&nbsp; Bus B <b>$${r.pB}</b> &nbsp;→&nbsp; gap <b>$${r.sep}/MWh</b></div>
+    <p><b>This is nodal pricing.</b> One system, two prices, because the wire between them is full. Customers at B pay more purely because of where they are.</p>`
+ },
+ {
+  title:"Where does the extra money go?",
+  body:"Customers at B pay more than the cheap plant earns. That difference has to go somewhere.",
+  todo:"Raise the cost of the costly plant to $130/MWh",
+  focus:"mcC",
+  test:r=>r.bound && r.pB>=130,
+  reveal:r=>`
+    <p>Consumers at B pay $${r.pB} for every MWh. But the cheap plant only earns $${r.pA} for the ${r.flow1} MW it sends down Line 1.</p>
+    <p>That difference does not belong to any generator. The market operator collects it. It is called <b>congestion rent</b>.</p>
+    <div class="eq">gap <b>$${r.sep}</b> × flow <b>${r.flow1} MW</b> = <b>$${n0(r.rent)}</b> per hour</div>
+    <p>Notice the rent grew when you made the costly plant dearer. Congestion rent measures <b>how badly the network is hurting</b>, not how much power moves.</p>`
+ },
+ {
+  title:"Last one: is congestion caused by demand, or by the wire?",
+  body:"You have only changed demand and generator costs so far. Now change the network itself.",
+  todo:"Drag the Line 1 limit down to 150 MW",
+  focus:"lim",
+  test:r=>r.bound && r.flow1<=150,
+  reveal:r=>`
+    <p>You did not touch demand. You made the wire smaller — and the system got worse. The costly plant now runs <b>${r.genC} MW</b> instead of a smaller amount.</p>
+    <p>The rent changed too, to <b>$${n0(r.rent)}/hour</b>, because rent depends on the flow the line can actually carry.</p>
+    <div class="eq">$${r.sep} × ${r.flow1} MW = <b>$${n0(r.rent)}</b>/hour &nbsp;·&nbsp; <b>US$${(r.rent*DATA.hours/1e6).toFixed(1)}M</b> a year</div>
+    <p><b>The regulator's question.</b> That annual figure is the yearly cost of a wire that is too small. Compare it to the cost of building a bigger line. If the line costs less than the rent, the investment pays for itself.</p>
+    <p>That is how congestion rent turns into a transmission investment case — the link you will use again on Day 3 and Day 5.</p>`
+ }
+];
+
+let step=0, done=false;
+
+function paintPips(){
+  $("pips").innerHTML=STEPS.map((_,i)=>
+    `<span class="pip ${i<step?"on":i===step?"now":""}"></span>`).join("");
+  $("stepLabel").textContent = step>=STEPS.length
+    ? "Activity complete · free play" : `Step ${step+1} of ${STEPS.length}`;
+}
+
+function loadStep(){
+  paintPips();
+  document.querySelectorAll(".ctl").forEach(c=>c.classList.remove("focus"));
+  if(step>=STEPS.length){
+    $("stepCard").classList.add("hide");
+    $("revealCard").classList.add("hide");
+    return;
+  }
+  const s=STEPS[step];
+  $("stepCard").classList.remove("hide");
+  $("revealCard").classList.add("hide");
+  $("sLab").textContent="Step "+(step+1);
+  $("sTitle").textContent=s.title;
+  $("sBody").textContent=s.body;
+  $("sTodo").textContent=s.todo;
+  $("c_"+s.focus).classList.add("focus");
+  done=false;
+  render();
+}
+
+function render(){
+  const dem=+$("dem").value, lim=+$("lim").value, mcC=+$("mcC").value;
+  $("demV").textContent=dem; $("limV").textContent=lim; $("mcCV").textContent=mcC;
+  $("pkD").textContent=dem;  $("pkL").textContent=lim;
+
+  const r=solve(dem,lim,mcC);
+  const AMB="#E8A33D",RED="#E05B4B",TEAL="#35C4B5",GREY="#26364F",DIM="#8296AE";
+
+  /* prices */
+  $("pAamt").textContent="$"+r.pA;
+  $("pBamt").textContent="$"+r.pB;
+  $("gapAmt").textContent="$"+r.sep;
+  $("gapAmt").style.color=r.bound?AMB:DIM;
+  $("boxB").className="pbox "+(r.bound?"hi":"lo");
+  $("pBamt").style.color=r.bound?AMB:TEAL;
+  $("pAamt").style.color=TEAL;
+  $("stateR").textContent=r.bound?"two prices":"one price";
+  $("stateR").style.color=r.bound?AMB:TEAL;
+
+  /* network */
+  $("l1").setAttribute("stroke",r.bound?RED:TEAL);
+  $("l1flow").textContent=r.flow1+" / "+lim+" MW";
+  $("l1flow").setAttribute("fill",r.bound?RED:"#DCE5F0");
+  $("l2flow").textContent=r.genC>0?(r.genC+" MW"):"";
+  $("l2").setAttribute("stroke",r.genC>0?AMB:GREY);
+  $("cRing").setAttribute("stroke",r.genC>0?AMB:GREY);
+  $("cLbl").textContent=r.genC>0?("costly plant · $"+mcC):"costly plant · idle";
+  $("bRing").setAttribute("stroke",r.bound?AMB:TEAL);
+
+  const span=Math.max(dem,lim);
+  $("m1v").textContent=r.flow1+" MW";
+  $("m1c").textContent=r.bound?("FULL — limit "+lim):("limit "+lim);
+  $("m1b").style.width=(r.flow1/span*100)+"%";
+  $("m1b").style.background=r.bound?RED:TEAL;
+  $("m1cap").style.left=(lim/span*100)+"%";
+  $("m2v").textContent=r.genC+" MW";
+  $("m2s").textContent=r.genC>0?(Math.round(r.genC/dem*100)+"% of demand"):"not running";
+  $("m2b").style.width=(r.genC/span*100)+"%";
+
+  /* rent */
+  $("rentH").innerHTML="$"+n0(r.rent)+"<i>/hour</i>";
+  $("rentCalc").innerHTML = r.bound
+    ? `gap <b>$${r.sep}</b> × flow <b>${r.flow1} MW</b> = <b>$${n0(r.rent)}</b>`
+    : `No gap between the prices, so no rent is collected.`;
+  $("rentYr").textContent = r.bound
+    ? "US$"+(r.rent*DATA.hours/1e6).toFixed(1)+"M a year at 8,760 hours" : "";
+
+  /* narrator — plain words, always */
+  if(r.bound){
+    $("nIc").textContent="🔴";
+    $("nTxt").innerHTML=`Line 1 is <b>full</b>. Cheap power cannot get through, so the costly plant runs `+
+      `<b>${r.genC} MW</b> and Bus B pays <b>$${r.pB}</b> while Bus A pays <b>$${r.pA}</b>.`;
+  }else{
+    $("nIc").textContent="🟢";
+    $("nTxt").innerHTML=`Line 1 has <b>${lim-r.flow1} MW to spare</b>. Cheap power reaches everyone, `+
+      `so both places pay the same <b>$${r.pA}</b> and there is no congestion rent.`;
+  }
+
+  /* step completion */
+  if(step<STEPS.length && !done && STEPS[step].test(r)){
+    done=true;
+    $("rBody").innerHTML=STEPS[step].reveal(r);
+    $("revealCard").classList.remove("hide");
+    $("stepCard").classList.add("hide");
+    $("nextBtn").textContent = step===STEPS.length-1 ? "Finish — free play" : "Continue";
+    $("revealCard").scrollIntoView({behavior:"smooth",block:"nearest"});
+  }
+  sizePad();
+}
+
+["dem","lim","mcC"].forEach(id=>$(id).addEventListener("input",render));
+$("nextBtn").addEventListener("click",()=>{ step++; loadStep();
+  window.scrollTo({top:0,behavior:"smooth"}); });
+$("resetAll").addEventListener("click",()=>{
+  $("dem").value=DATA.start.dem; $("lim").value=DATA.start.lim; $("mcC").value=DATA.start.mcC;
+  step=0; loadStep(); window.scrollTo({top:0,behavior:"smooth"});
+});
+
+const drawer=$("drawer"),handle=$("handle");
+function sizePad(){document.documentElement.style.setProperty("--drawer",drawer.offsetHeight+"px");}
+function toggleDrawer(){drawer.classList.toggle("min");
+  handle.setAttribute("aria-expanded",String(!drawer.classList.contains("min")));sizePad();}
+handle.addEventListener("click",toggleDrawer);
+handle.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleDrawer();}});
+window.addEventListener("resize",sizePad);
+
+loadStep(); sizePad();
+</script>
+</body>
+</html>
