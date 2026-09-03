@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sesheke–Gobabis Corridor · Day 4</title>
+<style>
+:root{
+  --bg:#0a0e13; --panel:#131b23; --panel2:#1a242e; --line:#25323e; --line2:#324352;
+  --ink:#eaf1f7; --dim:#8ca0b3; --dim2:#5d7286;
+  --accent:#2fc8a0; --accent2:#1a8f72; --warn:#eda23c; --bad:#e05548;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,sans-serif;
+  font-size:17px;line-height:1.55;-webkit-text-size-adjust:100%}
+#app{max-width:660px;margin:0 auto;padding:14px 16px 200px}
+
+/* header */
+header{position:sticky;top:0;z-index:20;background:rgba(10,14,19,.95);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.hin{max-width:660px;margin:0 auto;padding:9px 16px 7px}
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.hleft{display:flex;align-items:center;gap:8px;min-width:0}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--dim2);flex:none}
+.dot.live{background:var(--accent);box-shadow:0 0 0 3px rgba(47,200,160,.15)}
+.htitle{font-size:13px;font-weight:600;letter-spacing:.02em;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis}
+.hstep{font-size:12px;color:var(--dim);white-space:nowrap;font-variant-numeric:tabular-nums}
+.bar{height:3px;background:var(--panel2)}
+.bar span{display:block;height:100%;background:var(--accent);width:0;transition:width .4s}
+
+h1{font-size:23px;line-height:1.22;margin:0 0 6px;letter-spacing:-.01em}
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);
+  margin:24px 0 8px;font-weight:700}
+.kicker{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim2);margin-bottom:7px}
+p{margin:0 0 12px}
+.lead{color:var(--dim)}
+small{color:var(--dim2);font-size:13px}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;margin:14px 0}
+.card.tight{padding:12px 14px}
+.accent{border-left:3px solid var(--accent)}
+.warnbox{border-left:3px solid var(--warn)}
+.badbox{border-left:3px solid var(--bad)}
+
+table{width:100%;border-collapse:collapse;font-size:14px;margin:4px 0}
+th,td{text-align:left;padding:8px 5px;border-bottom:1px solid var(--line)}
+th{color:var(--dim2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tr.tot td{font-weight:700;border-top:1px solid var(--line2)}
+
+/* forms */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.06em;
+  color:var(--dim2);margin-bottom:6px;font-weight:600}
+input,select{width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--ink);
+  border-radius:11px;padding:0 14px;height:50px;font-size:17px;font-family:inherit;
+  -webkit-appearance:none;appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--dim) 50%),
+  linear-gradient(135deg,var(--dim) 50%,transparent 50%);
+  background-position:calc(100% - 20px) 22px,calc(100% - 15px) 22px;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+input:focus,select:focus{outline:none;border-color:var(--accent)}
+input[type=number]{font-variant-numeric:tabular-nums;font-size:19px;-moz-appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+.qbox{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:15px;margin:16px 0}
+.qhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.qhead .qlab{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);font-weight:700}
+.qhead .qmeta{font-size:12px;color:var(--dim2)}
+.qtext{font-size:16px;margin-bottom:12px}
+.inrow{display:flex;gap:8px}
+.pfx{display:flex;align-items:center;padding:0 13px;background:var(--panel);
+  border:1px solid var(--line2);border-radius:11px;color:var(--dim);font-size:14px;
+  font-weight:600;white-space:nowrap}
+.hint{font-size:13px;color:var(--dim2);margin-top:9px;line-height:1.45}
+
+button{font-family:inherit;font-size:16px;font-weight:600;border:none;cursor:pointer}
+.btn{width:100%;min-height:52px;border-radius:12px;background:var(--accent);color:#04231b;margin-top:12px}
+.btn.ghost{background:transparent;border:1px solid var(--line2);color:var(--ink)}
+.btn:disabled{opacity:.35;cursor:default}
+
+.verdict{border-radius:12px;padding:13px 15px;margin-top:12px;font-size:15px;display:none}
+.verdict.ok{background:rgba(47,200,160,.11);border:1px solid rgba(47,200,160,.35)}
+.verdict.no{background:rgba(224,85,72,.11);border:1px solid rgba(224,85,72,.35)}
+.verdict b{display:block;margin-bottom:3px}
+.reveal{display:none}
+.reveal.on{display:block;animation:fade .32s ease}
+@keyframes fade{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+.calc{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 13px;
+  font-variant-numeric:tabular-nums;font-size:14.5px;margin:10px 0}
+.calc div{padding:3px 0}
+.calc .eq{color:var(--dim2);font-size:13px}
+.calc .res{color:var(--accent);font-weight:700;font-size:16px;padding-top:7px;
+  border-top:1px solid var(--line);margin-top:7px}
+
+.pricebar{margin:16px 0}
+.pb{display:flex;align-items:center;gap:9px;margin-bottom:8px;font-size:13px}
+.pb .lab{width:76px;color:var(--dim);flex:none;font-size:12px}
+.pb .track{flex:1;height:24px;background:var(--panel2);border-radius:7px;overflow:hidden}
+.pb .fill{height:100%;border-radius:7px;transition:width .6s cubic-bezier(.2,.8,.3,1)}
+.pb .val{width:62px;text-align:right;font-variant-numeric:tabular-nums;flex:none;font-weight:600}
+
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.chip{background:var(--panel2);border:1px solid var(--line);border-radius:20px;
+  padding:5px 11px;font-size:13px;color:var(--dim)}
+.chip b{color:var(--ink);font-weight:600}
+
+details{background:var(--panel2);border:1px solid var(--line);border-radius:11px;
+  padding:12px 14px;margin:11px 0}
+summary{cursor:pointer;font-size:14px;font-weight:600;color:var(--accent);list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::after{content:" ▾";color:var(--dim2)}
+details[open] summary::after{content:" ▴"}
+details p{margin:10px 0 0;font-size:14px;color:var(--dim)}
+
+/* peers */
+.peer{border:1px solid var(--line);border-radius:13px;overflow:hidden;margin:14px 0;background:var(--panel)}
+.peerhead{display:flex;justify-content:space-between;align-items:center;
+  padding:11px 14px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.peerhead .t{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:700}
+.peerhead .c{font-size:12px;color:var(--accent);font-variant-numeric:tabular-nums}
+.prow{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.prow:last-child{border-bottom:none}
+.av{width:32px;height:32px;border-radius:9px;flex:none;display:flex;align-items:center;
+  justify-content:center;font-size:12px;font-weight:700;color:#04231b}
+.pinfo{flex:1;min-width:0}
+.pname{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.porg{font-size:12px;color:var(--dim2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pval{font-variant-numeric:tabular-nums;font-size:14.5px;font-weight:600;flex:none}
+.pval.ok{color:var(--accent)} .pval.no{color:var(--warn)}
+.pempty{padding:18px 14px;text-align:center;color:var(--dim2);font-size:14px}
+
+.tag{display:inline-block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+  padding:3px 8px;border-radius:6px;background:var(--panel2);color:var(--dim);border:1px solid var(--line)}
+.tag.on{background:rgba(47,200,160,.14);color:var(--accent);border-color:rgba(47,200,160,.3)}
+.tag.off{background:rgba(224,85,72,.12);color:var(--bad);border-color:rgba(224,85,72,.3)}
+
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(10,14,19,.97);
+  backdrop-filter:blur(12px);border-top:1px solid var(--line);
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.navin{max-width:660px;margin:0 auto;display:flex;gap:10px}
+.nav button{flex:1;min-height:51px;border-radius:12px}
+.nav .back{flex:0 0 88px;background:transparent;border:1px solid var(--line2);color:var(--dim)}
+.nav .next{background:var(--accent);color:#04231b}
+.nav .next:disabled{background:var(--panel2);color:var(--dim2)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hin">
+    <div class="hrow">
+      <div class="hleft"><span class="dot" id="hDot"></span>
+        <span class="htitle" id="hTitle">Sesheke–Gobabis Corridor</span></div>
+      <div class="hstep" id="hStep"></div>
+    </div>
+  </div>
+  <div class="bar"><span id="hBar"></span></div>
+</header>
+
+<div id="app"></div>
+
+<div class="nav"><div class="navin">
+  <button class="back" id="btnBack">Back</button>
+  <button class="next" id="btnNext">Begin</button>
+</div></div>
+
+<script>
+/* ══════════════ EDITABLE DATA BLOCK ══════════════ */
+const CFG = {
+  firebase: "https://test-7f3ce-default-rtdb.firebaseio.com",
+  root: "ttd/day4",          // database branch used by this app
+  session: "LUSAKA-01",      // change per cohort; trainees pick it on the sign-in screen
+  pollMs: 6000               // how often peer answers refresh
+};
+const SESSIONS = ["LUSAKA-01","LUSAKA-02","DUBAI-01","DEMO"];
+const ORGS = ["ZESCO","ERB","SAPP","NamPower","Botswana Power","Other"];
+
+const D = {
+  capacityMW: 50, capacityFactor: 0.40,
+  genCost: 50, altSupply: 90,
+  lossPct: 0.05, lossValue: 80,
+  rr: { ZM:1875000, BW:4500000, NA:1125000 },
+  zonal: { entryZM:15000, transitBW:0, exitNA:25000 },
+  resp: { ZM:[2000,500], BW:[200,800], NA:[100,1400] },
+  benefit: { ZM:20, NA:25, BW:5 }
+};
+/* ═════════════════════════════════════════════════ */
+
+/* ---- derived figures ---- */
+const E = D.capacityMW*8760*D.capacityFactor;
+const lossMWh = E*D.lossPct, lossCost = lossMWh*D.lossValue, lossPerMWh = lossCost/E;
+const rrTotal = D.rr.ZM+D.rr.BW+D.rr.NA;
+const s1Total = rrTotal+lossCost, s1 = s1Total/E;
+const s2Total = D.rr.BW+D.rr.NA+lossCost, s2 = s2Total/E;
+const s3Total = D.capacityMW*(D.zonal.entryZM+D.zonal.transitBW+D.zonal.exitNA), s3 = s3Total/E;
+const gap = rrTotal-s3Total;
+const rec = {ZM:D.capacityMW*D.zonal.entryZM, BW:D.capacityMW*D.zonal.transitBW, NA:D.capacityMW*D.zonal.exitNA};
+const respTot = Object.values(D.resp).reduce((a,b)=>a+b[0]+b[1],0);
+const share={}, contrib={}, receipt={}, net={};
+for(const k in D.resp){ share[k]=(D.resp[k][0]+D.resp[k][1])/respTot; }
+for(const k in share){ contrib[k]=share[k]*gap; receipt[k]=D.rr[k]-rec[k]; net[k]=receipt[k]-contrib[k]; }
+const benTot = D.benefit.ZM+D.benefit.NA+D.benefit.BW;
+const cbca={}; for(const k in D.benefit) cbca[k]=D.benefit[k]/benTot*rrTotal;
+const NAME = {ZM:'Zambia',BW:'Botswana',NA:'Namibia'};
+
+const m = n => Math.round(n).toLocaleString('en-US');
+const d2 = n => n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pc = n => (n*100).toLocaleString('en-US',{maximumFractionDigits:1})+'%';
+
+/* ══════════════ FIREBASE (REST, no SDK) ══════════════ */
+const FB = {
+  online: false,
+  url(path){ return `${CFG.firebase}/${CFG.root}/${state.session}/${path}.json`; },
+  async put(path, data){
+    try{
+      const r = await fetch(this.url(path), {method:'PUT', body:JSON.stringify(data)});
+      this.online = r.ok; setDot(); return r.ok;
+    }catch(e){ this.online=false; setDot(); return false; }
+  },
+  async patch(path, data){
+    try{
+      const r = await fetch(this.url(path), {method:'PATCH', body:JSON.stringify(data)});
+      this.online = r.ok; setDot(); return r.ok;
+    }catch(e){ this.online=false; setDot(); return false; }
+  },
+  async get(path){
+    try{
+      const r = await fetch(this.url(path));
+      this.online = r.ok; setDot();
+      if(!r.ok) return null;
+      return await r.json();
+    }catch(e){ this.online=false; setDot(); return null; }
+  }
+};
+function setDot(){
+  const d = document.getElementById('hDot');
+  if(d) d.className = 'dot' + (FB.online ? ' live' : '');
+}
+
+/* ---- local participant state ---- */
+const state = {
+  i:0, unlocked:false, poll:null,
+  uid: 'u'+Math.random().toString(36).slice(2,9),
+  name:'', org:'', session: CFG.session, answers:{}
+};
+
+function avatarColour(str){
+  let h=0; for(let i=0;i<str.length;i++) h=(h*31+str.charCodeAt(i))%360;
+  return `hsl(${h} 55% 62%)`;
+}
+function initials(n){
+  return n.trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase() || '?';
+}
+
+/* ---- question definitions (id → correct value, tolerance) ---- */
+const Q = {
+  s0:{v:E,      t:1,     unit:'MWh'},
+  s1:{v:D.genCost+s1, t:0.5, unit:'US$/MWh'},
+  s2:{v:D.genCost+s2, t:0.5, unit:'US$/MWh'},
+  s3:{v:D.genCost+s3+lossPerMWh, t:0.6, unit:'US$/MWh'},
+  s4:{v:contrib.ZM, t:5000, unit:'US$'},
+  s5:{v:cbca.BW,   t:20000, unit:'US$'}
+};
+
+/* ---- reusable question block ---- */
+function askBox(id, qlabel, question, prefix, hint, revealHTML){
+  return `<div class="qbox">
+    <div class="qhead"><span class="qlab">${qlabel}</span>
+      <span class="qmeta">answer in ${Q[id].unit}</span></div>
+    <div class="qtext">${question}</div>
+    <div class="inrow"><div class="pfx">${prefix}</div>
+      <input type="number" inputmode="decimal" id="in_${id}" placeholder="Your answer"></div>
+    <div class="hint">${hint}</div>
+    <button class="btn" id="ck_${id}">Submit answer</button>
+    <div class="verdict" id="vd_${id}"></div>
+  </div>
+  <div class="peer" id="pr_${id}">
+    <div class="peerhead"><span class="t">What the room answered</span>
+      <span class="c" id="pc_${id}">—</span></div>
+    <div id="pl_${id}"><div class="pempty">Submit your answer to see the room.</div></div>
+  </div>
+  <div class="reveal" id="rv_${id}">${revealHTML}</div>`;
+}
+
+function wireBox(id, okMsg, tip){
+  const btn=document.getElementById('ck_'+id), inp=document.getElementById('in_'+id),
+        vd=document.getElementById('vd_'+id), rv=document.getElementById('rv_'+id);
+  const {v:correct, t:tol} = Q[id];
+  let tries=0;
+  const submit = async (value, right) => {
+    state.answers[id] = {value, right, ts: Date.now()};
+    await FB.patch(`participants/${state.uid}/answers`, {[id]:{v:value, ok:right, ts:Date.now()}});
+    rv.classList.add('on'); state.unlocked=true; syncNav();
+    startPoll(id);
+  };
+  btn.onclick = async () => {
+    const val = parseFloat(inp.value);
+    vd.style.display='block';
+    if(isNaN(val)){ vd.className='verdict no'; vd.innerHTML='<b>Enter a number first.</b>'+tip; return; }
+    const right = Math.abs(val-correct) <= tol;
+    if(right){
+      vd.className='verdict ok'; vd.innerHTML='<b>Correct.</b>'+okMsg;
+      btn.disabled=true; inp.disabled=true; await submit(val,true);
+    } else {
+      tries++;
+      if(tries>=2){
+        vd.className='verdict no';
+        vd.innerHTML='<b>Not quite — the working is below.</b>Correct answer: '+d2(correct)+'.';
+        btn.disabled=true; inp.disabled=true; await submit(val,false);
+      } else {
+        vd.className='verdict no'; vd.innerHTML='<b>Not yet — one more try.</b>'+tip;
+      }
+    }
+  };
+  inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); btn.click(); }});
+}
+
+/* ---- live peer panel ---- */
+function startPoll(qid){
+  stopPoll();
+  const draw = async () => {
+    const data = await FB.get('participants');
+    const list = document.getElementById('pl_'+qid), cnt = document.getElementById('pc_'+qid);
+    if(!list) return stopPoll();
+    if(!data){
+      list.innerHTML = `<div class="pempty">Offline — your answer is saved on this device.</div>`;
+      if(cnt) cnt.textContent='offline'; return;
+    }
+    const rows = Object.entries(data)
+      .filter(([id,p]) => p && p.answers && p.answers[qid])
+      .sort((a,b)=> a[1].answers[qid].ts - b[1].answers[qid].ts);
+    if(cnt) cnt.textContent = rows.length + (rows.length===1?' answer':' answers');
+    if(!rows.length){ list.innerHTML=`<div class="pempty">You are first. Others will appear here.</div>`; return; }
+    list.innerHTML = rows.map(([id,p])=>{
+      const a = p.answers[qid], me = id===state.uid;
+      const nm = (p.name||'Anonymous') + (me?' (you)':'');
+      return `<div class="prow">
+        <div class="av" style="background:${avatarColour(p.name||id)}">${initials(p.name||'?')}</div>
+        <div class="pinfo"><div class="pname">${nm}</div><div class="porg">${p.org||''}</div></div>
+        <div class="pval ${a.ok?'ok':'no'}">${d2(a.v)}</div>
+      </div>`;
+    }).join('');
+  };
+  draw();
+  state.poll = setInterval(draw, CFG.pollMs);
+}
+function stopPoll(){ if(state.poll){ clearInterval(state.poll); state.poll=null; } }
+
+function priceBars(active){
+  const rows=[['Stage 1',D.genCost+s1,'var(--bad)'],['Stage 2',D.genCost+s2,'var(--warn)'],
+              ['Stage 3–4',D.genCost+s3+lossPerMWh,'var(--accent)']].slice(0,active);
+  const max=D.genCost+s1;
+  return `<div class="pricebar">${rows.map(r=>`<div class="pb"><div class="lab">${r[0]}</div>
+    <div class="track"><div class="fill" style="width:${(r[1]/max*100).toFixed(0)}%;background:${r[2]}"></div></div>
+    <div class="val">$${d2(r[1])}</div></div>`).join('')}
+    <div class="pb"><div class="lab">Namibia alt.</div>
+    <div class="track"><div class="fill" style="width:${(D.altSupply/max*100).toFixed(0)}%;background:transparent;border:1px dashed var(--dim2)"></div></div>
+    <div class="val">$${d2(D.altSupply)}</div></div></div>`;
+}
+
+/* ══════════════ SCREENS ══════════════ */
+const screens = [
+
+{ id:'signin', title:'Sign in', free:false, html:()=>`
+  <div class="kicker">Advanced Transmission Tariff Design · Day 4</div>
+  <h1>Sesheke–Gobabis Corridor</h1>
+  <p class="lead">A group exercise. Enter your details so the room can see each other's
+  answers as you work through it.</p>
+  <div class="card">
+    <div class="field"><label>Your name</label>
+      <input type="text" id="fName" autocomplete="name" placeholder="e.g. Mwansa Banda"></div>
+    <div class="field"><label>Organisation</label>
+      <select id="fOrg">${ORGS.map(o=>`<option>${o}</option>`).join('')}</select></div>
+    <div class="field" style="margin-bottom:0"><label>Session code</label>
+      <select id="fSess">${SESSIONS.map(s=>`<option ${s===CFG.session?'selected':''}>${s}</option>`).join('')}</select></div>
+    <button class="btn" id="joinBtn">Join session</button>
+    <div class="verdict" id="joinMsg"></div>
+  </div>
+  <small>Your answers are shared with this session only, under your chosen name. Nothing else
+  is collected.</small>`,
+  wire:()=>{
+    const btn=document.getElementById('joinBtn'), msg=document.getElementById('joinMsg');
+    document.getElementById('fName').addEventListener('keydown',e=>{if(e.key==='Enter')btn.click();});
+    btn.onclick = async () => {
+      const n=document.getElementById('fName').value.trim();
+      msg.style.display='block';
+      if(n.length<2){ msg.className='verdict no'; msg.innerHTML='<b>Please enter your name.</b>'; return; }
+      state.name=n;
+      state.org=document.getElementById('fOrg').value;
+      state.session=document.getElementById('fSess').value;
+      btn.disabled=true; btn.textContent='Joining…';
+      const ok = await FB.put(`participants/${state.uid}`,
+        {name:state.name, org:state.org, joined:Date.now(), answers:{}});
+      msg.className='verdict ok';
+      msg.innerHTML = ok
+        ? `<b>Joined ${state.session}.</b> You are live — the room will see your answers.`
+        : `<b>Joined offline.</b> Could not reach the database, so peer answers are hidden. Everything else works normally.`;
+      btn.textContent='Joined'; state.unlocked=true; syncNav();
+      document.getElementById('hTitle').textContent = state.name + ' · ' + state.session;
+    };
+  }},
+
+{ id:'intro', title:'Orientation', free:true, html:()=>`
+  <div class="kicker">Before you start</div>
+  <h1>One power line. Five ways to pay for it.</h1>
+  <p class="lead">You will price the same cross-border trade five times. The project never
+  changes — only the tariff rule. Watch what the rule alone does to the delivered price.</p>
+  <div class="card accent">
+    <h2 style="margin-top:0">Three questions behind everything today</h2>
+    <p><b>1 · Who owns the wires?</b> Several companies in several countries. Each has built
+    its network and must recover the cost.</p>
+    <p><b>2 · What does the trader pay, and to whom?</b> That is the wheeling charge.</p>
+    <p style="margin-bottom:0"><b>3 · What if charges don't cover costs?</b> Someone
+    under-recovers. A compensation fund closes the gap.</p>
+  </div>
+  <details><summary>Key terms — tap to open</summary>
+    <p><b>TSO</b> — Transmission System Operator; owns and runs the high-voltage grid.</p>
+    <p><b>Wheeling</b> — carrying someone else's power across your network.</p>
+    <p><b>Pancaking</b> — every country charges its full cost, stacked one on another.</p>
+    <p><b>Entry/exit</b> — you pay where power enters and leaves. Nothing in between.</p>
+    <p><b>Transit country</b> — power passes through but is neither made nor used there.</p>
+    <p><b>ITC</b> — Inter-TSO Compensation; a fund repaying hosts of flows they did not cause.</p>
+    <p><b>Responsibility</b> — a country's cross-border activity: exports + imports.</p>
+    <p><b>Capacity factor</b> — actual annual output ÷ maximum possible output.</p>
+  </details>`},
+
+{ id:'case', title:'The case', free:true, html:()=>`
+  <div class="kicker">The project</div>
+  <h1>Sesheke → Gobabis</h1>
+  <p>A ${D.capacityMW} MW hydro IPP in Sesheke, Zambia, wants to sell to an industrial load at
+  Gobabis, Namibia. The power must cross Botswana — which neither makes nor uses any of it.</p>
+  <div class="card tight"><table>
+    <tr><td>Zambia · ZESCO</td><td class="n">150 km</td></tr>
+    <tr><td>Botswana · BPC <span class="tag">transit</span></td><td class="n">500 km</td></tr>
+    <tr><td>Namibia · NamPower</td><td class="n">150 km</td></tr>
+    <tr class="tot"><td>Route</td><td class="n">800 km</td></tr>
+  </table></div>
+  <h2>Fixed inputs</h2>
+  <div class="chips">
+    <span class="chip">Capacity <b>${D.capacityMW} MW</b></span>
+    <span class="chip">Load factor <b>${pc(D.capacityFactor)}</b></span>
+    <span class="chip">Generation <b>$${D.genCost}/MWh</b></span>
+    <span class="chip">Namibia alternative <b>$${D.altSupply}/MWh</b></span>
+    <span class="chip">Losses <b>${pc(D.lossPct)}</b> @ <b>$${D.lossValue}/MWh</b></span>
+  </div>
+  <h2>Annual revenue requirement</h2>
+  <div class="card tight"><table>
+    <tr><th>Network</th><th class="n">US$/year</th></tr>
+    <tr><td>Zambia</td><td class="n">${m(D.rr.ZM)}</td></tr>
+    <tr><td>Botswana</td><td class="n">${m(D.rr.BW)}</td></tr>
+    <tr><td>Namibia</td><td class="n">${m(D.rr.NA)}</td></tr>
+    <tr class="tot"><td>Total</td><td class="n">${m(rrTotal)}</td></tr>
+  </table></div>
+  <p class="lead">Botswana carries the largest cost and uses none of the power. Remember that —
+  it drives everything from Stage 3 onward.</p>`},
+
+{ id:'step0', title:'Step 0', html:()=>`
+  <div class="kicker">Step 0 · foundation</div>
+  <h1>Turn capacity into energy</h1>
+  <p>Charges are quoted per year. Electricity sells per MWh. You cannot compare the two until
+  you know how much energy the corridor carries.</p>
+  <div class="calc"><div class="eq">Energy = MW × hours per year × load factor</div>
+    <div>= ${D.capacityMW} × 8,760 × ${D.capacityFactor}</div></div>
+  ${askBox('s0','Question 1','How many MWh does the corridor carry each year?','MWh',
+    'Multiply the three numbers above.', `
+    <div class="card accent"><div class="calc">
+      <div class="eq">Annual energy</div>
+      <div>${D.capacityMW} × 8,760 × ${D.capacityFactor} = <b>${m(E)} MWh</b></div>
+      <div class="eq" style="padding-top:8px">Losses</div>
+      <div>${m(E)} × ${D.lossPct} = ${m(lossMWh)} MWh</div>
+      <div>${m(lossMWh)} × $${D.lossValue} = $${m(lossCost)} per year</div>
+      <div class="res">Losses = $${d2(lossPerMWh)}/MWh</div>
+    </div>
+    <p style="margin:8px 0 0;font-size:14px;color:var(--dim)">Note $${d2(lossPerMWh)}/MWh down.
+    It appears in every stage and never changes.</p></div>`)}`,
+  wire:()=>wireBox('s0','Everything else rests on this number.',
+    'Hint: 8,760 hours × the load factor gives effective full-power hours.')},
+
+{ id:'s1', title:'Stage 1', html:()=>`
+  <div class="kicker">Stage 1 of 5 · pancaking</div>
+  <h1>Everyone charges in full</h1>
+  <p><b>The rule:</b> all three TSOs bill the trader their entire annual cost, stacked.</p>
+  ${askBox('s1','Question 2','What is the delivered price in Namibia?','US$',
+    `Add all three networks + $${m(lossCost)} losses, divide by ${m(E)} MWh, then add the $${D.genCost} generation cost.`, `
+    <div class="card badbox"><div class="calc">
+      <div>${m(D.rr.ZM)} + ${m(D.rr.BW)} + ${m(D.rr.NA)} + ${m(lossCost)}</div>
+      <div>= $${m(s1Total)} per year</div>
+      <div class="eq" style="padding-top:6px">÷ ${m(E)} MWh</div>
+      <div>= $${d2(s1)}/MWh wheeling</div>
+      <div class="res">+ $${D.genCost} generation = $${d2(D.genCost+s1)}/MWh delivered</div>
+    </div></div>
+    <div class="verdict no" style="display:block"><b>The trade dies.</b>
+    $${d2(D.genCost+s1)} sits above Namibia's $${D.altSupply} alternative — and no rule was
+    broken. Every TSO charged only its genuine cost.</div>
+    ${priceBars(1)}
+    <details><summary>Why this matters for SAPP</summary>
+      <p>Pancaking was the regional default before harmonisation. It kills sound trades purely
+      through the arithmetic of stacking, and the longer the route the worse it gets — which
+      penalises exactly the landlocked interconnections the region most needs.</p></details>`)}`,
+  wire:()=>wireBox('s1','And it prices the trade out of the market.',
+    'Hint: total annual charge ÷ '+m(E)+' MWh, then add $'+D.genCost+'.')},
+
+{ id:'s2', title:'Stage 2', html:()=>`
+  <div class="kicker">Stage 2 of 5 · transit cost-sharing</div>
+  <h1>Zambia steps out of the stack</h1>
+  <p><b>The rule:</b> ZESCO already recovers its 150 km from Zambian domestic tariffs. Billing
+  the export again would be double recovery. Only Botswana and Namibia charge.</p>
+  ${askBox('s2','Question 3','What is the new delivered price?','US$',
+    'Same method as Stage 1, but leave Zambia out.', `
+    <div class="card warnbox"><div class="calc">
+      <div>${m(D.rr.BW)} + ${m(D.rr.NA)} + ${m(lossCost)} = $${m(s2Total)}/yr</div>
+      <div class="eq" style="padding-top:6px">÷ ${m(E)} MWh</div>
+      <div>= $${d2(s2)}/MWh wheeling</div>
+      <div class="res">delivered $${d2(D.genCost+s2)}/MWh</div>
+    </div></div>
+    <div class="verdict ok" style="display:block"><b>The trade proceeds.</b>
+    Below the $${D.altSupply} alternative. Namibia saves $${d2(D.altSupply-D.genCost-s2)}/MWh —
+    roughly $${m((D.altSupply-D.genCost-s2)*E)} per year.</div>
+    ${priceBars(2)}
+    <details><summary>"But the power really does flow over Zambia's line."</summary>
+      <p>True, and irrelevant. That line serves Zambian domestic load whether or not the export
+      happens; the export uses spare capacity. Tariffs follow <b>incremental</b> cost, not
+      physical presence. This is the most common error in the exercise.</p></details>`)}`,
+  wire:()=>wireBox('s2','Removing one cost saved $'+d2(s1-s2)+'/MWh.',
+    'Hint: Botswana + Namibia + losses only.')},
+
+{ id:'s3', title:'Stage 3', html:()=>`
+  <div class="kicker">Stage 3 of 5 · entry / exit</div>
+  <h1>Pay at the edges only</h1>
+  <p><b>The rule:</b> the SAPP day-ahead direction and standard EU practice. Charge where power
+  enters the regional grid and where it leaves. Distance in between is free to the trader.</p>
+  <div class="card tight"><table>
+    <tr><th>Point</th><th class="n">US$/MW/yr</th></tr>
+    <tr><td>Zambia entry</td><td class="n">${m(D.zonal.entryZM)}</td></tr>
+    <tr><td>Botswana transit</td><td class="n">${m(D.zonal.transitBW)}</td></tr>
+    <tr><td>Namibia exit</td><td class="n">${m(D.zonal.exitNA)}</td></tr>
+  </table></div>
+  ${askBox('s3','Question 4','What is the delivered price now? (include losses)','US$',
+    `${D.capacityMW} MW × the charges, ÷ ${m(E)} MWh, + $${D.genCost} generation + $${d2(lossPerMWh)} losses.`, `
+    <div class="card accent"><div class="calc">
+      <div>${D.capacityMW} × (${m(D.zonal.entryZM)} + 0 + ${m(D.zonal.exitNA)}) = $${m(s3Total)}/yr</div>
+      <div>÷ ${m(E)} MWh = $${d2(s3)}/MWh</div>
+      <div class="res">$${D.genCost} + $${d2(s3)} + $${d2(lossPerMWh)} = $${d2(D.genCost+s3+lossPerMWh)}/MWh</div>
+    </div></div>
+    ${priceBars(3)}
+    <div class="verdict ok" style="display:block"><b>Cheapest yet.</b> Namibia saves
+    $${d2(D.altSupply-D.genCost-s3-lossPerMWh)}/MWh. The strongest trade signal so far.</div>
+    <h2>Now check the TSOs</h2>
+    <p>The trader is delighted. Look at who actually got paid.</p>
+    <div class="card badbox"><table>
+      <tr><th>TSO</th><th class="n">Receives</th><th class="n">Requires</th><th class="n">Position</th></tr>
+      ${['ZM','BW','NA'].map(k=>`<tr><td>${NAME[k]}</td><td class="n">${m(rec[k])}</td>
+        <td class="n">${m(D.rr[k])}</td>
+        <td class="n" style="color:${D.rr[k]-rec[k]>0?'var(--bad)':'var(--accent)'}">
+        ${D.rr[k]-rec[k]>0?'−':'+'}${m(Math.abs(D.rr[k]-rec[k]))}</td></tr>`).join('')}
+      <tr class="tot"><td>Shortfall</td><td class="n">${m(s3Total)}</td><td class="n">${m(rrTotal)}</td>
+        <td class="n" style="color:var(--bad)">−${m(gap)}</td></tr>
+    </table></div>
+    <p><b>Botswana hosts 500 km and receives nothing.</b> No Botswana regulator signs that.
+    Entry/exit pricing on its own is incomplete — which is exactly why Stage 4 exists.</p>`)}`,
+  wire:()=>wireBox('s3','Now look at what it does to the TSOs.',
+    'Hint: don\'t forget the $'+d2(lossPerMWh)+'/MWh loss charge.')},
+
+{ id:'s4', title:'Stage 4', html:()=>`
+  <div class="kicker">Stage 4 of 5 · Inter-TSO Compensation</div>
+  <h1>Close the gap with a fund</h1>
+  <p><b>The rule:</b> keep Stage 3's low charges — they are good economics — and close the
+  $${m(gap)} shortfall separately. Each country pays in by <b>responsibility</b>: exports + imports.</p>
+  <div class="card tight"><table>
+    <tr><th>Country</th><th class="n">Exp</th><th class="n">Imp</th><th class="n">Resp.</th><th class="n">Share</th></tr>
+    ${['ZM','BW','NA'].map(k=>`<tr><td>${NAME[k]}</td><td class="n">${m(D.resp[k][0])}</td>
+      <td class="n">${m(D.resp[k][1])}</td><td class="n">${m(D.resp[k][0]+D.resp[k][1])}</td>
+      <td class="n">${pc(share[k])}</td></tr>`).join('')}
+    <tr class="tot"><td>Total</td><td class="n"></td><td class="n"></td><td class="n">${m(respTot)}</td><td class="n">100%</td></tr>
+  </table><small>GWh per year, all cross-border flows</small></div>
+  ${askBox('s4','Question 5','How much does Zambia pay into the fund?','US$',
+    `Zambia's share (${pc(share.ZM)}) of the $${m(gap)} shortfall.`, `
+    <div class="card accent">
+      <h2 style="margin-top:0">Fund settlement</h2>
+      <table>
+        <tr><th>Country</th><th class="n">Receives</th><th class="n">Pays in</th><th class="n">Net</th></tr>
+        ${['ZM','BW','NA'].map(k=>`<tr><td>${NAME[k]}</td>
+          <td class="n">${receipt[k]<0?'−':''}${m(Math.abs(receipt[k]))}</td>
+          <td class="n">${m(contrib[k])}</td>
+          <td class="n" style="color:${net[k]>=0?'var(--accent)':'var(--bad)'}">
+          ${net[k]>=0?'+':'−'}${m(Math.abs(net[k]))}</td></tr>`).join('')}
+        <tr class="tot"><td>Balance</td><td class="n"></td><td class="n"></td><td class="n">0</td></tr>
+      </table>
+      <p style="font-size:14px;color:var(--dim);margin:8px 0 0">The fund balances to exactly
+      zero. That check is your proof the allocation is right.</p>
+    </div>
+    <div class="verdict ok" style="display:block"><b>Botswana is made whole.</b> It nets
+    $${m(net.BW)} — compensation for hosting flows it did not cause — while the trader still
+    pays only $${d2(D.genCost+s3+lossPerMWh)}/MWh.</div>
+    <details><summary>Zambia is the exporter — so why does it pay?</summary>
+      <p>Zambia carries the largest responsibility share (${pc(share.ZM)}) because its export
+      business is why the regional network is loaded. Responsibility follows the <b>cause of
+      flows</b>, not the location of assets.</p>
+      <p>For ERB the consequence is direct: as ZESCO's exports grow, Zambia's compensation
+      liability grows with them. Any position on a SAPP mechanism must be modelled against
+      projected export volumes, not today's.</p></details>`)}`,
+  wire:()=>wireBox('s4','Zambia carries the largest share because it exports most.',
+    'Hint: 2,500 ÷ '+m(respTot)+' = '+pc(share.ZM)+', applied to $'+m(gap)+'.')},
+
+{ id:'s5', title:'Stage 5', html:()=>`
+  <div class="kicker">Stage 5 of 5 · beneficiary pays</div>
+  <h1>Ask a different question</h1>
+  <p><b>The rule:</b> the US approach. Ignore who owns the wires. Ask who is better off because
+  the line exists, and split the cost that way.</p>
+  <div class="card tight"><table>
+    <tr><th>Beneficiary</th><th class="n">US$M NPV</th><th class="n">Share</th></tr>
+    <tr><td>Zambian IPP — market access</td><td class="n">${D.benefit.ZM}</td><td class="n">${pc(D.benefit.ZM/benTot)}</td></tr>
+    <tr><td>Namibian consumers — cheaper power</td><td class="n">${D.benefit.NA}</td><td class="n">${pc(D.benefit.NA/benTot)}</td></tr>
+    <tr><td>Botswana TSO — system stability</td><td class="n">${D.benefit.BW}</td><td class="n">${pc(D.benefit.BW/benTot)}</td></tr>
+    <tr class="tot"><td>Total</td><td class="n">${benTot}</td><td class="n">100%</td></tr>
+  </table></div>
+  ${askBox('s5','Question 6','What does Botswana pay each year under this rule?','US$',
+    `Its benefit share × the $${m(rrTotal)} annual requirement.`, `
+    <div class="card warnbox">
+      <h2 style="margin-top:0">The comparison that matters</h2>
+      <table>
+        <tr><th>Country</th><th class="n">Stage 4 · ITC</th><th class="n">Stage 5 · benefit</th></tr>
+        <tr><td>Zambia</td><td class="n">pays ${m(-net.ZM)}</td><td class="n">pays ${m(cbca.ZM)}</td></tr>
+        <tr><td>Botswana</td><td class="n" style="color:var(--accent)">gets ${m(net.BW)}</td>
+            <td class="n" style="color:var(--bad)">pays ${m(cbca.BW)}</td></tr>
+        <tr><td>Namibia</td><td class="n">pays ${m(-net.NA)}</td><td class="n">pays ${m(cbca.NA)}</td></tr>
+      </table>
+    </div>
+    <p><b>The two rules give opposite answers for Botswana.</b> Under ITC it is a compensated
+    host. Under beneficiary-pays it is a modest gainer that must contribute.</p>
+    <p>Nothing physical changed. Only the question changed — from <i>who caused the flow</i> to
+    <i>who gained from the line</i>.</p>
+    <details><summary>The negotiating lesson</summary>
+      <p>Whichever question your methodology asks, some party will prefer the other one. Expect
+      that argument in every cross-border negotiation ERB enters.</p></details>`)}`,
+  wire:()=>wireBox('s5','Compare that against Stage 4 below.',
+    'Hint: '+D.benefit.BW+' ÷ '+benTot+' = '+pc(D.benefit.BW/benTot)+' of $'+m(rrTotal)+'.')},
+
+{ id:'end', title:'Debrief', free:true, html:()=>`
+  <div class="kicker">Debrief</div>
+  <h1>What you just proved</h1>
+  ${priceBars(3)}
+  <div class="card tight"><table>
+    <tr><th>Stage</th><th class="n">Delivered</th><th class="n">Trade</th><th class="n">TSOs whole</th></tr>
+    <tr><td>1 Pancaking</td><td class="n">$${d2(D.genCost+s1)}</td><td class="n">No</td><td class="n">Yes</td></tr>
+    <tr><td>2 Cost-share</td><td class="n">$${d2(D.genCost+s2)}</td><td class="n">Yes</td><td class="n">Yes</td></tr>
+    <tr><td>3 Entry/exit</td><td class="n">$${d2(D.genCost+s3+lossPerMWh)}</td><td class="n">Yes</td><td class="n" style="color:var(--bad)">No</td></tr>
+    <tr><td>4 + ITC fund</td><td class="n">$${d2(D.genCost+s3+lossPerMWh)}</td><td class="n">Yes</td><td class="n" style="color:var(--accent)">Yes</td></tr>
+    <tr><td>5 Benefit pays</td><td class="n">billed to parties</td><td class="n">Yes</td><td class="n">Yes</td></tr>
+  </table></div>
+  <div class="card accent"><h2 style="margin-top:0">One sentence to remember</h2>
+    <p style="margin-bottom:0">Stage 3 alone is cheap but unstable. Stage 4 is the only design
+    that delivers the low price <b>and</b> leaves every TSO whole — which is why regional
+    markets converge on entry/exit pricing paired with a compensation fund.</p></div>
+  <div class="peer" id="boardWrap">
+    <div class="peerhead"><span class="t">Session scoreboard · ${state.session}</span>
+      <span class="c" id="boardCount">—</span></div>
+    <div id="board"><div class="pempty">Loading…</div></div>
+  </div>
+  <h2>Discuss in your group</h2>
+  <div class="card tight">
+    <p>1 · Zambia is a net payer under Stage 4 despite being the seller. If you sat at ERB,
+    would you sign that mechanism? What would you demand in return?</p>
+    <p>2 · Botswana hosts 500 km and charges the trader nothing. What incentive does it have to
+    reinforce that line for future trade?</p>
+    <p style="margin-bottom:0">3 · Which stage most resembles current SAPP practice? Which
+    resembles where SAPP is heading?</p>
+  </div>
+  <details><summary>Extension — if you finished early</summary>
+    <p>Redo Stage 4 with ZESCO's exports doubled to 4,000 GWh. Zambia's responsibility rises to
+    4,500 of 7,000 GWh (64.3%), its contribution to about $3,536,000, and its net position
+    worsens to roughly −$2,411,000. The lesson: growing your export business increases your
+    compensation liability.</p></details>
+  <button class="btn ghost" id="again">Start over</button>`,
+  wire:()=>{
+    const draw = async () => {
+      const data = await FB.get('participants');
+      const b=document.getElementById('board'), c=document.getElementById('boardCount');
+      if(!b) return stopPoll();
+      if(!data){ b.innerHTML='<div class="pempty">Offline — scoreboard unavailable.</div>';
+        if(c)c.textContent='offline'; return; }
+      const ids=Object.keys(Q);
+      const rows=Object.entries(data).map(([id,p])=>{
+        const a=p.answers||{}; const done=ids.filter(q=>a[q]).length;
+        const ok=ids.filter(q=>a[q]&&a[q].ok).length;
+        return {id,name:p.name||'Anonymous',org:p.org||'',done,ok};
+      }).sort((x,y)=> y.ok-x.ok || y.done-x.done);
+      if(c) c.textContent = rows.length+' in session';
+      b.innerHTML = rows.map(r=>`<div class="prow">
+        <div class="av" style="background:${avatarColour(r.name)}">${initials(r.name)}</div>
+        <div class="pinfo"><div class="pname">${r.name}${r.id===state.uid?' (you)':''}</div>
+          <div class="porg">${r.org}</div></div>
+        <div class="pval ok">${r.ok}/${ids.length}</div></div>`).join('');
+    };
+    draw(); stopPoll(); state.poll=setInterval(draw, CFG.pollMs);
+    document.getElementById('again').onclick=()=>{ stopPoll(); state.i=1; render(); };
+  }}
+];
+
+/* ══════════════ ENGINE ══════════════ */
+const app=document.getElementById('app'),
+      bBack=document.getElementById('btnBack'), bNext=document.getElementById('btnNext');
+
+function render(){
+  stopPoll();
+  const s=screens[state.i];
+  state.unlocked = !!s.free;
+  app.innerHTML = s.html();
+  if(s.wire) s.wire();
+  window.scrollTo(0,0);
+  document.getElementById('hStep').textContent = state.i===0?'':`${state.i} / ${screens.length-1}`;
+  document.getElementById('hBar').style.width = (state.i/(screens.length-1)*100)+'%';
+  bBack.style.visibility = state.i<=1?'hidden':'visible';
+  setDot(); syncNav();
+}
+function syncNav(){
+  const last = state.i===screens.length-1;
+  bNext.disabled = !state.unlocked || last;
+  bNext.textContent = state.i===0 ? (state.unlocked?'Continue':'Join to continue')
+    : last ? 'Complete' : (state.unlocked?'Next':'Answer to continue');
+}
+bNext.onclick=()=>{ if(state.i<screens.length-1){ state.i++; render(); } };
+bBack.onclick=()=>{ if(state.i>1){ state.i--; render(); } };
+render();
+</script>
+</body>
+</html>
