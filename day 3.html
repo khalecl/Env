@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Livingstone Corridor Determination — ERB Simulation</title>
+<style>
+:root{
+  --bg:#0a0e14; --surface:#111721; --surface2:#18202c; --line:#232d3c; --line2:#2f3b4c;
+  --ink:#e8eef6; --ink2:#a9b6c7; --dim:#6b7a8d;
+  --brand:#3ea8a0; --brand-lt:#5fd3c9; --gold:#c9a227; --good:#4aa863; --warn:#d1873f; --bad:#c05a5a;
+  --r:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;overscroll-behavior-y:none}
+body{
+  background:var(--bg); color:var(--ink);
+  font:16px/1.62 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  padding-bottom:104px; letter-spacing:-.005em;
+}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif;letter-spacing:-.015em}
+
+/* ---------- chrome ---------- */
+header{
+  position:sticky;top:0;z-index:60;background:rgba(10,14,20,.93);backdrop-filter:saturate(160%) blur(14px);
+  border-bottom:1px solid var(--line);padding:calc(12px + env(safe-area-inset-top,0)) 18px 11px;
+}
+.hrow{display:flex;align-items:center;gap:12px}
+.hrow .mark{flex:0 0 30px;height:30px;border-radius:8px;background:linear-gradient(140deg,var(--brand),#2a6f7a);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#04191c;letter-spacing:.02em}
+.hrow .txt{flex:1;min-width:0}
+.kicker{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand-lt);margin:0;font-weight:600}
+.htitle{font-size:15.5px;margin:1px 0 0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roombtn{flex:0 0 auto;background:var(--surface2);border:1px solid var(--line2);color:var(--ink2);
+  border-radius:20px;padding:7px 13px;font-size:12px;font-weight:600;display:flex;gap:6px;align-items:center;min-height:36px}
+.roombtn .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px rgba(74,168,99,.18)}
+.roombtn .dot.off{background:var(--dim);box-shadow:none}
+#bar{height:2px;background:var(--line);border-radius:2px;margin-top:11px;overflow:hidden}
+#barfill{height:100%;width:0;background:linear-gradient(90deg,var(--brand),var(--brand-lt));transition:width .35s}
+
+main{padding:22px 18px 8px;max-width:680px;margin:0 auto}
+.screen{display:none;animation:in .3s cubic-bezier(.2,.7,.3,1)}
+.screen.on{display:block}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.eyebrow{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand-lt);font-weight:700;margin:0 0 7px}
+h2{font-size:27px;line-height:1.16;margin:0 0 6px;font-weight:600}
+.lede{color:var(--ink2);font-size:15.5px;margin:0 0 22px;line-height:1.55}
+h3{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim);margin:30px 0 12px;font-weight:700}
+p{margin:0 0 15px;color:var(--ink)}
+b,strong{font-weight:650}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:17px 18px;margin:0 0 14px}
+.card.brief{border-left:3px solid var(--gold);background:linear-gradient(100deg,rgba(201,162,39,.06),transparent 55%)}
+.card.quiet{background:var(--surface2);border:none;font-size:13.5px;color:var(--ink2);line-height:1.55}
+.term{background:var(--surface2);border-left:2px solid var(--brand);border-radius:0 12px 12px 0;padding:13px 15px;margin:0 0 17px;font-size:14px;color:var(--ink2)}
+.term b{color:var(--brand-lt);display:block;margin-bottom:3px;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+ul{margin:0 0 15px;padding-left:19px;color:var(--ink)}
+li{margin-bottom:9px}
+.step{display:flex;gap:13px;margin:0 0 15px}
+.step .num{flex:0 0 27px;height:27px;border-radius:8px;background:var(--surface2);border:1px solid var(--line2);
+  color:var(--brand-lt);font-weight:700;font-size:12.5px;display:flex;align-items:center;justify-content:center}
+.step .body{flex:1;font-size:14.5px;color:var(--ink2);line-height:1.55}
+.step .body b{display:block;margin-bottom:1px;color:var(--ink);font-size:15px}
+
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 0 15px;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap}
+th,td{padding:10px 13px;border-bottom:1px solid var(--line);text-align:left}
+th{color:var(--dim);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.1em;background:var(--surface2)}
+tr:last-child td{border-bottom:none}
+td.n{font-variant-numeric:tabular-nums}
+tr.tot td{font-weight:700;background:rgba(62,168,160,.07)}
+.eq{background:var(--surface2);border-radius:11px;padding:13px 15px;margin:0 0 12px;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;overflow-x:auto;white-space:nowrap;color:var(--brand-lt)}
+.chk{color:var(--good);font-weight:700}
+.flag{display:inline-block;background:rgba(209,135,63,.14);color:var(--warn);border-radius:5px;padding:2px 7px;font-size:10.5px;font-weight:700;letter-spacing:.05em}
+
+button{font:inherit;cursor:pointer;border:none;border-radius:12px}
+.reveal{width:100%;min-height:50px;background:var(--surface);border:1px solid var(--line2);color:var(--gold);
+  padding:14px;font-size:14px;font-weight:650;margin:4px 0 18px;display:flex;align-items:center;justify-content:center;gap:8px}
+.reveal:active{background:var(--surface2)}
+.ans{display:none;border-left:2px solid var(--gold);padding-left:15px;margin:0 0 18px}
+.ans.on{display:block;animation:in .25s}
+
+label{display:block;font-size:10.5px;color:var(--dim);margin:0 0 6px;text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+input,textarea,select{
+  width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--ink);
+  border-radius:11px;padding:13px 14px;font:inherit;font-size:15px;min-height:50px;font-variant-numeric:tabular-nums}
+textarea{min-height:96px;resize:vertical;line-height:1.55}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(62,168,160,.13)}
+.fld{margin-bottom:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.slider{width:100%;margin:6px 0 0;accent-color:var(--brand-lt);height:36px;padding:0;min-height:0;background:none;border:none}
+.slabel{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+.slabel span{color:var(--brand-lt);font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:0}
+
+.out{background:var(--surface2);border-radius:12px;padding:15px 16px;margin:0 0 12px}
+.out .lbl{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+.out .big{font-size:29px;font-weight:600;color:var(--brand-lt);font-variant-numeric:tabular-nums;line-height:1.15;margin-top:3px}
+.out .big.sm{font-size:21px}
+.out .foot{font-size:12.5px;color:var(--dim);margin-top:9px;line-height:1.5;white-space:normal}
+
+.submit{width:100%;min-height:52px;background:var(--brand);color:#03201f;font-weight:700;font-size:15.5px;margin-top:4px}
+.submit:active{background:var(--brand-lt)}
+.submit.done{background:var(--surface2);color:var(--good);border:1px solid var(--line2)}
+.submit:disabled{opacity:.45}
+
+/* feed */
+.feed{margin-top:6px}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin-bottom:10px}
+.post .who{display:flex;gap:9px;align-items:center;margin-bottom:9px}
+.post .av{flex:0 0 30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+  font-size:11.5px;font-weight:800;color:#04191c}
+.post .nm{font-size:13.5px;font-weight:650;line-height:1.25}
+.post .mt{font-size:11px;color:var(--dim)}
+.post .qa{font-size:14px;color:var(--ink2);line-height:1.55;margin-bottom:9px;white-space:pre-wrap}
+.post .qa:last-child{margin-bottom:0}
+.post .qa em{color:var(--dim);font-style:normal;font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:2px;font-weight:700}
+.post .val{color:var(--brand-lt);font-weight:650;font-variant-numeric:tabular-nums}
+.empty{text-align:center;color:var(--dim);font-size:14px;padding:26px 14px;border:1px dashed var(--line2);border-radius:12px}
+
+/* nav */
+#dots{position:fixed;bottom:78px;left:0;right:0;display:flex;justify-content:center;gap:5px;z-index:55;pointer-events:none}
+#dots i{width:5px;height:5px;border-radius:50%;background:var(--line2);transition:all .3s}
+#dots i.on{background:var(--brand-lt);width:16px;border-radius:3px}
+nav{position:fixed;bottom:0;left:0;right:0;z-index:60;background:rgba(17,23,33,.97);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);padding:11px 14px calc(11px + env(safe-area-inset-bottom,0));
+  display:flex;gap:9px;max-width:680px;margin:0 auto}
+nav button{min-height:50px;font-weight:700;font-size:15px}
+nav .nx{flex:1;background:var(--brand);color:#03201f}
+nav .pv{flex:0 0 88px;background:var(--surface2);color:var(--ink2);border:1px solid var(--line2)}
+nav button:disabled{opacity:.28}
+
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:80;display:none}
+#sheet.on{display:block}
+#sheet .scrim{position:absolute;inset:0;background:rgba(4,7,11,.7);backdrop-filter:blur(3px)}
+#sheet .panel{position:absolute;left:0;right:0;bottom:0;max-height:86vh;background:var(--surface);
+  border-radius:20px 20px 0 0;border-top:1px solid var(--line2);display:flex;flex-direction:column;
+  animation:up .3s cubic-bezier(.2,.8,.3,1);max-width:680px;margin:0 auto}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+#sheet .ph{padding:16px 18px 12px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+#sheet .ph h4{margin:0;font-size:16px;font-weight:650;flex:1}
+#sheet .ph button{background:var(--surface2);color:var(--ink2);border:1px solid var(--line2);
+  border-radius:10px;padding:8px 13px;font-size:13px;min-height:40px;font-weight:600}
+#sheet .pb{overflow-y:auto;padding:16px 18px calc(20px + env(safe-area-inset-bottom,0));-webkit-overflow-scrolling:touch}
+.grabber{width:34px;height:4px;background:var(--line2);border-radius:2px;margin:9px auto 0}
+.tabs{display:flex;gap:7px;padding:0 18px 13px;overflow-x:auto}
+.tabs button{background:var(--surface2);border:1px solid var(--line2);color:var(--ink2);
+  padding:8px 14px;font-size:12.5px;border-radius:18px;white-space:nowrap;min-height:38px;font-weight:600}
+.tabs button.on{background:var(--brand);color:#03201f;border-color:var(--brand)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hrow">
+    <div class="mark">ERB</div>
+    <div class="txt">
+      <p class="kicker">Day 3 · Capstone Determination</p>
+      <p class="htitle serif" id="htitle">The Livingstone Corridor</p>
+    </div>
+    <button class="roombtn" id="roomBtn"><span class="dot off" id="dot"></span><span id="roomN">Room</span></button>
+  </div>
+  <div id="bar"><div id="barfill"></div></div>
+</header>
+
+<main id="main"></main>
+
+<div id="dots"></div>
+<nav><button class="pv" id="prev">Back</button><button class="nx" id="next">Begin</button></nav>
+
+<div id="sheet">
+  <div class="scrim" onclick="closeSheet()"></div>
+  <div class="panel">
+    <div class="grabber"></div>
+    <div class="ph"><h4 id="shTitle">The room</h4><button onclick="closeSheet()">Close</button></div>
+    <div class="tabs" id="shTabs"></div>
+    <div class="pb" id="shBody"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════ EDITABLE DATA BLOCK ═══════════ */
+const DB_URL = "https://test-7f3ce-default-rtdb.firebaseio.com";
+const DB_ROOT = "ttd_day3";              // change to reset all sessions
+const DEFAULT_ROOM = "LUSAKA";           // room code prefilled on the join screen
+const POLL_MS = 7000;
+
+const D = {
+  fx: 18,                       // ZK per USD — working assumption
+  embeddedTariff: 0.37,         // ZK/kWh, illustrative
+  lric: { omPerYr:3.5, life:30, rate:0.10, avail:0.80, mw:200, kmCost:2.2, subs:100 },
+  gens: [
+    {id:"A", name:"Kitwe, Zambia",        mw:250, f:0.70, km:180},
+    {id:"B", name:"Kusile, South Africa", mw:600, f:0.85, km:520},
+    {id:"C", name:"Morupule, Botswana",   mw:300, f:0.60, km:420},
+    {id:"D", name:"Kariba, Zimbabwe",     mw:200, f:0.90, km:280}
+  ],
+  netCost: 20,                  // US$M annual shared network cost
+  bene: [{c:"Zambia",b:28},{c:"Botswana",b:16},{c:"South Africa",b:12},{c:"System-wide pool",b:4}],
+  proj: { capex:350, life:10, rate:0.08 },
+  rpix: { start:0.40, years:5, a:0.6 }
+};
+/* ═══════════════════════════════════════════ */
+
+const af=(r,n)=>(1-Math.pow(1+r,-n))/r;
+const f=(x,d=2)=>(isFinite(x)?x:0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const esc=s=>String(s||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+const HUES=['#3ea8a0','#c9a227','#7a8fd1','#c07a9e','#6fae6f','#d1873f','#8f7ad1','#4fa8c0'];
+const hue=s=>HUES[[...String(s)].reduce((a,c)=>a+c.charCodeAt(0),0)%HUES.length];
+const initials=s=>String(s||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
+
+let me = JSON.parse(localStorage.getItem('ttd3_me')||'null');
+let room = (me && me.room) || DEFAULT_ROOM;
+let feed = {};            // part -> [posts]
+let online = 0;
+
+/* ─────────── Firebase REST ─────────── */
+async function push(part, payload){
+  const body = Object.assign({name:me.name, org:me.org, grp:me.grp, uid:me.uid, ts:Date.now()}, payload);
+  const r = await fetch(`${DB_URL}/${DB_ROOT}/${encodeURIComponent(room)}/${part}.json`,
+    {method:'POST', body:JSON.stringify(body)});
+  if(!r.ok) throw new Error('save failed');
+  return r.json();
+}
+async function pull(){
+  try{
+    const r = await fetch(`${DB_URL}/${DB_ROOT}/${encodeURIComponent(room)}.json`);
+    const j = await r.json();
+    feed = {};
+    const people = new Set();
+    Object.entries(j||{}).forEach(([part,items])=>{
+      feed[part] = Object.values(items||{}).sort((a,b)=>b.ts-a.ts);
+      feed[part].forEach(p=>people.add(p.uid||p.name));
+    });
+    online = people.size;
+    document.getElementById('dot').classList.remove('off');
+    document.getElementById('roomN').textContent = online ? `${room} · ${online}` : room;
+    if(document.getElementById('sheet').classList.contains('on')) renderSheet();
+    document.querySelectorAll('.feedslot').forEach(el=>el.innerHTML = feedHTML(el.dataset.part));
+  }catch(e){
+    document.getElementById('dot').classList.add('off');
+    document.getElementById('roomN').textContent = 'Offline';
+  }
+}
+setInterval(()=>{ if(me) pull(); }, POLL_MS);
+
+/* ─────────── feed rendering ─────────── */
+const LABELS = {
+  A:{title:"Part A · Cost audit", fields:{driver:"Charge driving increases", why:"Why"}},
+  B:{title:"Part B · LRIC", fields:{lric:"LRIC (US$/MWh)", policy:"Policy choice", why:"Reasoning"}},
+  C:{title:"Part C · MW-mile", fields:{ratio:"B ÷ A per MW", signal:"Signal to a developer"}},
+  D:{title:"Part D · Beneficiary pays", fields:{fair:"Fair?", risk:"Biggest political risk", defence:"Defence to parliament"}},
+  E:{title:"Part E · Benchmark", fields:{model:"Model for Zambia", first:"First reform", why:"Trilemma reasoning"}},
+  F:{title:"Part F · RPI-X", fields:{x:"X factor (%)", real:"Real change (%)", msg:"Message to consumers"}},
+  Z:{title:"Debrief", fields:{q1:"Which of B, C or D", q2:"Signal to a developer", q3:"Capability that fails first", q4:"Sustainable in real terms?"}}
+};
+function feedHTML(part){
+  const posts = (feed[part]||[]);
+  if(!posts.length) return `<div class="empty">No submissions yet in <b>${esc(room)}</b>.<br>Be the first — your answer appears here for everyone.</div>`;
+  const L = LABELS[part].fields;
+  return posts.map(p=>`
+    <div class="post">
+      <div class="who">
+        <div class="av" style="background:${hue(p.uid||p.name)}">${initials(p.name)}</div>
+        <div><div class="nm">${esc(p.name)}${p.grp?` · Group ${esc(p.grp)}`:''}</div>
+        <div class="mt">${esc(p.org||'')}${p.org?' · ':''}${new Date(p.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div></div>
+      </div>
+      ${Object.keys(L).map(k=> p[k] ? `<div class="qa"><em>${L[k]}</em>${
+          (k==='lric'||k==='x'||k==='real'||k==='ratio') ? `<span class="val">${esc(p[k])}</span>` : esc(p[k])
+        }</div>` : '').join('')}
+    </div>`).join('');
+}
+
+/* ─────────── sheet ─────────── */
+let shPart='A';
+document.getElementById('roomBtn').onclick=()=>{ if(!me){show(0);return;} openSheet(currentPart()||'A'); };
+function openSheet(p){ shPart=p; document.getElementById('sheet').classList.add('on'); renderSheet(); pull(); }
+function closeSheet(){ document.getElementById('sheet').classList.remove('on'); }
+function renderSheet(){
+  document.getElementById('shTitle').textContent = `${room} — ${online} participant${online===1?'':'s'}`;
+  document.getElementById('shTabs').innerHTML = Object.keys(LABELS).map(k=>{
+    const n=(feed[k]||[]).length;
+    return `<button class="${k===shPart?'on':''}" onclick="shPart='${k}';renderSheet()">${k==='Z'?'Debrief':'Part '+k}${n?` (${n})`:''}</button>`;
+  }).join('');
+  document.getElementById('shBody').innerHTML = feedHTML(shPart);
+}
+
+/* ═══════════ SCREENS ═══════════ */
+const S=[];
+
+/* 0 — join */
+S.push({t:"Join the session", part:null, html:`
+<p class="eyebrow">Before you begin</p>
+<h2 class="serif">Join your session room</h2>
+<p class="lede">Your answers are shared with everyone in the same room code. You will see their reasoning; they will see yours.</p>
+<div class="card">
+  <div class="fld"><label>Room code</label><input id="jRoom" type="text" autocapitalize="characters" placeholder="LUSAKA"></div>
+  <div class="fld"><label>Your name</label><input id="jName" type="text" autocomplete="name" placeholder="e.g. Mwansa Banda"></div>
+  <div class="g2">
+    <div class="fld"><label>Organisation</label><input id="jOrg" type="text" placeholder="ERB / ZESCO"></div>
+    <div class="fld"><label>Group</label><input id="jGrp" type="text" placeholder="3"></div>
+  </div>
+  <button class="submit" id="jGo">Enter the room</button>
+</div>
+<div class="card quiet">Use the same room code as the rest of the class. The facilitator will announce it. Your entry is stored on this device, so you can close and reopen without losing your place.</div>
+`});
+
+/* 1 — brief */
+S.push({t:"The brief", part:null, html:`
+<p class="eyebrow">Part 0 · Orientation</p>
+<h2 class="serif">What are we actually talking about?</h2>
+<p class="lede">Read this before you touch a calculator.</p>
+<p>A regulator does not wake up and decide to "do MW-mile allocation." A regulator receives an <b>application</b>. Somebody wants to build something, connect something, or charge somebody.</p>
+<div class="term"><b>Determination</b>The regulator's written decision on a tariff application. It states the numbers, states the reasoning, and can be challenged in court.</div>
+<div class="card brief">
+  <p class="eyebrow" style="color:var(--gold)">The application before you</p>
+  <p style="margin:0">A consortium proposes a new <b>330 kV corridor from Livingstone</b>, strengthening the link toward Botswana and South Africa. A 300 MW solar IPP wants to connect and export 200 MW. Three countries would use the reinforced corridor.</p>
+</div>
+<p>Today you answer the whole chain of questions a determination needs. Six parts, one wire.</p>
+<div class="card quiet">All Kwacha figures use a working assumption of <b>1 USD = ZK 18</b>. <span class="flag">CONFIRM ON THE DAY</span> Also confirm which ZESCO schedule is in force — the MYTF was reinstated 1 Nov 2025 to 31 Oct 2027.</div>
+`});
+
+/* 2 — the six */
+S.push({t:"Six questions", part:null, html:`
+<p class="eyebrow">Part 0 · Structure</p>
+<h2 class="serif">Six questions, one order</h2>
+<p class="lede">These are not six unrelated calculations. They are one chain of regulatory reasoning.</p>
+<div class="step"><div class="num">A</div><div class="body"><b>What are we already charging?</b>Building-block audit. You cannot change a tariff you have not read.</div></div>
+<div class="step"><div class="num">B</div><div class="body"><b>What does this new customer cost?</b>LRIC — the cost we would not otherwise have spent.</div></div>
+<div class="step"><div class="num">C</div><div class="body"><b>Who pays for the shared network?</b>MW-mile allocation across existing users.</div></div>
+<div class="step"><div class="num">D</div><div class="body"><b>Who pays for the new joint asset?</b>Beneficiary-pays across three countries.</div></div>
+<div class="step"><div class="num">E</div><div class="body"><b>What do other regulators do?</b>EU, US and SAPP — then Zambia's position.</div></div>
+<div class="step"><div class="num">F</div><div class="body"><b>Where does the price go?</b>RPI-X across five years.</div></div>
+<div class="card brief"><p style="margin:0"><b style="color:var(--gold)">The trap.</b> B, C and D are three different cost questions, and people confuse them constantly. B serves one new customer. C shares an existing network. D builds a new joint asset.</p></div>
+`});
+
+/* 3 — Part A */
+S.push({t:"Part A · Cost audit", part:"A", html:`
+<p class="eyebrow">Part A · 25 minutes</p>
+<h2 class="serif">What are we already charging?</h2>
+<p class="lede">Open the ZESCO schedule. Read it as a regulator, not a customer.</p>
+<div class="term"><b>Building block</b>Allowed revenue built from separately justified parts — OPEX, depreciation, return on capital, tax — instead of one negotiated lump sum.</div>
+<h3>Your task</h3>
+<ul>
+<li>List every distinct charge line.</li>
+<li>For each: which block does it recover, and is it variable or fixed?</li>
+<li>Estimate each line's share of revenue.</li>
+<li>Decide which line is driving increases.</li>
+</ul>
+<div class="card">
+  <div class="fld"><label>Charge driving recent increases</label>
+    <select id="aDriver"><option value="">Select…</option>
+      <option>Energy charge (fuel and generation OPEX)</option>
+      <option>Maximum demand charge (capacity)</option>
+      <option>Fixed monthly charge</option>
+      <option>Transmission use-of-system</option></select></div>
+  <div class="fld"><label>Why — two sentences</label><textarea id="aWhy" placeholder="Name the cost driver behind it and say why it is hard to compress."></textarea></div>
+  <button class="submit" data-part="A" data-map="driver:aDriver,why:aWhy">Submit to the room</button>
+</div>
+<button class="reveal" data-t="a1">Show the answer key</button>
+<div class="ans" id="a1">
+<div class="tw"><table>
+<tr><th>Charge</th><th>Block recovered</th><th>Type</th><th>Share</th></tr>
+<tr><td>Energy /kWh</td><td>Fuel, generation OPEX</td><td>Variable</td><td class="n">~45%</td></tr>
+<tr><td>Max demand /kVA</td><td>Generation + transmission CAPEX</td><td>Fixed per period</td><td class="n">~35%</td></tr>
+<tr><td>Fixed monthly</td><td>Metering, billing, service</td><td>Per customer</td><td class="n">~12%</td></tr>
+<tr><td>Transmission UoS</td><td>Network O&amp;M and capital</td><td>Zone-banded</td><td class="n">~8%</td></tr>
+<tr class="tot"><td>Total</td><td>—</td><td>—</td><td class="n">100%</td></tr>
+</table></div>
+<p><b>Read it this way.</b> Capacity charges — demand plus fixed, 47% together — dominate transmission economics. Network cost is driven by <b>peak flow</b>, not by annual energy.</p>
+<p><b>Hardest to compress:</b> the demand block. Peak capacity is physically fixed once built.</p>
+<p style="margin:0"><b>If everything were bundled into one per-kWh rate,</b> the regulator loses the ability to audit the wires business, and every locational and capacity signal disappears.</p>
+<div class="card quiet" style="margin-top:14px">Shares are illustrative teaching proportions, not audited ZESCO accounts.</div>
+</div>
+<h3>What the room said</h3><div class="feedslot" data-part="A"></div>
+`});
+
+/* 4 — Part B */
+S.push({t:"Part B · LRIC", part:"B", calc:"B", html:`
+<p class="eyebrow">Part B · 35 minutes</p>
+<h2 class="serif">What does the new connection cost?</h2>
+<p class="lede">The cost we would not otherwise have spent — spread across the life of the asset.</p>
+<div class="term"><b>LRIC — long-run incremental cost</b>The full forward-looking cost of the extra capacity built to serve one more customer.</div>
+<div class="card brief"><p style="margin:0">200 km of line at US$2.2M per km, plus US$100M of substations, gives <b>US$540M of CAPEX</b>. O&amp;M runs US$3.5M a year over a 30-year life, at a 10% discount rate, 0.80 availability, 200 MW of flow.</p></div>
+<h3>Move the inputs</h3>
+<div class="card" id="calcB"></div>
+<div class="card">
+  <div class="fld"><label>Your LRIC (US$/MWh)</label><input id="bL" type="number" step="0.01" inputmode="decimal" placeholder="43.37"></div>
+  <div class="fld"><label>Policy recommendation</label>
+    <select id="bP"><option value="">Select…</option>
+      <option>Full LRIC from day one</option><option>Permanent subsidy</option>
+      <option>Phased transition to full LRIC</option></select></div>
+  <div class="fld"><label>Reasoning</label><textarea id="bW" placeholder="Who bears the cost under your choice, and what precedent does it set?"></textarea></div>
+  <button class="submit" data-part="B" data-map="lric:bL,policy:bP,why:bW">Submit to the room</button>
+</div>
+<button class="reveal" data-t="b1">Show the worked steps</button>
+<div class="ans" id="b1">
+<div class="eq">a(30, 10%) = [1 − 1.10⁻³⁰] ÷ 0.10 = 9.4269</div>
+<div class="eq">PV = 540 + (3.5 × 9.4269) = US$573.0M</div>
+<div class="eq">Annual = 573.0 ÷ 9.4269 = US$60.78M</div>
+<div class="eq">Energy = 200 × 8,760 × 0.80 = 1,401,600 MWh</div>
+<div class="eq">LRIC = 60.78M ÷ 1,401,600 = US$43.37/MWh</div>
+<div class="eq">Kwacha = 43.37 × 18 = ZK 0.781/kWh</div>
+<p><span class="chk">Check ✓</span> 43.37 × 1,401,600 MWh = US$60.78M, which equals the annual cost.</p>
+<p><b>Why 2.1× the embedded tariff?</b> A long haul to a remote resource; one customer carrying the whole asset with no sharing; a 10% cost of capital against roughly 7% in mature markets.</p>
+<h3>Recommended: phase it in</h3>
+<div class="tw"><table><tr><th>Period</th><th>Charge</th><th>% of LRIC</th><th>Reason</th></tr>
+<tr><td>Years 1–2</td><td class="n">ZK 0.50</td><td class="n">64%</td><td>Reaches financial close</td></tr>
+<tr><td>Years 3–4</td><td class="n">ZK 0.65</td><td class="n">83%</td><td>Revenues build</td></tr>
+<tr><td>Year 5+</td><td class="n">ZK 0.78</td><td class="n">100%</td><td>Full cost signal</td></tr></table></div>
+<p style="margin:0">Full LRIC on day one is efficient but may kill the project. A permanent subsidy is unfair to existing customers, and every later applicant will cite it. Phasing reaches efficiency without either failure.</p>
+</div>
+<h3>What the room said</h3><div class="feedslot" data-part="B"></div>
+`});
+
+/* 5 — Part C */
+S.push({t:"Part C · MW-mile", part:"C", calc:"C", html:`
+<p class="eyebrow">Part C · 40 minutes</p>
+<h2 class="serif">Who pays for the shared network?</h2>
+<p class="lede">The corridor plugs into a network that already exists and already costs money.</p>
+<div class="term"><b>MW-mile (MW-km)</b>Each user's share of network cost is proportional to the power it injects, multiplied by the distance that power travels.</div>
+<p>The shared SAPP network costs <b>US$20M a year</b>. Allocate it across four generators.</p>
+<div id="calcC"></div>
+<div class="card">
+  <div class="fld"><label>Gen B ÷ Gen A, per MW</label><input id="cR" type="text" inputmode="decimal" placeholder="e.g. 3.5×"></div>
+  <div class="fld"><label>What does this tell a developer?</label><textarea id="cS" placeholder="One sentence on siting."></textarea></div>
+  <button class="submit" data-part="C" data-map="ratio:cR,signal:cS">Submit to the room</button>
+</div>
+<button class="reveal" data-t="c1">Show the interpretation</button>
+<div class="ans" id="c1">
+<div class="eq">MW-miles = capacity × flow factor × distance</div>
+<p>Generator B carries <b>8.43×</b> the MW-miles of A (265,200 ÷ 31,500) — it sits 2.9× further from the hub and runs harder. Because B is only 2.4× larger, its cost per MW comes out at <b>3.5×</b> what A pays.</p>
+<p>The method penalises distance and high utilisation, and rewards siting near load. That locational signal is the whole point.</p>
+<p><span class="chk">Benchmark ✓</span> The resulting US$6–21/kW/yr range sits inside SAPP's published US$1.4–28/kW/yr (ESMAP, 2010) — so the answer is plausible, not an arithmetic artefact.</p>
+<div class="card quiet" style="margin-bottom:0"><b style="color:var(--warn)">Raise in debrief.</b> Pure MW-mile ignores congestion and losses, and can over-penalise legitimate long-haul hydro such as Kariba. Distance is a proxy for cost causation, not a measurement of it.</div>
+</div>
+<h3>What the room said</h3><div class="feedslot" data-part="C"></div>
+`});
+
+/* 6 — Part D */
+S.push({t:"Part D · Beneficiary pays", part:"D", calc:"D", html:`
+<p class="eyebrow">Part D · 35 minutes</p>
+<h2 class="serif">Who pays for the new asset?</h2>
+<p class="lede">Three countries benefit. Only one of them hosts most of the steel.</p>
+<div class="term"><b>Beneficiary pays</b>Each party contributes in proportion to the benefit it receives — not to how much of the asset sits on its territory.</div>
+<p>A US$350M backbone, 10-year life, 8% discount rate. Annual benefits: Zambia 28, Botswana 16, South Africa 12, and 4 system-wide.</p>
+<div id="calcD"></div>
+<div class="card">
+  <div class="fld"><label>Is the allocation fair?</label>
+    <select id="dF"><option value="">Select…</option><option>Yes — proportional to benefit</option>
+    <option>No — Zambia carries too much</option><option>No — the system-wide share is unfunded</option>
+    <option>Fair in principle, fragile in politics</option></select></div>
+  <div class="fld"><label>Biggest political risk</label><input id="dR" type="text" placeholder="Name one."></div>
+  <div class="fld"><label>Your defence to parliament</label><textarea id="dD" placeholder="Two or three sentences a minister could actually deliver."></textarea></div>
+  <button class="submit" data-part="D" data-map="fair:dF,risk:dR,defence:dD">Submit to the room</button>
+</div>
+<button class="reveal" data-t="d1">Show fairness and risks</button>
+<div class="ans" id="d1">
+<div class="eq">a(10, 8%) = 6.7101 → annual cost = 350 ÷ 6.7101 = US$52.16M</div>
+<div class="eq">BCR = 60 ÷ 52.16 = 1.15 ✓ the project is justified</div>
+<p><b>Every payback is 5.8 years.</b> That is the signature of a strictly proportional allocation, and it is the strongest fairness argument you have.</p>
+<h3>Political risks</h3>
+<div class="tw"><table><tr><th>Risk</th><th>Mitigation</th></tr>
+<tr><td>Zambia pays most, wants a discount</td><td>Publish the benefit study; independent audit</td></tr>
+<tr><td>South Africa sees the smallest net gain</td><td>Frame as regional stability, not commercial return</td></tr>
+<tr><td>Who funds the 6.7% pool?</td><td>Transparent SAPP coordination fund</td></tr>
+<tr><td>FX exposure on US$ obligations</td><td>Adjustment clause past a stated threshold</td></tr>
+<tr><td>A new government renegotiates</td><td>Inter-governmental agreement, SAPP arbitration</td></tr></table></div>
+<div class="card brief" style="margin-bottom:0"><p style="margin:0"><b>To parliament.</b> Zambia contributes US$163.3M and receives US$280M of benefit over ten years — a net gain of about US$11.7M a year. The contribution is proportional to the benefit, and the same rule applies to every partner.</p></div>
+</div>
+<h3>What the room said</h3><div class="feedslot" data-part="D"></div>
+`});
+
+/* 7 — Part E */
+S.push({t:"Part E · Benchmark", part:"E", html:`
+<p class="eyebrow">Part E · 30 minutes</p>
+<h2 class="serif">What do other regulators do?</h2>
+<p class="lede">Then the harder question — which of these can Zambia actually run?</p>
+<div class="tw"><table>
+<tr><th>Dimension</th><th>EU</th><th>US</th><th>SAPP</th><th>Zambia</th></tr>
+<tr><td>Method</td><td>Bundled tariff</td><td>Nodal + FTRs</td><td>MW-km bands</td><td>Postage stamp</td></tr>
+<tr><td>Level</td><td>~€12/MWh (2023)</td><td>Hourly, per node</td><td>$1.4–28/kW/yr (2010)</td><td>See MYTF</td></tr>
+<tr><td>Locational signal</td><td>Weak–moderate</td><td>Very strong</td><td>Moderate</td><td>Weak</td></tr>
+<tr><td>Systems needed</td><td>High</td><td>Very high</td><td>Low</td><td>Modest today</td></tr>
+<tr><td>Policy costs inside</td><td>Significant</td><td>Limited</td><td>Minimal</td><td>Limited</td></tr>
+<tr><td>Runnable now</td><td>Moderate</td><td>Low</td><td>High</td><td>—</td></tr>
+</table></div>
+<div class="card">
+  <div class="fld"><label>Model for Zambia</label>
+    <select id="eM"><option value="">Select…</option>
+      <option>Adopt nodal pricing</option><option>Keep postage stamp</option>
+      <option>Modular blocks + distance bands</option><option>Pure SAPP MW-km</option></select></div>
+  <div class="fld"><label>First reform to implement</label><input id="eF" type="text" placeholder="One concrete step."></div>
+  <div class="fld"><label>Justify using the trilemma</label><textarea id="eW" placeholder="Efficiency, cost recovery, fairness — where does your choice win and where does it give something up?"></textarea></div>
+  <button class="submit" data-part="E" data-map="model:eM,first:eF,why:eW">Submit to the room</button>
+</div>
+<button class="reveal" data-t="e1">Show the recommendation</button>
+<div class="ans" id="e1">
+<p>Combine <b>modular cost separation</b> with a <b>distance signal</b>, and defer nodal pricing.</p>
+<div class="step"><div class="num">1</div><div class="body"><b>Separate the blocks</b>Publish generation, transmission and distribution separately so ERB can audit each. The highest-value reform available now.</div></div>
+<div class="step"><div class="num">2</div><div class="body"><b>Band by distance</b>A few bands deliver most of nodal's locational efficiency at a fraction of the system cost.</div></div>
+<div class="step"><div class="num">3</div><div class="body"><b>Keep multi-year review</b>The MYTF cycle gives investors certainty and ERB scheduled correction points.</div></div>
+<div class="step"><div class="num">4</div><div class="body"><b>Build toward zonal later</b>Sequence it behind SCADA, metering and staff capability — never ahead of them.</div></div>
+<div class="card brief" style="margin-bottom:0"><p style="margin:0"><b style="color:var(--gold)">Trilemma reading.</b> Efficiency moderate, since bands approximate congestion rather than measure it. Cost recovery strong, because separated blocks are auditable. Fairness high, because the rule is simple, published and predictable. Copying a nodal market the institutions cannot run scores worse on all three.</p></div>
+</div>
+<h3>What the room said</h3><div class="feedslot" data-part="E"></div>
+`});
+
+/* 8 — Part F */
+S.push({t:"Part F · RPI-X", part:"F", calc:"F", html:`
+<p class="eyebrow">Part F · 30 minutes</p>
+<h2 class="serif">Where does the price go?</h2>
+<p class="lede">A one-off cost number becomes a five-year path a utility can finance and a consumer can survive.</p>
+<div class="term"><b>RPI-X</b>The tariff may rise with inflation minus a fixed efficiency factor X. The utility keeps any saving beyond X until the next review. That retained gain is the incentive.</div>
+<p>Starting from ZK 0.40/kWh for the 2028–2032 control period.</p>
+<div class="card" id="calcF"></div>
+<div class="card">
+  <div class="g2">
+    <div class="fld"><label>Your X (%)</label><input id="fX2" type="number" step="0.01" inputmode="decimal" placeholder="2.46"></div>
+    <div class="fld"><label>Real change (%)</label><input id="fR2" type="text" inputmode="text" placeholder="−11.5"></div>
+  </div>
+  <div class="fld"><label>Message to consumers</label><textarea id="fM" placeholder="Explain a rising nominal price and a falling real price, without jargon."></textarea></div>
+  <button class="submit" data-part="F" data-map="x:fX2,real:fR2,msg:fM">Submit to the room</button>
+</div>
+<button class="reveal" data-t="f1">Show the derivation and the three explanations</button>
+<div class="ans" id="f1">
+<div class="eq">X = efficiency + (a × annual growth)</div>
+<div class="eq">X = 1.5% + (0.6 × 1.6%) = 2.46% ≈ 2.5%</div>
+<div class="eq">Real change = 1.015⁵ ÷ 1.04⁵ − 1 = −11.5% ✓</div>
+<h3>Say it three ways</h3>
+<div class="card"><p style="margin:0"><b>To the utility.</b> Find 1.5% efficiency a year and absorb 0.96% of growth cost through scale. Beat 1.5% and you keep the difference until the next review.</p></div>
+<div class="card"><p style="margin:0"><b>To consumers.</b> The nominal price rises 7.7% while general prices rise 21.7%. In real money you pay 11.5% less for transmission in 2032 than in 2027.</p></div>
+<div class="card" style="margin-bottom:0"><p style="margin:0"><b>To government.</b> A published five-year path lets the utility finance interconnection, protects consumers from inflation, and forces the cost separation any future competitive market will need.</p></div>
+</div>
+<h3>What the room said</h3><div class="feedslot" data-part="F"></div>
+`});
+
+/* 9 — debrief */
+S.push({t:"Debrief", part:"Z", html:`
+<p class="eyebrow">Closing · 15 minutes</p>
+<h2 class="serif">Debrief</h2>
+<p class="lede">One sentence each. No notes.</p>
+<div class="card">
+  <div class="fld"><label>1 · A single new customer connects — B, C or D? Why not the others?</label><textarea id="z1"></textarea></div>
+  <div class="fld"><label>2 · What does Part C tell a developer about where to build?</label><textarea id="z2"></textarea></div>
+  <div class="fld"><label>3 · If ERB adopted nodal pricing next year, which capability fails first?</label><textarea id="z3"></textarea></div>
+  <div class="fld"><label>4 · Your Part B path ends at ZK 0.78/kWh. Sustainable in real terms?</label><textarea id="z4"></textarea></div>
+  <button class="submit" data-part="Z" data-map="q1:z1,q2:z2,q3:z3,q4:z4">Submit to the room</button>
+</div>
+<div class="card brief"><p class="serif" style="margin:0;font-size:18px;line-height:1.45">Cost allocation is not arithmetic in search of a number. It is the regulator deciding, in public and on the record, <b>who caused a cost and who therefore ought to bear it.</b></p></div>
+<h3>Sources</h3>
+<div class="tw"><table>
+<tr><th>Source</th><th>Used in</th><th>Date</th></tr>
+<tr><td>ESMAP — SAPP Transmission &amp; Trading</td><td>C, E</td><td>2010</td></tr>
+<tr><td>Approved ZESCO Multi-Year Tariffs</td><td>A, B, F</td><td>2024–27</td></tr>
+<tr><td>ENTSO-E Tariff Synthesis</td><td>E</td><td>2023</td></tr>
+<tr><td>NERSA Wholesale Tariff Methodology</td><td>A, E</td><td>—</td></tr>
+<tr><td>Eskom Tariffs &amp; Charges Booklet</td><td>E</td><td>2025/26</td></tr>
+<tr><td>Pérez-Arriaga — Regulation of the Power Sector</td><td>A, B, D</td><td>2013</td></tr>
+<tr><td>Bank of Zambia interbank rate</td><td>FX note</td><td><span class="flag">NEEDED</span></td></tr>
+</table></div>
+<div class="card quiet">The SAPP wheeling range is 2010 — treat it as order-of-magnitude. ENTSO-E is 2023. Confirm the ZESCO schedule in force before presenting any Kwacha figure as current.</div>
+<h3>What the room said</h3><div class="feedslot" data-part="Z"></div>
+`});
+
+/* ═══════════ render + nav ═══════════ */
+let i=0;
+const main=document.getElementById('main'), dots=document.getElementById('dots');
+S.forEach((s,k)=>{
+  const d=document.createElement('section'); d.className='screen'; d.id='s'+k; d.innerHTML=s.html;
+  main.appendChild(d); dots.appendChild(document.createElement('i'));
+});
+const currentPart=()=>S[i].part;
+function show(k){
+  i=k;
+  document.querySelectorAll('.screen').forEach((e,n)=>e.classList.toggle('on',n===k));
+  [...dots.children].forEach((e,n)=>e.classList.toggle('on',n===k));
+  document.getElementById('htitle').textContent=S[k].t;
+  document.getElementById('barfill').style.width=(k/(S.length-1)*100)+'%';
+  document.getElementById('prev').disabled=(k<=1);
+  const nx=document.getElementById('next');
+  nx.style.display = k===0 ? 'none':'block';
+  document.getElementById('prev').style.display = k===0 ? 'none':'block';
+  nx.textContent = k===S.length-1 ? 'Finish' : 'Continue';
+  window.scrollTo(0,0);
+  if(S[k].part) document.querySelectorAll('.feedslot').forEach(el=>el.innerHTML=feedHTML(el.dataset.part));
+}
+document.getElementById('next').onclick=()=>{ if(i<S.length-1) show(i+1); else openSheet('Z'); };
+document.getElementById('prev').onclick=()=>{ if(i>1) show(i-1); };
+
+/* reveal */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.reveal'); if(!b) return;
+  const a=document.getElementById(b.dataset.t); const on=a.classList.toggle('on');
+  b.textContent = on ? 'Hide the answer key' : (b.dataset.t[0]==='a'?'Show the answer key':'Show it again');
+});
+
+/* join */
+document.getElementById('jGo').onclick=()=>{
+  const n=jName.value.trim();
+  if(!n){ jName.focus(); jName.style.borderColor='var(--bad)'; return; }
+  me={ name:n, org:jOrg.value.trim(), grp:jGrp.value.trim(),
+       room:(jRoom.value.trim().toUpperCase()||DEFAULT_ROOM),
+       uid: (localStorage.getItem('ttd3_uid') || (Date.now().toString(36)+Math.random().toString(36).slice(2,7))) };
+  localStorage.setItem('ttd3_uid',me.uid);
+  localStorage.setItem('ttd3_me',JSON.stringify(me));
+  room=me.room; pull(); show(1);
+};
+
+/* submit */
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('.submit[data-part]'); if(!b) return;
+  if(!me){ show(0); return; }
+  const map={}; b.dataset.map.split(',').forEach(pair=>{
+    const [k,id]=pair.split(':'); const v=document.getElementById(id).value.trim(); if(v) map[k]=v;
+  });
+  if(!Object.keys(map).length){ b.textContent='Answer at least one field'; setTimeout(()=>b.textContent='Submit to the room',1800); return; }
+  b.disabled=true; b.textContent='Sending…';
+  try{ await push(b.dataset.part, map); b.classList.add('done'); b.textContent='✓ Shared with the room'; await pull(); }
+  catch(err){ b.textContent='Could not send — retry'; }
+  finally{ b.disabled=false; setTimeout(()=>{ if(b.classList.contains('done')) b.textContent='✓ Shared — submit again to update'; },2600); }
+});
+
+/* ═══════════ calculators ═══════════ */
+function slider(id,label,min,max,step,val,fmt){
+  return `<div style="margin-bottom:14px"><div class="slabel"><label style="margin:0">${label}</label><span id="${id}v">${fmt(val)}</span></div>
+  <input class="slider" type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}"></div>`;
+}
+
+/* B */
+document.getElementById('calcB').innerHTML =
+  slider('bKm','Line distance',50,400,10,200,v=>v+' km')+
+  slider('bRate','Discount rate',5,18,0.5,10,v=>v+'%')+
+  slider('bAvail','Availability',50,95,5,80,v=>v+'%')+
+  `<div class="out"><div class="lbl">LRIC</div><div class="big" id="bOut">—</div>
+   <div class="lbl" style="margin-top:11px">In Kwacha</div><div class="big sm" id="bOut2">—</div>
+   <div class="foot" id="bCmp"></div></div>`;
+function runB(){
+  const km=+bKm.value, r=+bRate.value/100, av=+bAvail.value/100;
+  bKmv.textContent=km+' km'; bRatev.textContent=(+bRate.value)+'%'; bAvailv.textContent=(+bAvail.value)+'%';
+  const capex=km*D.lric.kmCost+D.lric.subs, a=af(r,D.lric.life);
+  const ann=(capex+D.lric.omPerYr*a)/a, mwh=D.lric.mw*8760*av, lric=ann*1e6/mwh, zk=lric*D.fx/1000;
+  bOut.textContent='US$'+f(lric)+' /MWh';
+  bOut2.textContent='ZK '+f(zk,3)+' /kWh';
+  bCmp.textContent='CAPEX US$'+f(capex,0)+'M · levelised US$'+f(ann)+'M a year · '+f(zk/D.embeddedTariff,1)+'× the embedded tariff of ZK '+D.embeddedTariff+'/kWh';
+}
+['bKm','bRate','bAvail'].forEach(id=>document.getElementById(id).addEventListener('input',runB)); runB();
+
+/* C */
+(function(){
+  const tot=D.gens.reduce((s,g)=>s+g.mw*g.f*g.km,0); let rows='',sum=0;
+  D.gens.forEach(g=>{
+    const mm=g.mw*g.f*g.km, pct=mm/tot, c=D.netCost*pct; sum+=c;
+    rows+=`<tr><td><b>${g.id}</b> · ${g.name}</td><td class="n">${mm.toLocaleString()}</td><td class="n">${f(pct*100)}%</td><td class="n">$${f(c)}M</td><td class="n">$${f(c*1e6/g.mw/1000)}</td></tr>`;
+  });
+  document.getElementById('calcC').innerHTML=
+   `<div class="tw"><table><tr><th>Generator</th><th>MW-miles</th><th>Share</th><th>Cost</th><th>$/kW/yr</th></tr>${rows}
+    <tr class="tot"><td>Total</td><td class="n">${tot.toLocaleString()}</td><td class="n">100.00%</td><td class="n">$${f(sum)}M</td><td></td></tr></table></div>
+    <div class="out"><div class="lbl">Reconciliation</div><div style="font-size:15.5px;margin-top:5px"><span class="chk">✓</span> Allocated US$${f(sum)}M = target US$${f(D.netCost)}M</div></div>`;
+})();
+
+/* D */
+(function(){
+  const B=D.bene.reduce((s,x)=>s+x.b,0), a=af(D.proj.rate,D.proj.life), ann=D.proj.capex/a, bcr=B/ann;
+  let rows='',sum=0;
+  D.bene.forEach(x=>{ const al=x.b/B*D.proj.capex; sum+=al;
+    rows+=`<tr><td>${x.c}</td><td class="n">${f(x.b/B*100,1)}%</td><td class="n">$${f(al,1)}M</td><td class="n">+${f(x.b-al/D.proj.life)}</td><td class="n">${f(al/x.b,1)} yr</td></tr>`; });
+  document.getElementById('calcD').innerHTML=
+   `<div class="g2" style="margin-bottom:12px">
+      <div class="out" style="margin:0"><div class="lbl">Annual cost</div><div class="big sm">US$${f(ann)}M</div></div>
+      <div class="out" style="margin:0"><div class="lbl">Benefit–cost</div><div class="big sm">${f(bcr)}</div></div></div>
+    <div class="tw"><table><tr><th>Party</th><th>Share</th><th>Pays</th><th>Net/yr</th><th>Payback</th></tr>${rows}
+    <tr class="tot"><td>Total</td><td class="n">100%</td><td class="n">$${f(sum,1)}M</td><td class="n">+${f(B-D.proj.capex/D.proj.life)}</td><td></td></tr></table></div>
+    <div class="out"><div class="lbl">Reconciliation</div><div style="font-size:15.5px;margin-top:5px"><span class="chk">✓</span> Allocated US$${f(sum,1)}M = project US$${f(D.proj.capex,1)}M</div></div>`;
+})();
+
+/* F */
+document.getElementById('calcF').innerHTML =
+  slider('fRpi','Inflation (RPI)',0,12,0.5,4,v=>v+'%')+
+  slider('fEff','Efficiency target',0,5,0.25,1.5,v=>v+'%')+
+  slider('fGro','Capacity growth over 5 years',0,20,1,8,v=>v+'%')+
+  `<div class="g2" style="margin-bottom:12px">
+     <div class="out" style="margin:0"><div class="lbl">X factor</div><div class="big sm" id="fXo">—</div></div>
+     <div class="out" style="margin:0"><div class="lbl">Real change</div><div class="big sm" id="fRo">—</div></div></div>
+   <div id="fTab"></div>`;
+function runF(){
+  const rpi=+fRpi.value/100, eff=+fEff.value/100, gro=+fGro.value/100;
+  fRpiv.textContent=(+fRpi.value)+'%'; fEffv.textContent=(+fEff.value)+'%'; fGrov.textContent=(+fGro.value)+'%';
+  const X=eff+D.rpix.a*(gro/D.rpix.years);
+  let p=D.rpix.start, rows=`<tr><td>2027</td><td class="n">${f(p,3)}</td><td class="n">${f(p,3)}</td></tr>`;
+  for(let y=1;y<=D.rpix.years;y++){ p*=(1+rpi-X);
+    rows+=`<tr><td>${2027+y}</td><td class="n">${f(p,3)}</td><td class="n">${f(p/Math.pow(1+rpi,y),3)}</td></tr>`; }
+  const real=p/Math.pow(1+rpi,D.rpix.years), ch=(real/D.rpix.start-1)*100;
+  fXo.textContent=f(X*100)+'%';
+  fRo.textContent=(ch<0?'−':'+')+f(Math.abs(ch),1)+'%';
+  fRo.style.color = ch<0 ? 'var(--good)' : 'var(--warn)';
+  document.getElementById('fTab').innerHTML=
+    `<div class="tw"><table><tr><th>Year</th><th>Nominal ZK/kWh</th><th>Real ZK/kWh</th></tr>${rows}</table></div>`;
+}
+['fRpi','fEff','fGro'].forEach(id=>document.getElementById(id).addEventListener('input',runF)); runF();
+
+/* boot */
+if(me){ document.getElementById('jRoom').value=me.room; document.getElementById('jName').value=me.name;
+  document.getElementById('jOrg').value=me.org||''; document.getElementById('jGrp').value=me.grp||'';
+  room=me.room; show(1); pull(); }
+else { document.getElementById('jRoom').value=DEFAULT_ROOM; show(0); }
+</script>
+</body>
+</html>
