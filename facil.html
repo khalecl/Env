@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Facilitator Console — Livingstone Corridor Determination</title>
+<style>
+:root{
+  --bg:#0a0e14; --surface:#111721; --surface2:#18202c; --line:#232d3c; --line2:#33405280;
+  --ink:#e8eef6; --ink2:#a9b6c7; --dim:#6b7a8d;
+  --brand:#3ea8a0; --brand-lt:#5fd3c9; --gold:#c9a227; --good:#4aa863; --warn:#d1873f; --bad:#c05a5a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{background:var(--bg);color:var(--ink);
+  font:16px/1.55 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+.serif{font-family:ui-serif,Georgia,"Times New Roman",serif}
+
+/* ── top bar ── */
+header{position:sticky;top:0;z-index:40;background:rgba(10,14,20,.95);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);padding:12px 22px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.mark{flex:0 0 34px;height:34px;border-radius:9px;background:linear-gradient(140deg,var(--brand),#2a6f7a);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#04191c}
+.hl{flex:1;min-width:180px}
+.hl .k{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand-lt);font-weight:700}
+.hl .t{font-size:17px;font-weight:600;margin-top:1px}
+.ctl{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+input,select,button{font:inherit;border-radius:10px;border:1px solid var(--line2);
+  background:var(--surface2);color:var(--ink);padding:9px 13px;min-height:42px}
+input:focus,select:focus{outline:none;border-color:var(--brand)}
+button{cursor:pointer;font-weight:600;font-size:14px}
+button.on{background:var(--brand);color:#03201f;border-color:var(--brand)}
+button.ghost:hover{border-color:var(--brand)}
+.live{display:flex;gap:7px;align-items:center;font-size:13px;color:var(--ink2);padding:0 4px}
+.live .d{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 4px rgba(74,168,99,.16)}
+.live .d.off{background:var(--dim);box-shadow:none}
+
+/* ── tabs ── */
+.tabs{display:flex;gap:8px;padding:14px 22px 0;overflow-x:auto;border-bottom:1px solid var(--line)}
+.tabs button{background:transparent;border:none;border-bottom:2px solid transparent;border-radius:0;
+  color:var(--dim);padding:8px 4px 12px;margin-right:16px;white-space:nowrap;font-size:14.5px}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--brand)}
+.tabs button .c{background:var(--surface2);border-radius:20px;padding:1px 8px;font-size:11.5px;margin-left:7px;color:var(--brand-lt)}
+
+main{padding:24px 22px 60px;max-width:1500px;margin:0 auto}
+h2{font-size:26px;margin:0 0 4px;font-weight:600;letter-spacing:-.015em}
+.sub{color:var(--ink2);font-size:15px;margin:0 0 24px}
+h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin:30px 0 13px;font-weight:700}
+
+/* ── stat strip ── */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:26px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px 17px}
+.stat .l{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:700}
+.stat .v{font-size:28px;font-weight:600;color:var(--brand-lt);font-variant-numeric:tabular-nums;line-height:1.15;margin-top:3px}
+.stat .f{font-size:12px;color:var(--dim);margin-top:5px}
+.stat.warn .v{color:var(--warn)} .stat.good .v{color:var(--good)}
+
+/* ── poll bars ── */
+.poll{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:18px 19px;margin-bottom:14px}
+.poll .q{font-size:13px;color:var(--ink2);margin-bottom:14px;font-weight:600}
+.row{margin-bottom:13px}
+.row:last-child{margin:0}
+.row .lab{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;gap:14px}
+.row .lab b{font-variant-numeric:tabular-nums;color:var(--brand-lt);flex:0 0 auto}
+.track{height:9px;background:var(--surface2);border-radius:5px;overflow:hidden}
+.fill{height:100%;border-radius:5px;transition:width .5s cubic-bezier(.2,.8,.3,1)}
+
+/* ── numeric spread ── */
+.spread{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:20px 22px 14px;margin-bottom:14px}
+.axis{position:relative;height:74px;margin:26px 0 4px}
+.axis .line{position:absolute;left:0;right:0;top:37px;height:2px;background:var(--line)}
+.axis .tgt{position:absolute;top:16px;bottom:16px;width:2px;background:var(--gold)}
+.axis .tgtl{position:absolute;top:-6px;font-size:10.5px;color:var(--gold);transform:translateX(-50%);
+  white-space:nowrap;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.axis .pt{position:absolute;top:29px;width:18px;height:18px;border-radius:50%;transform:translateX(-50%);
+  border:2px solid var(--bg);cursor:default}
+.axis .pt span{position:absolute;top:22px;left:50%;transform:translateX(-50%);font-size:10.5px;color:var(--dim);white-space:nowrap}
+.ends{display:flex;justify-content:space-between;font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums}
+
+/* ── responses ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:17px 18px;
+  cursor:pointer;transition:border-color .18s,transform .18s}
+.post:hover{border-color:var(--brand);transform:translateY(-2px)}
+.post .who{display:flex;gap:11px;align-items:center;margin-bottom:12px}
+.av{flex:0 0 34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:12.5px;font-weight:800;color:#04191c}
+.nm{font-size:14.5px;font-weight:650;line-height:1.25}
+.mt{font-size:11.5px;color:var(--dim)}
+.qa{font-size:14.5px;color:var(--ink2);line-height:1.55;margin-bottom:11px;white-space:pre-wrap}
+.qa:last-child{margin:0}
+.qa em{color:var(--dim);font-style:normal;font-size:10px;text-transform:uppercase;letter-spacing:.12em;
+  display:block;margin-bottom:3px;font-weight:700}
+.val{color:var(--brand-lt);font-weight:650;font-variant-numeric:tabular-nums;font-size:17px}
+.empty{text-align:center;color:var(--dim);padding:70px 20px;border:1px dashed var(--line2);border-radius:14px;font-size:15px}
+
+/* ── projector overlay ── */
+#proj{position:fixed;inset:0;z-index:90;background:var(--bg);display:none;flex-direction:column}
+#proj.on{display:flex}
+#proj .ph{padding:20px 34px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px}
+#proj .ph .who{display:flex;gap:14px;align-items:center;flex:1}
+#proj .ph .av{flex:0 0 50px;height:50px;border-radius:14px;font-size:18px}
+#proj .ph .nm{font-size:25px;font-weight:600}
+#proj .ph .mt{font-size:14px}
+#proj .pb{flex:1;overflow-y:auto;padding:44px 60px;display:flex;flex-direction:column;justify-content:center}
+#proj .pq{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand-lt);font-weight:700;margin-bottom:12px}
+#proj .pa{font-size:34px;line-height:1.4;margin-bottom:44px;white-space:pre-wrap;font-weight:400}
+#proj .pa.num{font-size:76px;font-weight:600;color:var(--brand-lt);font-variant-numeric:tabular-nums}
+#proj .pf{padding:16px 34px;border-top:1px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between}
+#proj .pf .n{color:var(--dim);font-size:14px;font-variant-numeric:tabular-nums}
+#proj button{min-height:50px;padding:11px 22px;font-size:16px}
+@media (max-width:760px){ #proj .pa{font-size:24px} #proj .pa.num{font-size:52px} #proj .pb{padding:26px} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="mark">ERB</div>
+  <div class="hl"><div class="k">Facilitator console</div><div class="t serif">Livingstone Corridor Determination</div></div>
+  <div class="ctl">
+    <input id="room" style="width:130px;text-transform:uppercase" placeholder="ROOM">
+    <select id="sort"><option value="new">Newest first</option><option value="old">Oldest first</option><option value="grp">By group</option></select>
+    <button class="ghost" id="proj0">▶ Project</button>
+    <button class="ghost" id="csv">Export CSV</button>
+    <div class="live"><span class="d off" id="dot"></span><span id="liveTxt">connecting…</span></div>
+  </div>
+</header>
+
+<div class="tabs" id="tabs"></div>
+<main id="main"></main>
+
+<div id="proj">
+  <div class="ph">
+    <div class="who"><div class="av" id="pAv"></div>
+      <div><div class="nm" id="pNm"></div><div class="mt" id="pMt"></div></div></div>
+    <button class="ghost" onclick="closeProj()">Exit ✕</button>
+  </div>
+  <div class="pb" id="pBody"></div>
+  <div class="pf">
+    <button class="ghost" onclick="step(-1)">← Previous</button>
+    <div class="n" id="pN"></div>
+    <button class="on" onclick="step(1)">Next →</button>
+  </div>
+</div>
+
+<script>
+/* ══════ CONFIG — must match the trainee app ══════ */
+const DB_URL="https://test-7f3ce-default-rtdb.firebaseio.com";
+const DB_ROOT="ttd_day3";
+const DEFAULT_ROOM="LUSAKA";
+const POLL_MS=6000;
+
+/* Model answers used for the spread markers */
+const TARGET={ B:{key:'lric',val:43.37,unit:'US$/MWh',label:'Model answer 43.37'},
+               F:{key:'x',   val:2.46, unit:'%',       label:'Model answer 2.46%'} };
+
+const PARTS={
+ A:{name:"Part A · Cost audit",
+    fields:{driver:"Charge driving increases",why:"Why"},
+    poll:"driver"},
+ B:{name:"Part B · LRIC",
+    fields:{lric:"LRIC (US$/MWh)",policy:"Policy choice",why:"Reasoning"},
+    poll:"policy", num:"lric"},
+ C:{name:"Part C · MW-mile",
+    fields:{ratio:"B ÷ A per MW",signal:"Signal to a developer"}},
+ D:{name:"Part D · Beneficiary pays",
+    fields:{fair:"Fair?",risk:"Biggest political risk",defence:"Defence to parliament"},
+    poll:"fair"},
+ E:{name:"Part E · Benchmark",
+    fields:{model:"Model for Zambia",first:"First reform",why:"Trilemma reasoning"},
+    poll:"model"},
+ F:{name:"Part F · RPI-X",
+    fields:{x:"X factor (%)",real:"Real change (%)",msg:"Message to consumers"},
+    num:"x"},
+ Z:{name:"Debrief",
+    fields:{q1:"Which of B, C or D",q2:"Signal to a developer",q3:"Capability that fails first",q4:"Sustainable in real terms?"}}
+};
+const NUMF=new Set(['lric','x','real','ratio']);
+/* ═════════════════════════════════════════════════ */
+
+const HUES=['#3ea8a0','#c9a227','#7a8fd1','#c07a9e','#6fae6f','#d1873f','#8f7ad1','#4fa8c0'];
+const hue=s=>HUES[[...String(s)].reduce((a,c)=>a+c.charCodeAt(0),0)%HUES.length];
+const ini=s=>String(s||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?';
+const esc=s=>String(s??'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+const num=s=>{const m=String(s??'').replace(/[−–]/g,'-').match(/-?\d+(\.\d+)?/);return m?parseFloat(m[0]):null;};
+const f=(x,d=2)=>(isFinite(x)?x:0).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+
+let room=localStorage.getItem('ttd3_fac_room')||DEFAULT_ROOM;
+let tab=localStorage.getItem('ttd3_fac_tab')||'A';
+let data={}, sortMode='new';
+
+document.getElementById('room').value=room;
+document.getElementById('room').onchange=e=>{
+  room=(e.target.value.trim().toUpperCase()||DEFAULT_ROOM); e.target.value=room;
+  localStorage.setItem('ttd3_fac_room',room); data={}; render(); pull();
+};
+document.getElementById('sort').onchange=e=>{sortMode=e.target.value;render();};
+
+async function pull(){
+  try{
+    const r=await fetch(`${DB_URL}/${DB_ROOT}/${encodeURIComponent(room)}.json`);
+    const j=await r.json()||{};
+    data={};
+    Object.entries(j).forEach(([p,items])=>{ data[p]=Object.values(items||{}); });
+    dot.className='d'; 
+    const ppl=new Set(); Object.values(data).flat().forEach(x=>ppl.add(x.uid||x.name));
+    liveTxt.textContent=`${room} · ${ppl.size} participant${ppl.size===1?'':'s'}`;
+    render();
+  }catch(e){ dot.className='d off'; liveTxt.textContent='offline — retrying'; }
+}
+setInterval(pull,POLL_MS); 
+
+function posts(p){
+  let a=(data[p]||[]).slice();
+  if(sortMode==='new') a.sort((x,y)=>y.ts-x.ts);
+  else if(sortMode==='old') a.sort((x,y)=>x.ts-y.ts);
+  else a.sort((x,y)=>String(x.grp||'zz').localeCompare(String(y.grp||'zz'))||x.ts-y.ts);
+  return a;
+}
+
+function renderTabs(){
+  tabs.innerHTML=Object.entries(PARTS).map(([k,v])=>{
+    const n=(data[k]||[]).length;
+    return `<button class="${k===tab?'on':''}" onclick="tab='${k}';localStorage.setItem('ttd3_fac_tab','${k}');render()">${esc(v.name)}${n?`<span class="c">${n}</span>`:''}</button>`;
+  }).join('');
+}
+
+function pollHTML(p){
+  const key=PARTS[p].poll; if(!key) return '';
+  const a=posts(p).filter(x=>x[key]); if(!a.length) return '';
+  const counts={}; a.forEach(x=>counts[x[key]]=(counts[x[key]]||0)+1);
+  const max=Math.max(...Object.values(counts));
+  const rows=Object.entries(counts).sort((x,y)=>y[1]-x[1]).map(([k,n],i)=>`
+    <div class="row"><div class="lab"><span>${esc(k)}</span><b>${n} · ${Math.round(n/a.length*100)}%</b></div>
+    <div class="track"><div class="fill" style="width:${n/max*100}%;background:${HUES[i%HUES.length]}"></div></div></div>`).join('');
+  return `<div class="poll"><div class="q">${esc(PARTS[p].fields[key])} — where the room landed (${a.length} responses)</div>${rows}</div>`;
+}
+
+function spreadHTML(p){
+  const key=PARTS[p].num; if(!key) return '';
+  const a=posts(p).map(x=>({v:num(x[key]),n:x.name,u:x.uid||x.name})).filter(x=>x.v!==null);
+  if(!a.length) return '';
+  const t=TARGET[p], vals=a.map(x=>x.v);
+  let lo=Math.min(...vals,t?t.val:Infinity), hi=Math.max(...vals,t?t.val:-Infinity);
+  const pad=(hi-lo||Math.abs(hi)||1)*0.18; lo-=pad; hi+=pad;
+  const pos=v=>((v-lo)/(hi-lo))*100;
+  const mean=vals.reduce((s,v)=>s+v,0)/vals.length;
+  const dots=a.map((x,i)=>`<div class="pt" style="left:${pos(x.v)}%;background:${hue(x.u)}" title="${esc(x.n)}: ${x.v}"><span>${x.v}</span></div>`).join('');
+  const tgt=t?`<div class="tgt" style="left:${pos(t.val)}%"></div><div class="tgtl" style="left:${pos(t.val)}%">${esc(t.label)}</div>`:'';
+  const off=t?Math.abs(mean-t.val)/Math.abs(t.val)*100:0;
+  return `<div class="spread">
+    <div class="q" style="font-size:13px;color:var(--ink2);font-weight:600">${esc(PARTS[p].fields[key])} — the spread across ${a.length} submission${a.length===1?'':'s'}</div>
+    <div class="axis"><div class="line"></div>${tgt}${dots}</div>
+    <div class="ends"><span>${f(lo)}</span><span>${f(hi)}</span></div>
+    <div class="strip" style="margin:18px 0 0">
+      <div class="stat"><div class="l">Lowest</div><div class="v">${f(Math.min(...vals))}</div></div>
+      <div class="stat"><div class="l">Mean</div><div class="v">${f(mean)}</div></div>
+      <div class="stat"><div class="l">Highest</div><div class="v">${f(Math.max(...vals))}</div></div>
+      ${t?`<div class="stat ${off<5?'good':off<20?'':'warn'}"><div class="l">Mean vs model</div><div class="v">${mean>=t.val?'+':'−'}${f(off,1)}%</div><div class="f">Model ${f(t.val)} ${esc(t.unit)}</div></div>`:''}
+    </div></div>`;
+}
+
+function render(){
+  renderTabs();
+  const P=PARTS[tab], a=posts(tab);
+  const groups=new Set(a.map(x=>x.grp).filter(Boolean));
+  let h=`<h2 class="serif">${esc(P.name)}</h2>
+   <p class="sub">${a.length?`${a.length} submission${a.length===1?'':'s'}${groups.size?` from ${groups.size} group${groups.size===1?'':'s'}`:''} in room ${esc(room)}.`:`Waiting for submissions in room ${esc(room)}.`}</p>`;
+  if(!a.length){ main.innerHTML=h+`<div class="empty">Nothing here yet.<br><br>Trainees join with the room code <b>${esc(room)}</b> and submit from the activity app.<br>This page refreshes on its own every few seconds.</div>`; return; }
+  h+=spreadHTML(tab)+pollHTML(tab);
+  h+=`<h3>Individual responses</h3><div class="grid">`+a.map((x,i)=>`
+    <div class="post" onclick="openProj(${i})">
+      <div class="who"><div class="av" style="background:${hue(x.uid||x.name)}">${ini(x.name)}</div>
+        <div><div class="nm">${esc(x.name)}${x.grp?` · Group ${esc(x.grp)}`:''}</div>
+        <div class="mt">${esc(x.org||'')}${x.org?' · ':''}${new Date(x.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div></div></div>
+      ${Object.keys(P.fields).map(k=>x[k]?`<div class="qa"><em>${esc(P.fields[k])}</em>${NUMF.has(k)?`<span class="val">${esc(x[k])}</span>`:esc(x[k])}</div>`:'').join('')}
+    </div>`).join('')+`</div>`;
+  main.innerHTML=h;
+}
+
+/* ── projector mode ── */
+let pi=0;
+function openProj(k){ pi=k; document.getElementById('proj').classList.add('on'); drawProj(); }
+function closeProj(){ document.getElementById('proj').classList.remove('on'); }
+function step(d){ const a=posts(tab); if(!a.length)return; pi=(pi+d+a.length)%a.length; drawProj(); }
+function drawProj(){
+  const a=posts(tab); if(!a.length){closeProj();return;}
+  const x=a[Math.min(pi,a.length-1)], P=PARTS[tab];
+  pAv.textContent=ini(x.name); pAv.style.background=hue(x.uid||x.name);
+  pNm.textContent=x.name+(x.grp?` · Group ${x.grp}`:'');
+  pMt.textContent=[x.org,P.name,new Date(x.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})].filter(Boolean).join(' · ');
+  pBody.innerHTML=Object.keys(P.fields).map(k=>x[k]
+    ?`<div class="pq">${esc(P.fields[k])}</div><div class="pa${NUMF.has(k)?' num':''}">${esc(x[k])}</div>`:'').join('')
+    || `<div class="pa" style="color:var(--dim)">No answer submitted.</div>`;
+  pN.textContent=`${pi+1} of ${a.length} · ${P.name}`;
+}
+document.getElementById('proj0').onclick=()=>openProj(0);
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('proj').classList.contains('on')){
+    if(e.key==='p'||e.key==='P') openProj(0); return; }
+  if(e.key==='ArrowRight'||e.key===' ') {e.preventDefault();step(1);}
+  if(e.key==='ArrowLeft') step(-1);
+  if(e.key==='Escape') closeProj();
+});
+
+/* ── CSV export ── */
+document.getElementById('csv').onclick=()=>{
+  const rows=[['Part','Name','Organisation','Group','Time','Field','Answer']];
+  Object.entries(PARTS).forEach(([p,P])=>posts(p).forEach(x=>
+    Object.keys(P.fields).forEach(k=>{ if(x[k]) rows.push(
+      [P.name,x.name,x.org||'',x.grp||'',new Date(x.ts).toISOString(),P.fields[k],x[k]]); })));
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`day3_${room}_${new Date().toISOString().slice(0,10)}.csv`; a.click();
+};
+
+render(); pull();
+</script>
+</body>
+</html>
