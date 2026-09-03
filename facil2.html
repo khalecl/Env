@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Facilitator Dashboard · Sesheke–Gobabis Corridor</title>
+<style>
+:root{
+  --bg:#080c11; --panel:#121a22; --panel2:#18222c; --line:#243039; --line2:#33454f;
+  --ink:#eef4f9; --dim:#93a7b9; --dim2:#5f7488;
+  --accent:#2fc8a0; --warn:#eda23c; --bad:#e05548; --blue:#5aa9f0;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:17px;line-height:1.5}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:30;background:rgba(8,12,17,.96);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topin{max-width:1500px;margin:0 auto;padding:12px 24px;
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{font-size:15px;font-weight:700;letter-spacing:.01em;white-space:nowrap}
+.brand small{display:block;font-size:11px;color:var(--dim2);font-weight:500;
+  text-transform:uppercase;letter-spacing:.12em;margin-top:1px}
+.spacer{flex:1}
+select,button{font-family:inherit;font-size:15px}
+select{background:var(--panel);border:1px solid var(--line2);color:var(--ink);
+  border-radius:9px;padding:9px 14px;-webkit-appearance:none;appearance:none;cursor:pointer}
+select:focus{outline:none;border-color:var(--accent)}
+.tbtn{background:var(--panel);border:1px solid var(--line2);color:var(--ink);
+  border-radius:9px;padding:9px 16px;cursor:pointer;font-weight:600}
+.tbtn.on{background:var(--accent);color:#04231b;border-color:var(--accent)}
+.pill{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dim);
+  background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:7px 14px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dim2)}
+.dot.live{background:var(--accent);box-shadow:0 0 0 4px rgba(47,200,160,.15);
+  animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+
+.wrap{max-width:1500px;margin:0 auto;padding:22px 24px 60px}
+
+/* stat strip */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px 17px}
+.stat .v{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat .l{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--dim2);
+  margin-top:5px;font-weight:600}
+.stat.g .v{color:var(--accent)} .stat.w .v{color:var(--warn)} .stat.b .v{color:var(--blue)}
+
+.grid{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
+@media(max-width:1000px){.grid{grid-template-columns:1fr}}
+
+.card{background:var(--panel);border:1px solid var(--line);border-radius:15px;
+  overflow:hidden;margin-bottom:20px}
+.chead{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:14px 18px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.chead h2{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.11em;
+  color:var(--dim);font-weight:700}
+.chead .meta{font-size:13px;color:var(--accent);font-variant-numeric:tabular-nums}
+.cbody{padding:18px}
+
+/* question tabs */
+.qtabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px}
+.qtab{flex:none;background:var(--panel);border:1px solid var(--line2);color:var(--dim);
+  border-radius:10px;padding:10px 15px;cursor:pointer;font-weight:600;font-size:14px;
+  white-space:nowrap;transition:.15s}
+.qtab.on{background:var(--accent);color:#04231b;border-color:var(--accent)}
+.qtab .n{display:block;font-size:10px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.08em;opacity:.75;margin-top:1px}
+
+.qtitle{font-size:21px;line-height:1.3;margin:0 0 6px}
+.qsub{color:var(--dim);font-size:15px;margin:0 0 18px}
+
+/* histogram */
+.hist{margin:8px 0 4px}
+.hrow{display:flex;align-items:center;gap:12px;margin-bottom:9px}
+.hlab{width:120px;flex:none;text-align:right;font-variant-numeric:tabular-nums;
+  font-size:14px;color:var(--dim)}
+.htrack{flex:1;height:30px;background:var(--panel2);border-radius:8px;position:relative;overflow:hidden}
+.hfill{height:100%;border-radius:8px;transition:width .5s cubic-bezier(.2,.8,.3,1);
+  display:flex;align-items:center;padding-left:11px;font-size:13px;font-weight:600;color:#04231b}
+.hfill.miss{background:var(--warn)} .hfill.hit{background:var(--accent)}
+.hcnt{width:52px;flex:none;font-variant-numeric:tabular-nums;font-size:14px;color:var(--dim)}
+.correctline{display:flex;align-items:center;gap:9px;margin:16px 0 6px;
+  padding:11px 14px;background:rgba(47,200,160,.1);border:1px solid rgba(47,200,160,.3);
+  border-radius:10px;font-size:15px}
+.correctline b{color:var(--accent);font-variant-numeric:tabular-nums}
+
+/* answer table */
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line)}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--dim2);font-weight:700}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:none}
+.who{display:flex;align-items:center;gap:10px}
+.av{width:32px;height:32px;border-radius:9px;flex:none;display:flex;align-items:center;
+  justify-content:center;font-size:12px;font-weight:700;color:#04231b}
+.nm{font-weight:600;line-height:1.2}
+.og{font-size:12px;color:var(--dim2)}
+.ok{color:var(--accent);font-weight:600}
+.no{color:var(--warn);font-weight:600}
+
+/* progress matrix */
+.mrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:none}
+.mcells{display:flex;gap:4px;flex:none}
+.cell{width:20px;height:20px;border-radius:5px;background:var(--panel2);border:1px solid var(--line)}
+.cell.hit{background:var(--accent);border-color:var(--accent)}
+.cell.miss{background:var(--warn);border-color:var(--warn)}
+.mname{flex:1;min-width:0;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mscore{width:38px;text-align:right;font-variant-numeric:tabular-nums;font-size:14px;font-weight:600}
+
+.prompt{background:var(--panel2);border-left:3px solid var(--blue);border-radius:0 11px 11px 0;
+  padding:14px 17px;margin:14px 0}
+.prompt .pl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);
+  font-weight:700;margin-bottom:6px}
+.prompt p{margin:0 0 9px;font-size:15px;color:var(--dim)}
+.prompt p:last-child{margin-bottom:0}
+.prompt b{color:var(--ink)}
+
+.empty{padding:44px 20px;text-align:center;color:var(--dim2)}
+.empty .big{font-size:19px;color:var(--dim);margin-bottom:7px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;
+  background:var(--panel2);padding:2px 7px;border-radius:5px;color:var(--accent)}
+.hidden{display:none}
+body.present .stats .stat .v{font-size:38px}
+body.present{font-size:19px}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="topin">
+  <div class="brand">Facilitator Dashboard<small>Sesheke–Gobabis Corridor · Day 4</small></div>
+  <select id="selSession"></select>
+  <div class="spacer"></div>
+  <div class="pill"><span class="dot" id="dot"></span><span id="lastSync">connecting…</span></div>
+  <button class="tbtn" id="btnPresent">Present mode</button>
+  <button class="tbtn" id="btnReset">Clear session</button>
+</div></div>
+
+<div class="wrap">
+  <div class="stats" id="stats"></div>
+  <div class="qtabs" id="qtabs"></div>
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="chead"><h2 id="qHead">Question</h2><span class="meta" id="qMeta"></span></div>
+        <div class="cbody" id="qBody"></div>
+      </div>
+      <div class="card">
+        <div class="chead"><h2>Individual answers</h2><span class="meta" id="tblMeta"></span></div>
+        <div class="cbody" style="padding:6px 18px 12px" id="tblBody"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="chead"><h2>Progress matrix</h2><span class="meta" id="mxMeta"></span></div>
+        <div class="cbody" id="mxBody"></div>
+      </div>
+      <div class="card">
+        <div class="chead"><h2>Cohort ranking</h2></div>
+        <div class="cbody" style="padding:6px 18px 12px" id="rankBody"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════ EDITABLE CONFIG — must match the trainee app ═══════════ */
+const CFG = {
+  firebase: "https://test-7f3ce-default-rtdb.firebaseio.com",
+  root: "ttd/day4",
+  sessions: ["LUSAKA-01","LUSAKA-02","DUBAI-01","DEMO"],
+  pollMs: 5000
+};
+const D = {
+  capacityMW:50, capacityFactor:0.40, genCost:50, altSupply:90,
+  lossPct:0.05, lossValue:80,
+  rr:{ZM:1875000,BW:4500000,NA:1125000},
+  zonal:{entryZM:15000,transitBW:0,exitNA:25000},
+  resp:{ZM:[2000,500],BW:[200,800],NA:[100,1400]},
+  benefit:{ZM:20,NA:25,BW:5}
+};
+/* ════════════════════════════════════════════════════════════════════ */
+
+const E=D.capacityMW*8760*D.capacityFactor;
+const lossCost=E*D.lossPct*D.lossValue, lossPerMWh=lossCost/E;
+const rrTotal=D.rr.ZM+D.rr.BW+D.rr.NA;
+const s1=(rrTotal+lossCost)/E, s2=(D.rr.BW+D.rr.NA+lossCost)/E;
+const s3Total=D.capacityMW*(D.zonal.entryZM+D.zonal.transitBW+D.zonal.exitNA), s3=s3Total/E;
+const gap=rrTotal-s3Total;
+const respTot=Object.values(D.resp).reduce((a,b)=>a+b[0]+b[1],0);
+const shareZM=(D.resp.ZM[0]+D.resp.ZM[1])/respTot;
+const benTot=D.benefit.ZM+D.benefit.NA+D.benefit.BW;
+
+const m=n=>Math.round(n).toLocaleString('en-US');
+const d2=n=>n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+/* question metadata + the discussion prompt for each */
+const QS = [
+ {id:'s0', n:'Step 0', title:'Annual energy through the corridor',
+  sub:'50 MW × 8,760 hours × 0.40 load factor',
+  correct:E, tol:1, fmt:v=>m(v)+' MWh', unit:'MWh',
+  prompts:[
+   ['If several answers cluster near <b>438,000</b>','They applied 8,760 hours without the load factor. Ask what a 40% capacity factor physically means for a hydro plant.'],
+   ['If answers cluster near <b>20</b>','Units confused — MW multiplied but hours dropped. Rebuild the units on the board: MW × h = MWh.'],
+   ['Everyone correct','Move fast. Point at $'+d2(lossPerMWh)+'/MWh and tell them it never changes again.']]},
+
+ {id:'s1', n:'Stage 1', title:'Delivered price under pancaking',
+  sub:'All three TSOs bill their full cost, stacked',
+  correct:D.genCost+s1, tol:0.5, fmt:v=>'$'+d2(v)+'/MWh', unit:'US$/MWh',
+  prompts:[
+   ['If answers cluster near <b>46.81</b>','They stopped at the wheeling charge and forgot to add the $50 generation cost. Useful — ask which number a Namibian buyer actually cares about.'],
+   ['If answers cluster near <b>92.81</b>','Losses were omitted. Ask who pays for energy that turns into heat in the line.'],
+   ['Whole room correct','Push straight to the point: nobody cheated, every TSO charged its real cost, and the trade still died.']]},
+
+ {id:'s2', n:'Stage 2', title:'Delivered price with transit cost-sharing',
+  sub:'Zambia drops out — it already recovers domestically',
+  correct:D.genCost+s2, tol:0.5, fmt:v=>'$'+d2(v)+'/MWh', unit:'US$/MWh',
+  prompts:[
+   ['If answers stayed near Stage 1','They kept Zambia in the stack. This is the most common error in the whole exercise — run the incremental-cost argument on the board.'],
+   ['If someone dropped Botswana instead','Interesting error worth airing: ask why the transit country is the one that <i>cannot</i> be dropped.'],
+   ['Discussion opener','"Is Zambia giving something away for free here?" The answer is no — and the reason is double recovery.']]},
+
+ {id:'s3', n:'Stage 3', title:'Delivered price under entry/exit charges',
+  sub:'Pay at the edges only; transit is free to the trader',
+  correct:D.genCost+s3+lossPerMWh, tol:0.6, fmt:v=>'$'+d2(v)+'/MWh', unit:'US$/MWh',
+  prompts:[
+   ['If answers cluster near <b>61.42</b>','Losses dropped again. Worth naming aloud — it is the second time the same slip appears.'],
+   ['Everyone correct and pleased','That is the trap. Now show the TSO table and let the room discover Botswana gets nothing.'],
+   ['Key question to ask','"Who just lost $'+m(D.rr.BW)+' and why would they ever sign this?"']]},
+
+ {id:'s4', n:'Stage 4', title:'Zambia\'s contribution to the ITC fund',
+  sub:'Responsibility share ('+(shareZM*100).toFixed(0)+'%) of the $'+m(gap)+' shortfall',
+  correct:shareZM*gap, tol:5000, fmt:v=>'$'+m(v), unit:'US$',
+  prompts:[
+   ['If answers cluster near <b>1,650,000</b>','Responsibility calculated from imports only. Ask why exports load the network too.'],
+   ['If answers are far too large','They applied the share to the full $'+m(rrTotal)+' rather than the $'+m(gap)+' gap. Separate the two clearly.'],
+   ['The debate to run','Zambia is the seller and still a net payer. Ask the ERB people directly whether they would sign it.']]},
+
+ {id:'s5', n:'Stage 5', title:'Botswana\'s cost under beneficiary-pays',
+  sub:D.benefit.BW+' of '+benTot+' NPV benefit, applied to $'+m(rrTotal),
+  correct:D.benefit.BW/benTot*rrTotal, tol:20000, fmt:v=>'$'+m(v), unit:'US$',
+  prompts:[
+   ['If answers vary widely','Benefit shares were misread. Put the three NPV figures back on screen before arguing methodology.'],
+   ['The closing point','Same line, same physics, opposite verdict for Botswana. The methodology <i>is</i> the negotiation.'],
+   ['Final question','"Which rule would you table first if you were representing Zambia? And if you were representing Botswana?"']]}
+];
+
+let session = CFG.sessions[0], activeQ = 0, data = null, timer = null;
+
+const url = p => `${CFG.firebase}/${CFG.root}/${session}/${p}.json`;
+async function pull(){
+  try{
+    const r = await fetch(url('participants'));
+    if(!r.ok) throw 0;
+    data = await r.json();
+    setStatus(true);
+  }catch(e){ data=null; setStatus(false); }
+  draw();
+}
+function setStatus(ok){
+  document.getElementById('dot').className = 'dot' + (ok?' live':'');
+  document.getElementById('lastSync').textContent = ok
+    ? 'live · ' + new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',second:'2-digit'})
+    : 'no connection';
+}
+function avatarColour(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%360;
+  return `hsl(${h} 55% 62%)`; }
+function initials(n){ return n.trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'?'; }
+
+function participants(){
+  if(!data) return [];
+  return Object.entries(data).map(([id,p])=>({
+    id, name:p.name||'Anonymous', org:p.org||'—', answers:p.answers||{}
+  })).sort((a,b)=>a.name.localeCompare(b.name));
+}
+
+function draw(){
+  const ps = participants();
+  const q = QS[activeQ];
+  const answered = ps.filter(p=>p.answers[q.id]);
+  const right = answered.filter(p=>p.answers[q.id].ok);
+
+  /* stat strip */
+  const totalAns = ps.reduce((a,p)=>a+Object.keys(p.answers).length,0);
+  const totalOk = ps.reduce((a,p)=>a+Object.values(p.answers).filter(x=>x.ok).length,0);
+  document.getElementById('stats').innerHTML = `
+    <div class="stat b"><div class="v">${ps.length}</div><div class="l">In session</div></div>
+    <div class="stat"><div class="v">${answered.length}</div><div class="l">Answered this question</div></div>
+    <div class="stat g"><div class="v">${answered.length?Math.round(right.length/answered.length*100):0}%</div><div class="l">Correct this question</div></div>
+    <div class="stat w"><div class="v">${answered.length-right.length}</div><div class="l">Need discussion</div></div>
+    <div class="stat"><div class="v">${totalAns?Math.round(totalOk/totalAns*100):0}%</div><div class="l">Cohort accuracy</div></div>`;
+
+  /* tabs */
+  document.getElementById('qtabs').innerHTML = QS.map((x,i)=>{
+    const a = ps.filter(p=>p.answers[x.id]).length;
+    return `<button class="qtab ${i===activeQ?'on':''}" data-i="${i}">${x.n}
+      <span class="n">${a}/${ps.length||0} in</span></button>`;
+  }).join('');
+  document.querySelectorAll('.qtab').forEach(b=>b.onclick=()=>{ activeQ=+b.dataset.i; draw(); });
+
+  /* question panel */
+  document.getElementById('qHead').textContent = q.n;
+  document.getElementById('qMeta').textContent = answered.length + ' of ' + ps.length + ' answered';
+  const body = document.getElementById('qBody');
+
+  if(!ps.length){
+    body.innerHTML = `<div class="empty"><div class="big">Nobody has joined <span class="mono">${session}</span> yet.</div>
+      Ask trainees to open the exercise and select this session code.</div>`;
+  } else if(!answered.length){
+    body.innerHTML = `<h3 class="qtitle">${q.title}</h3><p class="qsub">${q.sub}</p>
+      <div class="empty"><div class="big">No answers submitted yet.</div>
+      Correct answer: <b>${q.fmt(q.correct)}</b> — hold it back until the room has responded.</div>`;
+  } else {
+    /* bucket answers */
+    const buckets = new Map();
+    answered.forEach(p=>{
+      const v = p.answers[q.id].v;
+      const key = Math.abs(v-q.correct)<=q.tol ? 'CORRECT' : String(v);
+      if(!buckets.has(key)) buckets.set(key,{v, ok:key==='CORRECT', n:0});
+      buckets.get(key).n++;
+    });
+    const rows = [...buckets.values()].sort((a,b)=>b.n-a.n || a.v-b.v);
+    const max = Math.max(...rows.map(r=>r.n));
+    body.innerHTML = `
+      <h3 class="qtitle">${q.title}</h3><p class="qsub">${q.sub}</p>
+      <div class="hist">${rows.map(r=>`
+        <div class="hrow">
+          <div class="hlab">${q.fmt(r.v)}</div>
+          <div class="htrack"><div class="hfill ${r.ok?'hit':'miss'}"
+            style="width:${Math.max(r.n/max*100,7)}%">${r.ok?'correct':''}</div></div>
+          <div class="hcnt">${r.n}</div>
+        </div>`).join('')}</div>
+      <div class="correctline">Correct answer: <b>${q.fmt(q.correct)}</b>
+        · ${right.length} of ${answered.length} got it</div>
+      ${q.prompts.map(p=>`<div class="prompt"><div class="pl">${p[0]}</div><p>${p[1]}</p></div>`).join('')}`;
+  }
+
+  /* individual table */
+  document.getElementById('tblMeta').textContent = q.n;
+  document.getElementById('tblBody').innerHTML = ps.length ? `<table>
+    <tr><th>Participant</th><th>Organisation</th><th class="n">Answer</th><th class="n">Result</th></tr>
+    ${ps.map(p=>{
+      const a=p.answers[q.id];
+      return `<tr>
+        <td><div class="who"><div class="av" style="background:${avatarColour(p.name)}">${initials(p.name)}</div>
+          <div class="nm">${p.name}</div></div></td>
+        <td style="color:var(--dim)">${p.org}</td>
+        <td class="n">${a?q.fmt(a.v):'—'}</td>
+        <td class="n ${a?(a.ok?'ok':'no'):''}">${a?(a.ok?'correct':'review'):'waiting'}</td>
+      </tr>`;}).join('')}</table>` : `<div class="empty">Waiting for participants.</div>`;
+
+  /* progress matrix */
+  document.getElementById('mxMeta').textContent = QS.length + ' questions';
+  document.getElementById('mxBody').innerHTML = ps.length ? ps.map(p=>{
+    const ok = QS.filter(x=>p.answers[x.id]&&p.answers[x.id].ok).length;
+    return `<div class="mrow">
+      <div class="mcells">${QS.map(x=>{
+        const a=p.answers[x.id];
+        return `<div class="cell ${a?(a.ok?'hit':'miss'):''}" title="${x.n}"></div>`;}).join('')}</div>
+      <div class="mname">${p.name}</div>
+      <div class="mscore">${ok}/${QS.length}</div></div>`;
+  }).join('') : `<div class="empty">No participants yet.</div>`;
+
+  /* ranking */
+  const ranked = [...ps].map(p=>({
+    ...p, ok:QS.filter(x=>p.answers[x.id]&&p.answers[x.id].ok).length,
+    done:Object.keys(p.answers).length
+  })).sort((a,b)=>b.ok-a.ok||b.done-a.done||a.name.localeCompare(b.name));
+  document.getElementById('rankBody').innerHTML = ranked.length ? `<table>
+    ${ranked.map((p,i)=>`<tr>
+      <td style="width:26px;color:var(--dim2)">${i+1}</td>
+      <td><div class="who"><div class="av" style="background:${avatarColour(p.name)}">${initials(p.name)}</div>
+        <div><div class="nm">${p.name}</div><div class="og">${p.org}</div></div></div></td>
+      <td class="n ok">${p.ok}/${QS.length}</td></tr>`).join('')}</table>`
+    : `<div class="empty">No participants yet.</div>`;
+}
+
+/* controls */
+const sel=document.getElementById('selSession');
+sel.innerHTML = CFG.sessions.map(s=>`<option>${s}</option>`).join('');
+sel.onchange = () => { session=sel.value; data=null; draw(); pull(); };
+
+document.getElementById('btnPresent').onclick = function(){
+  document.body.classList.toggle('present');
+  this.classList.toggle('on');
+  if(document.body.classList.contains('present') && document.documentElement.requestFullscreen)
+    document.documentElement.requestFullscreen().catch(()=>{});
+  else if(document.exitFullscreen && document.fullscreenElement) document.exitFullscreen();
+};
+
+document.getElementById('btnReset').onclick = async () => {
+  if(!confirm(`Delete all answers for ${session}? This cannot be undone.`)) return;
+  try{ await fetch(url('participants'), {method:'DELETE'}); }catch(e){}
+  data=null; draw(); pull();
+};
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight' && activeQ<QS.length-1){ activeQ++; draw(); }
+  if(e.key==='ArrowLeft'  && activeQ>0){ activeQ--; draw(); }
+});
+
+pull(); timer=setInterval(pull, CFG.pollMs);
+</script>
+</body>
+</html>
