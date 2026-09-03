@@ -139,6 +139,46 @@ details p{margin:10px 0 0;font-size:14px;color:var(--dim)}
 .tag.on{background:rgba(47,200,160,.14);color:var(--accent);border-color:rgba(47,200,160,.3)}
 .tag.off{background:rgba(224,85,72,.12);color:var(--bad);border-color:rgba(224,85,72,.3)}
 
+/* ── celebration layer ── */
+#fx{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.conf{position:absolute;width:9px;height:14px;border-radius:2px;will-change:transform,opacity}
+@keyframes drop{
+  0%{transform:translate3d(0,0,0) rotate(0deg);opacity:1}
+  100%{transform:translate3d(var(--dx),108vh,0) rotate(var(--rot));opacity:0}}
+.spark{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+@keyframes burst{0%{transform:translate(0,0) scale(1);opacity:1}
+  100%{transform:translate(var(--bx),var(--by)) scale(0);opacity:0}}
+
+#toast{position:fixed;left:50%;top:22%;transform:translate(-50%,-14px) scale(.9);
+  z-index:70;pointer-events:none;opacity:0;transition:opacity .22s,transform .28s cubic-bezier(.2,1.5,.4,1);
+  background:var(--panel);border:1px solid var(--line2);border-radius:16px;
+  padding:16px 26px;text-align:center;box-shadow:0 18px 50px rgba(0,0,0,.55);min-width:210px}
+#toast.on{opacity:1;transform:translate(-50%,0) scale(1)}
+#toast.win{border-color:var(--accent);box-shadow:0 0 0 1px rgba(47,200,160,.3),0 18px 50px rgba(0,0,0,.55)}
+#toast.lose{border-color:var(--warn)}
+#toast .em{font-size:34px;line-height:1;margin-bottom:6px}
+#toast .tt{font-size:19px;font-weight:700;letter-spacing:-.01em}
+#toast .ts{font-size:13px;color:var(--dim);margin-top:3px}
+#toast .pts{font-size:13px;color:var(--accent);font-weight:700;margin-top:7px;
+  font-variant-numeric:tabular-nums}
+
+.streak{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;
+  color:var(--warn);font-variant-numeric:tabular-nums;white-space:nowrap;
+  opacity:0;transform:scale(.7);transition:.28s cubic-bezier(.2,1.6,.4,1)}
+.streak.on{opacity:1;transform:scale(1)}
+.score{font-size:12px;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;
+  white-space:nowrap}
+
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}
+  30%,50%,70%{transform:translateX(-7px)}40%,60%{transform:translateX(7px)}}
+.shake{animation:shake .5s}
+@keyframes popin{0%{transform:scale(.94);opacity:0}100%{transform:scale(1);opacity:1}}
+.reveal.on>*{animation:popin .34s ease both}
+
+.sndbtn{background:none;border:none;color:var(--dim2);font-size:15px;padding:2px 4px;
+  cursor:pointer;line-height:1}
+.sndbtn.off{opacity:.4}
+
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(10,14,19,.97);
   backdrop-filter:blur(12px);border-top:1px solid var(--line);
   padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
@@ -156,11 +196,20 @@ details p{margin:10px 0 0;font-size:14px;color:var(--dim)}
     <div class="hrow">
       <div class="hleft"><span class="dot" id="hDot"></span>
         <span class="htitle" id="hTitle">Sesheke–Gobabis Corridor</span></div>
-      <div class="hstep" id="hStep"></div>
+      <div class="hleft" style="gap:11px">
+        <span class="streak" id="hStreak"></span>
+        <span class="score" id="hScore"></span>
+        <button class="sndbtn" id="hSnd" title="Sound on/off">🔊</button>
+        <span class="hstep" id="hStep"></span>
+      </div>
     </div>
   </div>
   <div class="bar"><span id="hBar"></span></div>
 </header>
+
+<div id="fx"></div>
+<div id="toast"><div class="em" id="tEm"></div><div class="tt" id="tTt"></div>
+  <div class="ts" id="tTs"></div><div class="pts" id="tPts"></div></div>
 
 <div id="app"></div>
 
@@ -267,6 +316,128 @@ const Q = {
   s5:{v:cbca.BW,   t:20000, unit:'US$'}
 };
 
+/* ══════════════ SOUND (synthesised, no external files) ══════════════ */
+const SFX = {
+  ctx:null, on:true,
+  init(){ if(!this.ctx){ try{ this.ctx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} }
+    if(this.ctx && this.ctx.state==='suspended') this.ctx.resume(); },
+  /* one square-wave note — the chiptune building block */
+  note(freq, start, dur, vol=0.16, type='square'){
+    if(!this.ctx) return;
+    const t0=this.ctx.currentTime+start;
+    const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+    o.type=type; o.frequency.setValueAtTime(freq,t0);
+    g.gain.setValueAtTime(0,t0);
+    g.gain.linearRampToValueAtTime(vol,t0+0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.connect(g); g.connect(this.ctx.destination);
+    o.start(t0); o.stop(t0+dur+0.02);
+  },
+  sweep(f1,f2,start,dur,vol=0.14,type='square'){
+    if(!this.ctx) return;
+    const t0=this.ctx.currentTime+start;
+    const o=this.ctx.createOscillator(), g=this.ctx.createGain();
+    o.type=type; o.frequency.setValueAtTime(f1,t0);
+    o.frequency.exponentialRampToValueAtTime(f2,t0+dur);
+    g.gain.setValueAtTime(vol,t0);
+    g.gain.exponentialRampToValueAtTime(0.0001,t0+dur);
+    o.connect(g); g.connect(this.ctx.destination);
+    o.start(t0); o.stop(t0+dur+0.02);
+  },
+  play(kind, streak=0){
+    if(!this.on) return; this.init(); if(!this.ctx) return;
+    if(kind==='correct'){
+      /* bright rising arpeggio; climbs a step higher on a streak */
+      const base = [523.25, 659.25, 783.99, 1046.50];   // C5 E5 G5 C6
+      const lift = Math.min(streak,3) * 0.0595;          // ~1 semitone per streak
+      base.forEach((f,i)=> this.note(f*(1+lift), i*0.075, 0.16, 0.15));
+      this.note(1318.5*(1+lift), 0.30, 0.30, 0.11, 'triangle');
+    }
+    if(kind==='perfect'){
+      /* all six correct — longer fanfare */
+      const seq=[523.25,659.25,783.99,1046.50,783.99,1046.50,1318.51];
+      seq.forEach((f,i)=> this.note(f, i*0.085, 0.20, 0.16));
+      this.note(1567.98, 0.62, 0.55, 0.13, 'triangle');
+    }
+    if(kind==='wrong'){
+      this.note(311.13, 0,    0.13, 0.13);   // Eb4
+      this.note(233.08, 0.12, 0.26, 0.13);   // Bb3
+    }
+    if(kind==='retry'){ this.sweep(420,300,0,0.13,0.10,'sawtooth'); }
+    if(kind==='tap'){ this.note(880,0,0.05,0.07,'triangle'); }
+    if(kind==='join'){ [392,523.25,659.25].forEach((f,i)=>this.note(f,i*0.09,0.18,0.14)); }
+  }
+};
+
+/* ══════════════ VISUAL CELEBRATION ══════════════ */
+const FXL = document.getElementById('fx');
+function confetti(n=48){
+  const cols=['#2fc8a0','#eda23c','#5aa9f0','#eaf1f7','#e05548'];
+  for(let i=0;i<n;i++){
+    const d=document.createElement('div');
+    d.className='conf';
+    d.style.background=cols[i%cols.length];
+    d.style.left=(8+Math.random()*84)+'vw';
+    d.style.top='-20px';
+    d.style.setProperty('--dx',(Math.random()*160-80)+'px');
+    d.style.setProperty('--rot',(Math.random()*900-450)+'deg');
+    d.style.animation=`drop ${1.5+Math.random()*1.3}s cubic-bezier(.15,.6,.5,1) ${Math.random()*0.35}s forwards`;
+    FXL.appendChild(d);
+    setTimeout(()=>d.remove(),3400);
+  }
+}
+function sparkBurst(el){
+  if(!el) return;
+  const r=el.getBoundingClientRect();
+  const cx=r.left+r.width/2, cy=r.top+r.height/2;
+  for(let i=0;i<16;i++){
+    const s=document.createElement('div');
+    s.className='spark';
+    const a=(Math.PI*2*i)/16, dist=70+Math.random()*70;
+    s.style.left=cx+'px'; s.style.top=cy+'px';
+    s.style.setProperty('--bx',Math.cos(a)*dist+'px');
+    s.style.setProperty('--by',Math.sin(a)*dist+'px');
+    s.style.background=i%3===0?'var(--warn)':'var(--accent)';
+    s.style.animation=`burst ${0.5+Math.random()*0.35}s ease-out forwards`;
+    FXL.appendChild(s);
+    setTimeout(()=>s.remove(),950);
+  }
+}
+let toastTimer=null;
+function toast(em, title, sub, pts, cls){
+  const t=document.getElementById('toast');
+  document.getElementById('tEm').textContent=em;
+  document.getElementById('tTt').textContent=title;
+  document.getElementById('tTs').textContent=sub||'';
+  document.getElementById('tPts').textContent=pts||'';
+  t.className='on '+(cls||'');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>{ t.className=''; }, 2300);
+}
+
+/* ══════════════ SCORE & STREAK ══════════════ */
+const SCORE = {
+  pts:0, streak:0, best:0, solved:0,
+  award(firstTry){
+    const base = firstTry?100:40;
+    this.streak = firstTry ? this.streak+1 : 0;
+    this.best = Math.max(this.best,this.streak);
+    const bonus = firstTry ? (this.streak-1)*25 : 0;
+    this.pts += base+bonus; this.solved++;
+    this.paint();
+    return {base, bonus, total:base+bonus};
+  },
+  paint(){
+    const s=document.getElementById('hScore'), k=document.getElementById('hStreak');
+    if(s) s.textContent = this.pts ? this.pts+' pts' : '';
+    if(k){
+      if(this.streak>=2){ k.textContent='🔥 '+this.streak; k.classList.add('on'); }
+      else k.classList.remove('on');
+    }
+  }
+};
+const STREAK_WORDS = ['Nice.','Sharp.','On a roll.','Excellent.','Unstoppable.','Flawless.'];
+
 /* ---- reusable question block ---- */
 function askBox(id, qlabel, question, prefix, hint, revealHTML){
   return `<div class="qbox">
@@ -299,21 +470,49 @@ function wireBox(id, okMsg, tip){
     startPoll(id);
   };
   btn.onclick = async () => {
+    SFX.init();
     const val = parseFloat(inp.value);
     vd.style.display='block';
-    if(isNaN(val)){ vd.className='verdict no'; vd.innerHTML='<b>Enter a number first.</b>'+tip; return; }
+    if(isNaN(val)){
+      vd.className='verdict no'; vd.innerHTML='<b>Enter a number first.</b>'+tip;
+      SFX.play('retry'); inp.classList.add('shake');
+      setTimeout(()=>inp.classList.remove('shake'),520); return;
+    }
     const right = Math.abs(val-correct) <= tol;
     if(right){
+      const firstTry = tries===0;
+      const a = SCORE.award(firstTry);
       vd.className='verdict ok'; vd.innerHTML='<b>Correct.</b>'+okMsg;
-      btn.disabled=true; inp.disabled=true; await submit(val,true);
+      btn.disabled=true; inp.disabled=true;
+      SFX.play('correct', SCORE.streak);
+      sparkBurst(inp);
+      const done = SCORE.solved===Object.keys(Q).length;
+      if(done){
+        setTimeout(()=>{ SFX.play('perfect'); confetti(90);
+          toast('🏆','All six complete','Score '+SCORE.pts+' · best streak '+SCORE.best,'', 'win'); }, 700);
+      } else if(SCORE.streak>=2){
+        confetti(SCORE.streak>=4?60:34);
+        toast('🔥', STREAK_WORDS[Math.min(SCORE.streak,5)],
+          SCORE.streak+' in a row, first try', '+'+a.total+' pts', 'win');
+      } else {
+        toast('✅','Correct', firstTry?'First attempt':'Got there','+'+a.total+' pts','win');
+      }
+      await submit(val,true);
     } else {
       tries++;
       if(tries>=2){
+        SCORE.streak=0; SCORE.paint();
         vd.className='verdict no';
         vd.innerHTML='<b>Not quite — the working is below.</b>Correct answer: '+d2(correct)+'.';
-        btn.disabled=true; inp.disabled=true; await submit(val,false);
+        btn.disabled=true; inp.disabled=true;
+        SFX.play('wrong');
+        toast('📖','Let\'s walk it through','The full working is just below','','lose');
+        await submit(val,false);
       } else {
         vd.className='verdict no'; vd.innerHTML='<b>Not yet — one more try.</b>'+tip;
+        SFX.play('retry');
+        inp.classList.add('shake'); setTimeout(()=>inp.classList.remove('shake'),520);
+        toast('🤔','Close — try again','One more attempt before the answer','','lose');
       }
     }
   };
@@ -400,6 +599,8 @@ const screens = [
       msg.innerHTML = ok
         ? `<b>Joined ${state.session}.</b> You are live — the room will see your answers.`
         : `<b>Joined offline.</b> Could not reach the database, so peer answers are hidden. Everything else works normally.`;
+      SFX.init(); SFX.play('join');
+      if(ok){ confetti(26); toast('👋','Welcome, '+state.name.split(' ')[0], 'Session '+state.session,'','win'); }
       btn.textContent='Joined'; state.unlocked=true; syncNav();
       document.getElementById('hTitle').textContent = state.name + ' · ' + state.session;
     };
@@ -724,9 +925,18 @@ function syncNav(){
   bNext.textContent = state.i===0 ? (state.unlocked?'Continue':'Join to continue')
     : last ? 'Complete' : (state.unlocked?'Next':'Answer to continue');
 }
-bNext.onclick=()=>{ if(state.i<screens.length-1){ state.i++; render(); } };
-bBack.onclick=()=>{ if(state.i>1){ state.i--; render(); } };
-render();
+bNext.onclick=()=>{ if(state.i<screens.length-1){ SFX.play('tap'); state.i++; render(); } };
+bBack.onclick=()=>{ if(state.i>1){ SFX.play('tap'); state.i--; render(); } };
+
+const sndBtn=document.getElementById('hSnd');
+sndBtn.onclick=()=>{
+  SFX.on=!SFX.on;
+  sndBtn.textContent = SFX.on?'🔊':'🔇';
+  sndBtn.classList.toggle('off',!SFX.on);
+  if(SFX.on){ SFX.init(); SFX.play('tap'); }
+};
+
+render(); SCORE.paint();
 </script>
 </body>
 </html>
