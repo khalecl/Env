@@ -248,7 +248,7 @@ setInterval(()=>{ if(me) pull(); }, POLL_MS);
 
 /* ─────────── feed rendering ─────────── */
 const LABELS = {
-  A:{title:"Part A · Cost audit", fields:{driver:"Charge driving increases", why:"Why"}},
+  A:{title:"Part A · Cost audit", fields:{r1:"Energy charge", r2:"Maximum demand charge", r3:"Fixed monthly charge", r4:"Transmission use-of-system", driver:"Driving increases", why:"Why"}},
   B:{title:"Part B · LRIC", fields:{lric:"LRIC (US$/MWh)", policy:"Policy choice", why:"Reasoning"}},
   C:{title:"Part C · MW-mile", fields:{ratio:"B ÷ A per MW", signal:"Signal to a developer"}},
   D:{title:"Part D · Beneficiary pays", fields:{fair:"Fair?", risk:"Biggest political risk", defence:"Defence to parliament"}},
@@ -350,15 +350,21 @@ S.push({t:"Part A · Cost audit", part:"A", html:`
 <li>Decide which line is driving increases.</li>
 </ul>
 <div class="card">
-  <div class="fld"><label>Charge driving recent increases</label>
+  <p class="eyebrow" style="margin-bottom:14px">Classify all four charge lines, then submit once</p>
+  <div class="fld"><label>Energy charge (per kWh)</label><textarea id="aR1" placeholder="What does it recover? Variable or fixed?"></textarea></div>
+  <div class="fld"><label>Maximum demand charge (per kVA)</label><textarea id="aR2" placeholder="What does it recover? Variable or fixed?"></textarea></div>
+  <div class="fld"><label>Fixed monthly charge</label><textarea id="aR3" placeholder="What does it recover? Variable or fixed?"></textarea></div>
+  <div class="fld"><label>Transmission use-of-system</label><textarea id="aR4" placeholder="What does it recover? Variable or fixed?"></textarea></div>
+  <div class="fld"><label>Which line is driving recent increases, and why?</label>
     <select id="aDriver"><option value="">Select…</option>
       <option>Energy charge (fuel and generation OPEX)</option>
       <option>Maximum demand charge (capacity)</option>
       <option>Fixed monthly charge</option>
       <option>Transmission use-of-system</option></select></div>
-  <div class="fld"><label>Why — two sentences</label><textarea id="aWhy" placeholder="Name the cost driver behind it and say why it is hard to compress."></textarea></div>
-  <button class="submit" data-part="A" data-map="driver:aDriver,why:aWhy">Submit to the room</button>
+  <div class="fld"><textarea id="aWhy" placeholder="Say why it is hard to compress."></textarea></div>
+  <button class="submit" data-part="A" data-map="r1:aR1,r2:aR2,r3:aR3,r4:aR4,driver:aDriver,why:aWhy">Submit all six answers</button>
 </div>
+<div class="card quiet">Fill in every box above, then press submit <b>once</b>. Submitting again replaces your earlier answer rather than adding a second one.</div>
 <button class="reveal" data-t="a1">Show the answer key</button>
 <div class="ans" id="a1">
 <div class="tw"><table>
