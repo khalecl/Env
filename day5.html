@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b0f14">
+<title>The Dry-Year Desk — Day 5</title>
+<style>
+:root{
+  --bg:#0b0f14; --panel:#121820; --panel2:#161d27; --line:#232d3a; --line2:#2e3a4a;
+  --ink:#eef3f8; --ink2:#a9b8c9; --mute:#6d7f93;
+  --teal:#2ec4b6; --teal-d:#1b8a80; --teal-bg:rgba(46,196,182,.10);
+  --gold:#d4a72c; --gold-bg:rgba(212,167,44,.09);
+  --warn:#e08a4b; --warn-bg:rgba(224,138,75,.09);
+  --r:14px;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg)}
+body{color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:540px;margin:0 auto;padding:0 16px 108px}
+
+/* header */
+header{position:sticky;top:0;z-index:40;background:rgba(11,15,20,.94);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);padding:calc(11px + env(safe-area-inset-top)) 16px 11px}
+.hin{max-width:540px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.hl{flex:1;min-width:0}
+.htitle{font:600 14.5px var(--sans);letter-spacing:.2px}
+.hsub{font-size:11px;color:var(--mute);letter-spacing:.06em;text-transform:uppercase;margin-top:1px}
+.pill{display:flex;align-items:center;gap:6px;border:1px solid var(--line2);border-radius:99px;
+  padding:7px 11px;font-size:11.5px;color:var(--ink2);background:var(--panel);white-space:nowrap;cursor:pointer}
+.dot{width:6px;height:6px;border-radius:99px;background:var(--teal);box-shadow:0 0 0 3px var(--teal-bg)}
+.pill.off .dot{background:var(--mute);box-shadow:none}
+.pill.off{color:var(--mute)}
+.bar{max-width:540px;margin:11px auto 0;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal-d),var(--teal));transition:width .4s}
+
+/* cards */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 18px;margin-top:16px}
+.rule{font:700 10.5px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--teal);
+  display:flex;align-items:center;gap:10px}
+.rule:after{content:"";flex:1;height:1px;background:var(--line)}
+h1{font:400 26px/1.25 var(--serif);margin:12px 0 0}
+h2{font:400 22px/1.3 var(--serif);margin:12px 0 0}
+p{margin:12px 0 0;color:var(--ink2);font-size:15px}
+p.lead{color:var(--ink);font-size:16px}
+b,strong{color:var(--ink);font-weight:600}
+small{display:block;color:var(--mute);font-size:12.5px;line-height:1.55;margin-top:10px}
+
+/* data */
+.data{margin-top:16px;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--panel2)}
+.data .cap{font:700 10px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mute);
+  padding:9px 13px;border-bottom:1px solid var(--line)}
+table{width:100%;border-collapse:collapse}
+.data td{padding:10px 13px;font-size:13.5px;color:var(--ink2);border-bottom:1px solid var(--line)}
+.data td:last-child{text-align:right;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.data tr:last-child td{border-bottom:0}
+
+.eq{font:13px/1.5 var(--mono);background:#0d131a;border:1px solid var(--line);border-radius:9px;
+  padding:11px 12px;margin-top:12px;overflow-x:auto;white-space:nowrap;color:var(--teal)}
+.note{margin-top:16px;border-left:2px solid var(--warn);background:var(--warn-bg);
+  border-radius:0 9px 9px 0;padding:12px 14px;font-size:13.5px;color:#e6c3a6}
+.note b{color:#f0d3ba}
+
+/* form */
+label{display:block;font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--mute);margin:18px 0 7px}
+input,textarea{width:100%;font:15.5px/1.5 var(--sans);color:var(--ink);background:var(--panel2);
+  border:1px solid var(--line2);border-radius:11px;padding:13px 14px;min-height:50px}
+textarea{min-height:84px;resize:vertical}
+input::placeholder,textarea::placeholder{color:#55657a}
+input:focus,textarea:focus{outline:none;border-color:var(--teal-d);background:#131b24}
+.two{display:flex;gap:10px}.two>div{flex:1}
+
+.opt{display:flex;align-items:center;gap:11px;border:1px solid var(--line2);border-radius:11px;
+  padding:14px;margin-top:9px;font-size:14.5px;color:var(--ink2);background:var(--panel2);
+  cursor:pointer;min-height:52px}
+.opt.sel{border-color:var(--teal-d);background:var(--teal-bg);color:var(--ink)}
+.opt .n{width:26px;height:26px;flex:none;border-radius:99px;border:1px solid var(--line2);
+  display:grid;place-items:center;font:700 12px var(--mono);color:var(--mute)}
+.opt.sel .n{background:var(--teal-d);border-color:var(--teal-d);color:#06231f}
+
+button{font:600 15.5px var(--sans);border:0;border-radius:12px;padding:15px;width:100%;
+  background:var(--teal-d);color:#04211e;cursor:pointer;min-height:52px;margin-top:18px}
+button:active{transform:translateY(1px)}
+button[disabled]{background:var(--panel2);color:var(--mute);border:1px solid var(--line)}
+.ghost{background:transparent;color:var(--ink2);border:1px solid var(--line2)}
+.mini{padding:10px 14px;font-size:13px;width:auto;margin-top:10px;min-height:0}
+
+/* answer key */
+.key{display:none;margin-top:20px;padding-top:16px;border-top:1px solid var(--gold)}
+.key.on{display:block;animation:fade .4s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}}
+.key .rule{color:var(--gold)}
+.key .rule:after{background:rgba(212,167,44,.3)}
+.key .hd{font:400 19px/1.35 var(--serif);color:var(--gold);margin-top:11px}
+.key .eq{color:var(--gold);border-color:rgba(212,167,44,.28)}
+.key p{color:var(--ink2)}
+.chk{margin-top:12px;font-size:13px;color:var(--teal);font-family:var(--mono)}
+
+/* feed */
+.feed{margin-top:22px;padding-top:14px;border-top:1px solid var(--line)}
+.fh{font:700 10.5px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.msg{display:flex;gap:11px;padding:13px 0;border-bottom:1px solid var(--line)}
+.msg:last-child{border-bottom:0}
+.av{width:32px;height:32px;flex:none;border-radius:99px;display:grid;place-items:center;
+  font:700 11.5px var(--sans);color:#0b0f14}
+.mb{flex:1;min-width:0}
+.mn{font-size:12.5px;color:var(--ink);font-weight:600}
+.mn span{color:var(--mute);font-weight:400}
+.mt{font-size:14px;color:var(--ink2);margin-top:3px;word-break:break-word}
+.num{font-family:var(--mono);color:var(--teal);background:var(--teal-bg);
+  border-radius:5px;padding:1px 5px;font-size:13px}
+
+/* nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(11,15,20,.95);
+  backdrop-filter:blur(12px);border-top:1px solid var(--line);
+  padding:12px 16px calc(12px + env(safe-area-inset-bottom))}
+.nin{max-width:540px;margin:0 auto;display:flex;gap:10px}
+.nin button{margin:0;flex:1}
+.nin .ghost{flex:0 0 34%}
+
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:60;background:var(--bg);display:none;flex-direction:column}
+.sheet.on{display:flex}
+.sh{padding:calc(14px + env(safe-area-inset-top)) 16px 12px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:12px}
+.sh h3{font:400 19px var(--serif);margin:0;flex:1}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding:11px 16px;border-bottom:1px solid var(--line)}
+.tab{border:1px solid var(--line2);border-radius:99px;padding:8px 14px;font-size:12.5px;
+  color:var(--ink2);white-space:nowrap;background:var(--panel);cursor:pointer}
+.tab.on{background:var(--teal-d);border-color:var(--teal-d);color:#04211e;font-weight:600}
+.sbody{flex:1;overflow-y:auto;padding:6px 16px calc(20px + env(safe-area-inset-bottom))}
+.x{width:36px;height:36px;border-radius:99px;border:1px solid var(--line2);background:var(--panel);
+  color:var(--ink2);font-size:17px;display:grid;place-items:center;cursor:pointer}
+
+.timer{font:700 13px var(--mono);color:var(--teal);letter-spacing:.04em}
+.timer.low{color:var(--warn)}
+.rowhead{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.hide{display:none}
+.map td:first-child{color:var(--teal);font-weight:600}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hin">
+    <div class="hl">
+      <div class="htitle">The Dry-Year Desk</div>
+      <div class="hsub" id="hsub">Day 5 · Risk &amp; future challenges</div>
+    </div>
+    <div class="pill off" id="pill" onclick="openSheet()"><span class="dot"></span><span id="pilltx">Not joined</span></div>
+  </div>
+  <div class="bar"><i id="pb"></i></div>
+</header>
+
+<div class="wrap">
+
+<!-- 0 JOIN -->
+<section class="card scr" id="s0">
+  <div class="rule">Advanced Transmission Tariff Design</div>
+  <h1>One desk, five decisions, ten minutes</h1>
+  <p class="lead">Day 5 taught five risk tools one at a time. A real dry year forces a regulator to use all five inside a single decision cycle. That is this exercise.</p>
+  <div class="data">
+    <div class="cap">What each decision tests</div>
+    <table class="map">
+      <tr><td>Decision 1</td><td>True-up mechanics</td></tr>
+      <tr><td>Decision 2</td><td>FTRs &amp; congestion</td></tr>
+      <tr><td>Decision 3</td><td>Real options</td></tr>
+      <tr><td>Decision 4</td><td>State-contingent tariffs</td></tr>
+      <tr><td>Decision 5</td><td>Reform sequencing</td></tr>
+    </table>
+  </div>
+  <label>Room code</label>
+  <input id="jr" value="LUSAKA" autocapitalize="characters" autocomplete="off">
+  <label>Your name</label>
+  <input id="jn" placeholder="Full name" autocomplete="off">
+  <div class="two">
+    <div>
+      <label>Organisation</label>
+      <input id="jo" placeholder="ZESCO / ERB" autocomplete="off">
+    </div>
+    <div>
+      <label>Group</label>
+      <input id="jg" placeholder="3" inputmode="numeric" autocomplete="off">
+    </div>
+  </div>
+  <button onclick="join()">Enter the room</button>
+  <small>Ninety seconds per decision. Answer, submit, then see how the room compares. Your answers are visible to everyone in this room code.</small>
+</section>
+
+<!-- 1 BRIEF -->
+<section class="card scr hide" id="s1">
+  <div class="rule">The scenario · read once</div>
+  <h2>March 2027 — Kariba at 38 percent</h2>
+  <p>Lake Kariba has fallen to 38 percent of usable storage. ZESCO loses <b>250 MW</b> of firm hydro for an expected six months. The shortfall is replaced by SAPP spot imports at a price well above the hydro it displaces.</p>
+  <p>Every decision that follows uses this one situation. Nothing new is introduced.</p>
+  <div class="data">
+    <div class="cap">Inputs you will need</div>
+    <table>
+      <tr><td>Lost firm hydro</td><td>250 MW</td></tr>
+      <tr><td>SAPP spot import</td><td>US$120/MWh</td></tr>
+      <tr><td>Avoided own hydro</td><td>US$70/MWh</td></tr>
+      <tr><td>Hours per month</td><td>720</td></tr>
+      <tr><td>Eligible annual sales</td><td>5,400 GWh</td></tr>
+      <tr><td>Exchange rate</td><td>ZMW 26 = US$1</td></tr>
+    </table>
+  </div>
+  <div class="note"><b>Freshness.</b> These are teaching values for a hypothetical 2027, not published ERB or ZESCO data. The schedule actually in force is the reverted MYTF, 1 November 2025 to 31 October 2027, energy-only with no fixed or maximum-demand charges. Confirm the live schedule with ERB before quoting any Kwacha figure to a real board.</div>
+</section>
+
+<!-- 2 D1 -->
+<section class="card scr hide" id="s2">
+  <div class="rowhead"><div class="rule" style="flex:1">Decision 1 of 5</div><div class="timer" id="t2">1:30</div></div>
+  <h2>The revenue gap</h2>
+  <p><b>What we are deciding.</b> How much extra money ZESCO must collect over six months, and what that costs each unit sold.</p>
+  <div class="eq">ΔC = P_lost × H × (c_import − c_hydro)</div>
+  <small>P_lost = lost capacity, MW · H = hours per month · c = US$/MWh</small>
+  <label>Monthly gap · US$ million</label>
+  <input id="a1a" inputmode="decimal" placeholder="0.0">
+  <label>Six-month total · US$ million</label>
+  <input id="a1b" inputmode="decimal" placeholder="0">
+  <label>True-up over 5,400 GWh · US$/MWh</label>
+  <input id="a1c" inputmode="decimal" placeholder="0.00">
+  <button id="b1" onclick="sub(1)">Submit answer</button>
+  <div class="key" id="k1">
+    <div class="rule">Answer</div>
+    <div class="hd">US$9.0m per month → US$54m → US$10.00/MWh</div>
+    <div class="eq">250 × 720 × 50 = 9,000,000</div>
+    <div class="eq">54,000,000 ÷ 5,400,000 MWh = 10.00</div>
+    <div class="chk">✓ 5.4m MWh × $10.00 = $54.0m — reconciles</div>
+    <p>In Kwacha at 26 to the dollar that is ZMW 0.26/kWh.</p>
+    <p>Large in dollars, small per unit, because it is spread across a full year of sales. That spreading is the entire economic function of a true-up. Compress recovery into three months and the same gap becomes US$40/MWh, which is politically unpayable. <b>Duration is the lever, not the amount.</b></p>
+  </div>
+  <div class="feed hide" id="f1"></div>
+</section>
+
+<!-- 3 D2 -->
+<section class="card scr hide" id="s3">
+  <div class="rowhead"><div class="rule" style="flex:1">Decision 2 of 5</div><div class="timer" id="t3">1:30</div></div>
+  <h2>Which way does the FTR point?</h2>
+  <p><b>What we are deciding.</b> Whether a financial transmission right on the Zimbabwe to South Africa corridor is worth buying, or whether the money sits in the opposite direction.</p>
+  <div class="data">
+    <div class="cap">2027 nodal outlook · US$/MWh</div>
+    <table>
+      <tr><td>Normal · 40%</td><td>ZW 58 · SA 62</td></tr>
+      <tr><td>Dry · 35%</td><td>ZW 95 · SA 65</td></tr>
+      <tr><td>Wet · 25%</td><td>ZW 44 · SA 58</td></tr>
+    </table>
+  </div>
+  <div class="eq">E[spread] = Σ πᵢ (p_SA,ᵢ − p_ZW,ᵢ)</div>
+  <label>Expected spread, SA minus ZW · US$/MWh with sign</label>
+  <input id="a2a" placeholder="e.g. −0.00">
+  <label>Which direction should SAPP auction?</label>
+  <div class="opt" onclick="pickDir(this,'ZW → SA')"><span class="n">A</span>Zimbabwe → South Africa</div>
+  <div class="opt" onclick="pickDir(this,'SA → ZW')"><span class="n">B</span>South Africa → Zimbabwe</div>
+  <label>Annual value, 100 MW in that direction · US$ million</label>
+  <input id="a2c" inputmode="decimal" placeholder="0.00">
+  <button id="b2" onclick="sub(2)">Submit answer</button>
+  <div class="key" id="k2">
+    <div class="rule">Answer</div>
+    <div class="hd">−US$5.40/MWh. Auction the reverse: SA → ZW, worth US$4.73m a year</div>
+    <div class="eq">0.40(4) + 0.35(−30) + 0.25(14) = −5.40</div>
+    <div class="eq">100 × 8,760 × 5.40 = 4,730,400</div>
+    <div class="chk">✓ probabilities sum to 1.00 — valid distribution</div>
+    <p>Hydro scarcity <b>inverts the corridor</b>. The dry state dominates the expectation, and in that state Zimbabwe's own price spikes above South Africa's. An FTR issued on the historical trade direction hedges the wrong risk entirely.</p>
+  </div>
+  <div class="feed hide" id="f2"></div>
+</section>
+
+<!-- 4 D3 -->
+<section class="card scr hide" id="s4">
+  <div class="rowhead"><div class="rule" style="flex:1">Decision 3 of 5</div><div class="timer" id="t4">1:30</div></div>
+  <h2>Build now, or wait?</h2>
+  <p><b>What we are deciding.</b> Commit the Kariba–Livingstone uprate from 800 to 1,200 MW at US$80m in 2027, or defer the decision to 2032.</p>
+  <div class="data">
+    <div class="cap">Two equally likely futures</div>
+    <table>
+      <tr><td>Slow growth · 50%</td><td>−US$40m</td></tr>
+      <tr><td>Fast growth · 50%</td><td>+US$200m</td></tr>
+      <tr><td>Wait, then slow</td><td>Do not build · 0</td></tr>
+      <tr><td>Wait, then fast</td><td>Build 2032 · 90% of value</td></tr>
+    </table>
+  </div>
+  <label>Expected NPV, build now · US$ million</label>
+  <input id="a3a" inputmode="decimal" placeholder="0">
+  <label>Expected NPV, wait · US$ million</label>
+  <input id="a3b" inputmode="decimal" placeholder="0">
+  <label>Your recommendation, one line</label>
+  <textarea id="a3c" placeholder="Which strategy — and the single assumption that would flip it"></textarea>
+  <button id="b3" onclick="sub(3)">Submit answer</button>
+  <div class="key" id="k3">
+    <div class="rule">Answer</div>
+    <div class="hd">US$80m now against US$90m waiting — option value US$10m</div>
+    <div class="eq">now:  0.5(−40) + 0.5(200) = 80</div>
+    <div class="eq">wait: 0.5(0) + 0.5(180) = 90</div>
+    <div class="chk">✓ waiting removes $40m downside at 50% (+$20m), costs 10% of $200m at 50% (−$10m) = +$10m</div>
+    <p>Both strategies pass a conventional NPV test. Waiting still wins, because <b>the right not to build has value</b> whenever the downside is real and uncertainty resolves with time. The recommendation flips if the delay penalty exceeds 20 percent, or if the slow-growth downside is milder than −US$40m. Name the assumption; a board will test it.</p>
+  </div>
+  <div class="feed hide" id="f3"></div>
+</section>
+
+<!-- 5 D4 -->
+<section class="card scr hide" id="s5">
+  <div class="rowhead"><div class="rule" style="flex:1">Decision 4 of 5</div><div class="timer" id="t5">1:30</div></div>
+  <h2>Set the trigger</h2>
+  <p><b>What we are deciding.</b> The automatic, formula-driven adjustment that removes the need for an emergency ERB hearing the next time this happens.</p>
+  <div class="data">
+    <div class="cap">Proposed band table · baseline ZMW 1.50/kWh</div>
+    <table>
+      <tr><td>Storage ≥ 55%</td><td>0%</td></tr>
+      <tr><td>45 – 54.9%</td><td>+5%</td></tr>
+      <tr><td>35 – 44.9%</td><td>+10%</td></tr>
+      <tr><td>Below 35%</td><td>+15% hard cap</td></tr>
+    </table>
+  </div>
+  <label>Adjusted charge at 38 percent · ZMW/kWh</label>
+  <input id="a4a" inputmode="decimal" placeholder="0.00">
+  <label>Your recovery condition — when does it revert?</label>
+  <textarea id="a4b" placeholder="Measurement window · persistence rule · automatic or hearing"></textarea>
+  <button id="b4" onclick="sub(4)">Submit answer</button>
+  <div class="key" id="k4">
+    <div class="rule">Answer</div>
+    <div class="hd">ZMW 1.65/kWh</div>
+    <div class="eq">1.50 × 1.10 = 1.65</div>
+    <div class="chk">✓ +ZMW 0.15 is 10% of 1.50, below the +15% cap</div>
+    <p><b>Recovery.</b> Revert one band at the next quarterly review, once storage has held above the band's upper threshold for two consecutive months. The persistence rule stops the tariff oscillating on a single wet week. Any answer containing a measurement window, a persistence requirement and automatic reversion without a hearing is correct.</p>
+    <p>Stepped bands beat a continuous formula here for one reason: customers can read a band table. <b>Predictability is a design objective in its own right</b>, not a compromise.</p>
+  </div>
+  <div class="feed hide" id="f4"></div>
+</section>
+
+<!-- 6 D5 -->
+<section class="card scr hide" id="s6">
+  <div class="rowhead"><div class="rule" style="flex:1">Decision 5 of 5</div><div class="timer" id="t6">1:30</div></div>
+  <h2>Order the reforms, 2027 to 2032</h2>
+  <p><b>What we are deciding.</b> The sequence. Tap the four in order, first to last.</p>
+  <div id="rank"></div>
+  <button class="ghost mini" onclick="resetRank()">Clear order</button>
+  <label>One line — why your first is first</label>
+  <textarea id="a5b" placeholder=""></textarea>
+  <button id="b5" onclick="sub(5)">Submit answer</button>
+  <div class="key" id="k5">
+    <div class="rule">Answer</div>
+    <div class="hd">D → C → B → A</div>
+    <p><b>D first.</b> Everything downstream prices something. Without a defensible transmission revenue requirement and asset base, loss factors, wheeling charges and trigger baselines all rest on an unverified number, and the first legal challenge collapses them.</p>
+    <p><b>C second.</b> Loss factors and MW-km wheeling turn the cost base into locational signals and make open access chargeable. <b>B third</b> — the trigger needs a stable baseline to adjust from.</p>
+    <p><b>A last.</b> FTRs hedge congestion price differences that must first exist, be measured and be published. That needs zonal or nodal pricing, a functioning day-ahead market and a creditworthy settlement counterparty. SAPP is not there yet, so an FTR market launched in 2027 would have nothing to price.</p>
+    <p>Also accept D → B → C → A if the argument is that revenue stability must precede locational reform. Reject any order placing A before C, or anything before D.</p>
+  </div>
+  <div class="feed hide" id="f5"></div>
+</section>
+
+<!-- 7 CLOSE -->
+<section class="card scr hide" id="s7">
+  <div class="rule">Close</div>
+  <h2>One sentence each</h2>
+  <p class="lead">“The tool I could actually use in Zambia next year is ____, because ____.”</p>
+  <label>Your sentence</label>
+  <textarea id="a6" placeholder=""></textarea>
+  <button id="b6" onclick="sub(6)">Submit to the room</button>
+  <div class="feed hide" id="f6"></div>
+  <div class="data" style="margin-top:22px">
+    <div class="cap">Sources</div>
+    <table>
+      <tr><td>ZESCO MYTF, ERB-approved (reverted 2025–27)</td><td>2025</td></tr>
+      <tr><td>ESMAP · SAPP Transmission &amp; Trading</td><td>2010</td></tr>
+      <tr><td>Pérez-Arriaga · Regulation of the Power Sector</td><td>2013</td></tr>
+      <tr><td>FERC Orders 888 / 1000</td><td>1996 / 2011</td></tr>
+      <tr><td>Eskom Tariffs &amp; Charges Booklet</td><td>2025/26</td></tr>
+    </table>
+  </div>
+  <small>All monetary values, lake levels and probability distributions in this exercise are constructed teaching inputs for a hypothetical 2027 dry year. They are not published ERB, ZESCO, SAPP or Eskom figures and must not be presented as such.</small>
+</section>
+
+</div>
+
+<div class="nav hide" id="nav"><div class="nin">
+  <button class="ghost" id="prev" onclick="go(-1)">Back</button>
+  <button id="next" onclick="go(1)">Next</button>
+</div></div>
+
+<!-- REVIEW SHEET -->
+<div class="sheet" id="sheet">
+  <div class="sh"><h3>What the room said</h3><div class="x" onclick="closeSheet()">✕</div></div>
+  <div class="tabs" id="stabs"></div>
+  <div class="sbody" id="sbody"></div>
+</div>
+
+<script>
+/* ══════════════ EDITABLE DATA BLOCK ══════════════ */
+const DB_URL       = "https://test-7f3ce-default-rtdb.firebaseio.com";
+const DB_ROOT      = "ttd_day5";        // branch; change for a clean slate per cohort
+const DEFAULT_ROOM = "LUSAKA";          // change per cohort: LUSAKA, DUBAI, ...
+const POLL_MS      = 7000;              // peer-feed refresh
+const SECONDS      = 90;                // per decision
+/* ═════════════════════════════════════════════════ */
+
+const STAGES=[
+ {id:"D1",label:"1 · Revenue gap"},{id:"D2",label:"2 · FTR direction"},
+ {id:"D3",label:"3 · Build or wait"},{id:"D4",label:"4 · Trigger"},
+ {id:"D5",label:"5 · Sequencing"},{id:"D6",label:"Close"}];
+
+const $=id=>document.getElementById(id);
+const v=id=>(($(id)||{}).value||"").trim();
+let me={room:DEFAULT_ROOM,name:"",org:"",group:""}, i=0, N=8, polls={}, online=true;
+
+/* ---- navigation ---- */
+function show(){
+  document.querySelectorAll(".scr").forEach((s,k)=>s.classList.toggle("hide",k!==i));
+  $("pb").style.width=(i/(N-1)*100)+"%";
+  $("nav").classList.toggle("hide",i===0);
+  $("prev").style.visibility=i<2?"hidden":"visible";
+  $("next").textContent=i===N-1?"Done":"Next";
+  window.scrollTo({top:0});
+  if(i>=2&&i<=6) startTimer(i);
+}
+function go(d){i=Math.max(1,Math.min(N-1,i+d));show();}
+
+function join(){
+  const n=v("jn"); if(!n){$("jn").focus();return;}
+  me={room:(v("jr")||DEFAULT_ROOM).toUpperCase(),name:n,org:v("jo"),group:v("jg")};
+  try{localStorage.setItem("d5me",JSON.stringify(me))}catch(e){}
+  $("hsub").textContent=me.name+(me.org?" · "+me.org:"");
+  $("pill").classList.remove("off"); $("pilltx").textContent="Room "+me.room;
+  ping(); i=1; show();
+}
+
+/* ---- timer ---- */
+function startTimer(n){
+  const el=$("t"+n); if(!el||el.dataset.on) return; el.dataset.on=1;
+  let s=SECONDS;
+  const id=setInterval(()=>{
+    el.textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");
+    el.classList.toggle("low",s<=20);
+    if(s--<=0){clearInterval(id);el.textContent="0:00";}
+  },1000);
+  el.textContent="1:30";
+}
+
+/* ---- ranking ---- */
+const R=[["D","Cost-of-service &amp; asset valuation study"],
+         ["C","Zonal loss factors &amp; MW-km wheeling"],
+         ["B","Hydro trigger table embedded in the MYTF"],
+         ["A","FTR market on the export corridors"]];
+let order=[];
+function drawRank(){
+  $("rank").innerHTML=R.map(([k,t])=>{
+    const p=order.indexOf(k);
+    return `<div class="opt ${p>-1?'sel':''}" onclick="pick('${k}')">
+      <span class="n">${p>-1?p+1:k}</span>${t}</div>`;}).join("");
+}
+function pick(k){if(!order.includes(k)){order.push(k);drawRank();}}
+function resetRank(){order=[];drawRank();}
+drawRank();
+
+let dir="";
+function pickDir(el,val){
+  dir=val;
+  el.parentNode.querySelectorAll(".opt").forEach(o=>o.classList.remove("sel"));
+  el.classList.add("sel");
+}
+
+/* ---- firebase (REST) ---- */
+function path(st){return `${DB_URL}/${DB_ROOT}/${me.room}/${st}.json`;}
+function ping(){
+  fetch(`${DB_URL}/${DB_ROOT}/${me.room}.json?shallow=true`)
+    .then(r=>{setOnline(r.ok)}).catch(()=>setOnline(false));
+}
+function setOnline(ok){
+  online=ok; const p=$("pill");
+  if(ok){p.classList.remove("off");$("pilltx").textContent="Room "+me.room;}
+  else{p.classList.add("off");$("pilltx").textContent="Offline";}
+}
+function send(st,fields,text){
+  const rec={name:me.name,org:me.org,group:me.group,text:text,ts:Date.now(),...fields};
+  try{localStorage.setItem("d5_"+st,JSON.stringify(rec))}catch(e){}
+  return fetch(path(st),{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(rec)}).then(r=>{setOnline(r.ok);return r}).catch(()=>setOnline(false));
+}
+function loadFeed(st,el){
+  const draw=d=>{
+    setOnline(true);
+    const rows=Object.values(d||{}).filter(r=>r&&r.name).sort((a,b)=>b.ts-a.ts);
+    el.innerHTML=`<div class="fh">What the room said · ${rows.length} submitted</div>`+
+      (rows.length?rows.slice(0,30).map(card).join(""):`<div class="mt" style="padding:12px 0">You are first. Others will appear here.</div>`);
+  };
+  const run=()=>fetch(path(st)).then(r=>r.json()).then(draw)
+    .catch(()=>{setOnline(false);el.innerHTML='<div class="fh">Offline — your answer is saved on this device and will not be lost</div>';});
+  run(); if(!polls[st]) polls[st]=setInterval(()=>{if(!$("sheet").classList.contains("on"))run();},POLL_MS);
+}
+function card(r){
+  const ini=(r.name||"?").split(/\s+/).map(w=>w[0]).slice(0,2).join("").toUpperCase();
+  const meta=[r.org,r.group?"Group "+r.group:"",ago(r.ts)].filter(Boolean).join(" · ");
+  return `<div class="msg"><div class="av" style="background:${hue(r.name)}">${esc(ini)}</div>
+    <div class="mb"><div class="mn">${esc(r.name)} <span>${esc(meta)}</span></div>
+    <div class="mt">${mark(r.text)}</div></div></div>`;
+}
+const esc=s=>String(s==null?"":s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const mark=s=>esc(s).replace(/(-?[\d.,]*\d(?:\s?(?:m|\/MWh|%|MW))?)/g,m=>/\d/.test(m)?`<span class="num">${m}</span>`:m);
+function hue(n){let h=0;for(const c of String(n))h=(h*31+c.charCodeAt(0))%360;return `hsl(${h},52%,64%)`;}
+function ago(t){const m=Math.floor((Date.now()-t)/60000);return m<1?"just now":m<60?m+"m ago":Math.floor(m/60)+"h ago";}
+
+/* ---- submit ---- */
+function sub(n){
+  let text="",f={};
+  if(n===1){f={monthly:v("a1a"),total:v("a1b"),trueup:v("a1c")};
+    text=`Monthly US$${f.monthly}m · six-month US$${f.total}m · true-up US$${f.trueup}/MWh`;}
+  if(n===2){f={spread:v("a2a"),direction:dir,value:v("a2c")};
+    text=`Spread ${f.spread} $/MWh · auction ${dir||"—"} · value US$${f.value}m`;}
+  if(n===3){f={now:v("a3a"),wait:v("a3b"),rec:v("a3c")};
+    text=`Now US$${f.now}m · wait US$${f.wait}m — ${f.rec}`;}
+  if(n===4){f={charge:v("a4a"),recovery:v("a4b")};
+    text=`ZMW ${f.charge}/kWh — ${f.recovery}`;}
+  if(n===5){f={order:order.join(""),why:v("a5b")};
+    text=`${order.join(" → ")||"—"} — ${f.why}`;}
+  if(n===6){f={sentence:v("a6")};text=f.sentence;}
+  const st="D"+n, b=$("b"+n);
+  b.disabled=true; b.textContent="Submitted";
+  const k=$("k"+n); if(k)k.classList.add("on");
+  const fe=$("f"+n); fe.classList.remove("hide");
+  send(st,f,text).finally(()=>loadFeed(st,fe));
+  if(k) setTimeout(()=>k.scrollIntoView({behavior:"smooth",block:"start"}),120);
+}
+
+/* ---- review sheet ---- */
+let sTab=0;
+function openSheet(){
+  if(!me.name) return;
+  $("stabs").innerHTML=STAGES.map((s,k)=>`<div class="tab ${k===sTab?'on':''}" onclick="sTab=${k};openSheet()">${s.label}</div>`).join("");
+  $("sheet").classList.add("on");
+  const b=$("sbody"); b.innerHTML='<div class="fh" style="padding:16px 0">Loading…</div>';
+  fetch(path(STAGES[sTab].id)).then(r=>r.json()).then(d=>{
+    const rows=Object.values(d||{}).filter(r=>r&&r.name).sort((a,b)=>b.ts-a.ts);
+    b.innerHTML=`<div class="fh" style="padding:14px 0 4px">${rows.length} submitted</div>`+
+      (rows.length?rows.map(card).join(""):'<div class="mt" style="padding:12px 0">Nothing submitted yet for this decision.</div>');
+  }).catch(()=>b.innerHTML='<div class="fh" style="padding:16px 0">Offline — cannot load the room.</div>');
+}
+function closeSheet(){$("sheet").classList.remove("on");}
+
+/* ---- restore ---- */
+try{const s=JSON.parse(localStorage.getItem("d5me")||"{}");
+  if(s.name){$("jn").value=s.name;$("jr").value=s.room||DEFAULT_ROOM;$("jo").value=s.org||"";$("jg").value=s.group||"";}
+}catch(e){}
+show();
+</script>
+</body>
+</html>
