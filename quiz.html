@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Quiz Bros 🍄</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Fredoka', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(180deg, #5c94fc 0%, #9fd0ff 60%, #c8f5e1 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  /* ☁️ CSS-only clouds — GPU-friendly transform animation */
+  .cloud {
+    position: fixed;
+    font-size: 3rem;
+    opacity: 0.85;
+    animation: drift linear infinite;
+    pointer-events: none;
+    will-change: transform;
+  }
+  @keyframes drift {
+    from { transform: translateX(-15vw); }
+    to { transform: translateX(115vw); }
+  }
+
+  .ground {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 28px;
+    background: repeating-linear-gradient(90deg, #e09543 0 32px, #c97b2e 32px 64px);
+    border-top: 6px solid #8b5a1e;
+    pointer-events: none;
+  }
+
+  .card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 2rem;
+    border: 5px solid #7c5cbf;
+    box-shadow: 0 12px 0 rgba(0,0,0,0.15);
+    padding: 2rem;
+    width: 100%;
+    max-width: 560px;
+    text-align: center;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes popIn {
+    from { transform: scale(0.7) translateY(40px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  h1 { color: #e52521; font-size: 1.9rem; text-shadow: 2px 2px 0 #ffd23e; }
+  .subtitle { color: #7c5cbf; margin: 0.5rem 0 1rem; }
+
+  .hud {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    color: #7c5cbf;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .coin-counter { color: #d4a017; }
+
+  .progress-track {
+    height: 14px;
+    background: #e8ddf7;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    border: 2px solid #c9a0f5;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #43d14f, #a8f0a0);
+    transition: width 0.4s ease;
+  }
+
+  .question {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #3d2b5a;
+    margin-bottom: 1.25rem;
+    min-height: 3.2rem;
+  }
+
+  .answers { display: grid; gap: 0.7rem; }
+
+  /* 🧱 Question-block style buttons */
+  .answer-btn {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.9rem 1.2rem;
+    border: 3px solid #d4a017;
+    border-radius: 1rem;
+    background: linear-gradient(180deg, #ffd23e, #ffb52e);
+    color: #6b4a00;
+    cursor: pointer;
+    text-align: left;
+    box-shadow: 0 4px 0 #b8860b;
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s;
+    will-change: transform;
+  }
+  .answer-btn:hover:not(:disabled) { transform: scale(1.05) rotate(-0.5deg); }
+  .answer-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 #b8860b; }
+  .answer-btn:disabled { cursor: default; }
+
+  .answer-btn.correct {
+    background: linear-gradient(180deg, #7fe08a, #43d14f);
+    border-color: #2a9d3a;
+    color: #0d5c1a;
+    animation: bounce 0.5s;
+  }
+  .answer-btn.wrong {
+    background: linear-gradient(180deg, #ff9a8a, #e55252);
+    border-color: #b03030;
+    color: #fff;
+    animation: shake 0.4s;
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    40% { transform: scale(1.08) translateY(-8px); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .feedback { margin-top: 1rem; font-weight: 700; font-size: 1.1rem; min-height: 1.6rem; }
+  .feedback.good { color: #2a9d3a; }
+  .feedback.bad { color: #d43a3a; }
+
+  .big-btn {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    padding: 0.9rem 2.2rem;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #ff6b5e, #e52521);
+    color: #fff;
+    cursor: pointer;
+    margin-top: 1.25rem;
+    box-shadow: 0 5px 0 #a01515;
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .big-btn:hover { transform: scale(1.05); }
+  .big-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #a01515; }
+
+  /* 🪙 Flying coin — pure CSS transform, removed from DOM after animation */
+  .coin {
+    position: fixed;
+    font-size: 2rem;
+    pointer-events: none;
+    z-index: 50;
+    animation: coinFly 0.8s ease-out forwards;
+    will-change: transform, opacity;
+  }
+  @keyframes coinFly {
+    0% { transform: translateY(0) scale(1) rotateY(0); opacity: 1; }
+    100% { transform: translateY(-140px) scale(1.6) rotateY(720deg); opacity: 0; }
+  }
+
+  .mario-buddy {
+    font-size: 3rem;
+    display: inline-block;
+    animation: idle 1.2s ease-in-out infinite;
+  }
+  @keyframes idle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .result-emoji { font-size: 4rem; }
+  .result-score { font-size: 2.4rem; font-weight: 700; color: #e52521; text-shadow: 2px 2px 0 #ffd23e; }
+
+  .breakdown {
+    text-align: left;
+    margin-top: 1.25rem;
+    max-height: 240px;
+    overflow-y: auto;
+    display: grid;
+    gap: 0.5rem;
+  }
+  .breakdown-item {
+    background: #f4effc;
+    border-radius: 0.9rem;
+    padding: 0.7rem 1rem;
+    font-size: 0.88rem;
+    color: #4a3a6b;
+    border-left: 6px solid #43d14f;
+  }
+  .breakdown-item.missed { border-left-color: #e55252; }
+  .breakdown-item .your-answer { color: #9a8ab8; font-size: 0.78rem; }
+
+  @media (max-width: 480px) {
+    .card { padding: 1.4rem; border-radius: 1.5rem; }
+    h1 { font-size: 1.4rem; }
+    .question { font-size: 1.05rem; }
+    .cloud { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Decorative clouds: 3 elements, infinite CSS animation, zero JS cost -->
+<div class="cloud" style="top:8%; animation-duration:38s;">☁️</div>
+<div class="cloud" style="top:20%; animation-duration:55s; animation-delay:-20s;">☁️</div>
+<div class="cloud" style="top:4%; animation-duration:70s; animation-delay:-45s;">☁️</div>
+<div class="ground"></div>
+
+<div class="card" id="app"></div>
+
+<script>
+/* ============================================================
+   🔊 SOUND ENGINE — Web Audio API, zero audio files.
+   Context created lazily on first click (browser autoplay policy).
+   ============================================================ */
+let audioCtx = null;
+function ac() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function beep(freq, start, dur, type = 'square', vol = 0.12) {
+  const ctx = ac();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(vol, ctx.currentTime + start);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(ctx.currentTime + start);
+  osc.stop(ctx.currentTime + start + dur);
+}
+
+const SFX = {
+  coin()   { beep(988, 0, 0.08); beep(1319, 0.08, 0.35); },                       // classic coin ding
+  wrong()  { beep(220, 0, 0.15, 'sawtooth'); beep(165, 0.15, 0.3, 'sawtooth'); }, // sad slide down
+  jump()   { beep(300, 0, 0.1, 'square'); beep(600, 0.08, 0.12); },               // boing
+  start()  { [523, 659, 784].forEach((f, i) => beep(f, i * 0.09, 0.12)); },       // power-up arpeggio
+  fanfare(){ [523, 659, 784, 1047, 784, 1047].forEach((f, i) => beep(f, i * 0.12, 0.18)); }, // level clear!
+  gameover(){ [392, 370, 349, 330].forEach((f, i) => beep(f, i * 0.18, 0.22, 'triangle')); }
+};
+
+/* ============================================================
+   📝 QUESTIONS
+   ============================================================ */
+const QUESTIONS = [
+  { q: "What is the largest planet in our solar system?", answers: ["Mars", "Jupiter", "Saturn", "Neptune"], correct: 1 },
+  { q: "Which country is home to the kangaroo?", answers: ["New Zealand", "South Africa", "Australia", "Brazil"], correct: 2 },
+  { q: "How many colors are in a rainbow?", answers: ["5", "6", "7", "8"], correct: 2 },
+  { q: "What is the chemical symbol for gold?", answers: ["Go", "Gd", "Au", "Ag"], correct: 2 },
+  { q: "Which ocean is the largest?", answers: ["Atlantic", "Indian", "Arctic", "Pacific"], correct: 3 },
+  { q: "Who painted the Mona Lisa?", answers: ["Vincent van Gogh", "Leonardo da Vinci", "Pablo Picasso", "Claude Monet"], correct: 1 },
+  { q: "What is the fastest land animal?", answers: ["Cheetah", "Lion", "Greyhound", "Horse"], correct: 0 },
+  { q: "How many continents are there on Earth?", answers: ["5", "6", "7", "8"], correct: 2 },
+  { q: "Which planet is known as the Red Planet?", answers: ["Venus", "Mercury", "Jupiter", "Mars"], correct: 3 },
+  { q: "What is the capital of Japan?", answers: ["Kyoto", "Osaka", "Tokyo", "Seoul"], correct: 2 }
+];
+
+const PRAISE = ["Wahoo! 🍄", "It's-a correct! ⭐", "Mamma mia, nice! 🎉", "Coin collected! 🪙", "1-UP! 💚"];
+const ROASTS = [
+  "Oof. A Goomba could've answered that. 💀",
+  "You fell in a pit. It happens. 🕳️",
+  "Wrong pipe, buddy. 🔧",
+  "Bowser is laughing at you right now. 🐢",
+  "That answer got fireballed. 🔥"
+];
+
+const app = document.getElementById('app');
+let current = 0, score = 0, results = [];
+
+function renderStart() {
+  app.innerHTML = `
+    <div class="mario-buddy">🍄</div>
+    <h1>SUPER QUIZ BROS</h1>
+    <p class="subtitle">10 questions stand between you and the flagpole.<br>
+    Collect coins. Avoid pits. Don't let Bowser win.</p>
+    <button class="big-btn" onclick="startQuiz()">▶ START GAME</button>
+  `;
+}
+
+function startQuiz() {
+  SFX.start();
+  current = 0; score = 0; results = [];
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[current];
+  app.innerHTML = `
+    <div class="hud">
+      <span>WORLD 1-${current + 1}</span>
+      <span class="coin-counter">🪙 × ${String(score).padStart(2, '0')}</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" style="width:${(current / QUESTIONS.length) * 100}%"></div>
+    </div>
+    <div class="question">${q.q}</div>
+    <div class="answers">
+      ${q.answers.map((a, i) => `<button class="answer-btn" onclick="answer(${i}, this)">❓ ${a}</button>`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+  `;
+}
+
+function spawnCoin(x, y) {
+  const c = document.createElement('div');
+  c.className = 'coin';
+  c.textContent = '🪙';
+  c.style.left = x + 'px';
+  c.style.top = y + 'px';
+  document.body.appendChild(c);
+  c.addEventListener('animationend', () => c.remove()); // no DOM leaks
+}
+
+function answer(i, btn) {
+  const q = QUESTIONS[current];
+  const buttons = document.querySelectorAll('.answer-btn');
+  const feedback = document.getElementById('feedback');
+  buttons.forEach(b => b.disabled = true);
+
+  const isCorrect = i === q.correct;
+  buttons[q.correct].classList.add('correct');
+
+  if (isCorrect) {
+    score++;
+    SFX.coin();
+    const r = btn.getBoundingClientRect();
+    spawnCoin(r.left + r.width / 2, r.top);
+    feedback.textContent = PRAISE[Math.floor(Math.random() * PRAISE.length)];
+    feedback.className = 'feedback good';
+  } else {
+    SFX.wrong();
+    buttons[i].classList.add('wrong');
+    feedback.textContent = ROASTS[Math.floor(Math.random() * ROASTS.length)] +
+      ` (It was: ${q.answers[q.correct]})`;
+    feedback.className = 'feedback bad';
+  }
+
+  results.push({ question: q.q, picked: q.answers[i], correctAnswer: q.answers[q.correct], isCorrect });
+
+  setTimeout(() => {
+    current++;
+    current < QUESTIONS.length ? renderQuestion() : renderResults();
+  }, 1600);
+}
+
+function renderResults() {
+  const perfect = score === QUESTIONS.length;
+  const emoji = perfect ? '🏆' : score >= 7 ? '⭐' : score >= 4 ? '🍄' : '💀';
+  const message = perfect ? "LEVEL CLEAR! You saved the princess!" :
+                  score >= 7 ? "So close! The princess is in THIS castle!" :
+                  score >= 4 ? "Not bad, but Bowser escaped..." :
+                  "GAME OVER. The Goombas send their regards.";
+
+  perfect || score >= 7 ? SFX.fanfare() : SFX.gameover();
+
+  app.innerHTML = `
+    <div class="result-emoji">${emoji}</div>
+    <h1>${message}</h1>
+    <div class="result-score">🪙 ${score} / ${QUESTIONS.length}</div>
+    <p class="subtitle">${Math.round((score / QUESTIONS.length) * 100)}% — ${perfect ? "PERFECT RUN!" : "insert coin to continue"}</p>
+    <div class="breakdown">
+      ${results.map(r => `
+        <div class="breakdown-item ${r.isCorrect ? '' : 'missed'}">
+          ${r.isCorrect ? '🪙' : '💀'} ${r.question}
+          ${r.isCorrect ? '' : `<div class="your-answer">You: ${r.picked} · Answer: ${r.correctAnswer}</div>`}
+        </div>`).join('')}
+    </div>
+    <button class="big-btn" onclick="startQuiz()">🔄 CONTINUE?</button>
+  `;
+
+  if (perfect) {
+    const colors = ['#e52521', '#ffd23e', '#43d14f', '#5c94fc'];
+    confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors });
+    setTimeout(() => confetti({ particleCount: 100, angle: 60, spread: 80, origin: { x: 0 }, colors }), 300);
+    setTimeout(() => confetti({ particleCount: 100, angle: 120, spread: 80, origin: { x: 1 }, colors }), 600);
+  }
+}
+
+renderStart();
+</script>
+</body>
+</html>
