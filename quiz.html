@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Super Quiz Bros 🍄</title>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -34,13 +34,69 @@
     to { transform: translateX(115vw); }
   }
 
+  /* 🧱 Brick ground — two repeating gradients fake the brick mortar lines */
   .ground {
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    height: 28px;
-    background: repeating-linear-gradient(90deg, #e09543 0 32px, #c97b2e 32px 64px);
-    border-top: 6px solid #8b5a1e;
+    height: 34px;
+    background:
+      repeating-linear-gradient(0deg, transparent 0 14px, rgba(0,0,0,0.35) 14px 17px),
+      repeating-linear-gradient(90deg, #c84c0c 0 30px, #8f3208 30px 33px);
+    border-top: 5px solid #5e2004;
     pointer-events: none;
+  }
+
+  /* 🟢 Warp pipe — ::before forms the rim */
+  .pipe {
+    position: fixed;
+    bottom: 34px;
+    width: 58px;
+    background: linear-gradient(90deg, #1c6b28 0%, #7fe08a 25%, #43d14f 55%, #1c6b28 100%);
+    border: 3px solid #14511e;
+    border-bottom: none;
+    border-radius: 6px 6px 0 0;
+    pointer-events: none;
+  }
+  .pipe::before {
+    content: '';
+    position: absolute;
+    top: -16px; left: -9px; right: -9px;
+    height: 14px;
+    background: inherit;
+    border: 3px solid #14511e;
+    border-radius: 6px;
+  }
+
+  /* ⛰️ Background hill */
+  .hill {
+    position: fixed;
+    bottom: 34px;
+    width: 90px; height: 45px;
+    background: #43d14f;
+    border: 3px solid #2a9d3a;
+    border-bottom: none;
+    border-radius: 90px 90px 0 0;
+    pointer-events: none;
+  }
+
+  /* ❓ Floating question block */
+  .qblock {
+    position: fixed;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 1rem;
+    color: #6b4a00;
+    background: linear-gradient(180deg, #ffd23e, #ffb52e);
+    border: 3px solid #b8860b;
+    border-radius: 8px;
+    box-shadow: 0 4px 0 #8a6508;
+    animation: bobble 2.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes bobble {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
   }
 
   .card {
@@ -61,7 +117,7 @@
     to { transform: scale(1) translateY(0); opacity: 1; }
   }
 
-  h1 { color: #e52521; font-size: 1.9rem; text-shadow: 2px 2px 0 #ffd23e; }
+  h1 { font-family: 'Press Start 2P', monospace; color: #e52521; font-size: 1.25rem; line-height: 1.5; text-shadow: 3px 3px 0 #ffd23e; }
   .subtitle { color: #7c5cbf; margin: 0.5rem 0 1rem; }
 
   .hud {
@@ -107,7 +163,12 @@
     padding: 0.9rem 1.2rem;
     border: 3px solid #d4a017;
     border-radius: 1rem;
-    background: linear-gradient(180deg, #ffd23e, #ffb52e);
+    background:
+      radial-gradient(circle at 9px 9px, #b8860b 3px, transparent 4px),
+      radial-gradient(circle at calc(100% - 9px) 9px, #b8860b 3px, transparent 4px),
+      radial-gradient(circle at 9px calc(100% - 9px), #b8860b 3px, transparent 4px),
+      radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), #b8860b 3px, transparent 4px),
+      linear-gradient(180deg, #ffd23e, #ffb52e);
     color: #6b4a00;
     cursor: pointer;
     text-align: left;
@@ -187,6 +248,59 @@
     50% { transform: translateY(-10px); }
   }
 
+  /* 🏃 Running hero — outer div moves across screen, inner span bounces */
+  .runner {
+    position: fixed;
+    bottom: 38px;
+    left: 0;
+    font-size: 2.6rem;
+    z-index: 2;
+    pointer-events: none;
+    animation: runAcross 14s linear infinite;
+    will-change: transform;
+  }
+  .runner span {
+    display: inline-block;
+    animation: runBounce 0.35s ease-in-out infinite;
+  }
+  @keyframes runAcross {
+    from { transform: translateX(-10vw); }
+    to { transform: translateX(110vw); }
+  }
+  @keyframes runBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  /* 👾 Enemies walking the other way */
+  .enemy {
+    position: fixed;
+    bottom: 38px;
+    left: 0;
+    font-size: 1.9rem;
+    z-index: 1;
+    pointer-events: none;
+    animation: walkLeft linear infinite;
+    will-change: transform;
+  }
+  @keyframes walkLeft {
+    from { transform: translateX(110vw) scaleX(-1); }
+    to { transform: translateX(-12vw) scaleX(-1); }
+  }
+
+  /* 🪙 Spinning background coins */
+  .spin-coin {
+    position: fixed;
+    font-size: 1.5rem;
+    pointer-events: none;
+    animation: coinSpin 1.4s linear infinite;
+    will-change: transform;
+  }
+  @keyframes coinSpin {
+    from { transform: rotateY(0); }
+    to { transform: rotateY(360deg); }
+  }
+
   .result-emoji { font-size: 4rem; }
   .result-score { font-size: 2.4rem; font-weight: 700; color: #e52521; text-shadow: 2px 2px 0 #ffd23e; }
 
@@ -209,11 +323,28 @@
   .breakdown-item.missed { border-left-color: #e55252; }
   .breakdown-item .your-answer { color: #9a8ab8; font-size: 0.78rem; }
 
+  /* 📱 Mobile: keep the scenery, but shrink & tuck it behind the card */
   @media (max-width: 480px) {
-    .card { padding: 1.4rem; border-radius: 1.5rem; }
-    h1 { font-size: 1.4rem; }
-    .question { font-size: 1.05rem; }
+    body { padding: 12px; align-items: flex-start; padding-top: 8vh; }
+    .card { padding: 1.4rem; border-radius: 1.5rem; border-width: 4px; }
+    h1 { font-size: 0.95rem; }
+    .subtitle { font-size: 0.85rem; }
+    .question { font-size: 1.05rem; min-height: 2.6rem; }
+    .answer-btn { font-size: 0.9rem; padding: 0.75rem 1rem; }
+    .big-btn { font-size: 1rem; padding: 0.8rem 1.8rem; }
     .cloud { font-size: 2rem; }
+    .pipe { width: 42px; }
+    .pipe[style*="105px"] { height: 70px; }
+    .hill { width: 65px; height: 32px; }
+    .hill[style*="130px"] { width: 90px; height: 45px; }
+    .qblock { width: 34px; height: 34px; font-size: 0.75rem; }
+    .mario-buddy { font-size: 2.2rem; }
+    .result-emoji { font-size: 3rem; }
+    .result-score { font-size: 1.8rem; }
+    .breakdown { max-height: 180px; }
+    .runner { font-size: 1.9rem; }
+    .enemy { font-size: 1.4rem; }
+    .spin-coin { font-size: 1.1rem; }
   }
 </style>
 </head>
@@ -224,6 +355,21 @@
 <div class="cloud" style="top:20%; animation-duration:55s; animation-delay:-20s;">☁️</div>
 <div class="cloud" style="top:4%; animation-duration:70s; animation-delay:-45s;">☁️</div>
 <div class="ground"></div>
+<!-- 🍄 Scenery: pipes, hills, floating ?-blocks (pure CSS, zero JS) -->
+<div class="pipe" style="left:5%; height:70px;"></div>
+<div class="pipe" style="right:6%; height:105px;"></div>
+<div class="hill" style="left:20%;"></div>
+<div class="hill" style="right:24%; width:130px; height:65px;"></div>
+<div class="qblock" style="left:13%; top:26%;">?</div>
+<div class="qblock" style="right:13%; top:18%; animation-delay:-1.1s;">?</div>
+<!-- 🏃 Animated characters: running hero, walking enemies, spinning coins -->
+<div class="runner"><span>🏃‍♂️💨</span></div>
+<div class="enemy" style="animation-duration:19s;">🐢</div>
+<div class="enemy" style="animation-duration:26s; animation-delay:-9s;">👻</div>
+<div class="enemy" style="animation-duration:33s; animation-delay:-20s; font-size:1.5rem;">🦆</div>
+<div class="spin-coin" style="left:30%; top:14%;">🪙</div>
+<div class="spin-coin" style="left:70%; top:30%; animation-delay:-0.5s;">🪙</div>
+<div class="spin-coin" style="left:48%; top:8%; animation-delay:-0.9s;">🪙</div>
 
 <div class="card" id="app"></div>
 
@@ -259,21 +405,81 @@ const SFX = {
   fanfare(){ [523, 659, 784, 1047, 784, 1047].forEach((f, i) => beep(f, i * 0.12, 0.18)); }, // level clear!
   gameover(){ [392, 370, 349, 330].forEach((f, i) => beep(f, i * 0.18, 0.22, 'triangle')); }
 };
+/* ============================================================
+   🎵 BACKGROUND MUSIC — looping overworld melody, Web Audio only.
+   Starts on first user interaction (autoplay policy).
+   ============================================================ */
+const MELODY = [ // [note, beats] — 0 = rest — actual SMB overworld theme
+  [659,.5],[659,.5],[0,.5],[659,.5],[0,.5],[523,.5],[659,.5],[0,.5],
+  [784,1],[0,1],[392,1],[0,1],
+  [523,.75],[0,.25],[392,.5],[0,.5],[330,.5],[0,.5],
+  [440,.5],[494,.5],[0,.25],[466,.25],[440,.5],
+  [392,.75],[659,.75],[784,.75],[880,.5],[698,.5],[784,.5],
+  [0,.25],[659,.5],[523,.5],[587,.5],[494,.75],[0,.75],
+  [523,.75],[0,.25],[392,.5],[0,.5],[330,.5],[0,.5],
+  [440,.5],[494,.5],[0,.25],[466,.25],[440,.5],
+  [392,.75],[659,.75],[784,.75],[880,.5],[698,.5],[784,.5],
+  [0,.25],[659,.5],[523,.5],[587,.5],[494,.75],[0,.75]
+];
+const BASS = [ // simple bassline, one note per bar-ish
+  [294,1],[294,1],[0,1],[294,1],[0,1],[294,1],[294,1],[0,1],
+  [392,1],[0,1],[196,2],
+  [262,1.5],[196,1],[165,1.5],[220,1],[247,1],[233,.5],[220,1],
+  [165,.75],[262,.75],[330,.75],[440,1],[349,.5],[392,1],[330,1],[262,.5],[294,.5],[247,1.5]
+];
+const BEAT = 0.18;
+let musicOn = false;
+
+function playLoop() {
+  if (!musicOn) return;
+  let t = 0;
+  MELODY.forEach(([f, b]) => {
+    if (f) beep(f, t, BEAT * b * 0.9, 'square', 0.045);
+    t += BEAT * b;
+  });
+  let bt = 0;
+  BASS.forEach(([f, b]) => {
+    if (f) beep(f, bt, BEAT * b * 0.9, 'triangle', 0.06);
+    bt += BEAT * b;
+  });
+  setTimeout(playLoop, Math.max(t, bt) * 1000);
+}
+
+function startMusic() {
+  if (musicOn) return;
+  musicOn = true;
+  playLoop();
+}
 
 /* ============================================================
    📝 QUESTIONS
    ============================================================ */
 const QUESTIONS = [
-  { q: "What is the largest planet in our solar system?", answers: ["Mars", "Jupiter", "Saturn", "Neptune"], correct: 1 },
-  { q: "Which country is home to the kangaroo?", answers: ["New Zealand", "South Africa", "Australia", "Brazil"], correct: 2 },
-  { q: "How many colors are in a rainbow?", answers: ["5", "6", "7", "8"], correct: 2 },
-  { q: "What is the chemical symbol for gold?", answers: ["Go", "Gd", "Au", "Ag"], correct: 2 },
-  { q: "Which ocean is the largest?", answers: ["Atlantic", "Indian", "Arctic", "Pacific"], correct: 3 },
-  { q: "Who painted the Mona Lisa?", answers: ["Vincent van Gogh", "Leonardo da Vinci", "Pablo Picasso", "Claude Monet"], correct: 1 },
-  { q: "What is the fastest land animal?", answers: ["Cheetah", "Lion", "Greyhound", "Horse"], correct: 0 },
-  { q: "How many continents are there on Earth?", answers: ["5", "6", "7", "8"], correct: 2 },
-  { q: "Which planet is known as the Red Planet?", answers: ["Venus", "Mercury", "Jupiter", "Mars"], correct: 3 },
-  { q: "What is the capital of Japan?", answers: ["Kyoto", "Osaka", "Tokyo", "Seoul"], correct: 2 }
+  { q: "Which neurotransmitter deficiency is most strongly implicated in the negative symptoms of schizophrenia?", answers: ["Serotonin", "Dopamine (mesocortical)", "GABA", "Acetylcholine"], correct: 1 },
+  { q: "In CBT, 'catastrophizing' is best classified as which type of cognitive distortion?", answers: ["Arbitrary inference", "Overgeneralization", "Magnification", "Selective abstraction"], correct: 2 },
+  { q: "A patient must wash their hands exactly 7 times to prevent harm to family. This is an example of:", answers: ["Obsession only", "Compulsion with magical thinking", "Delusion of control", "Phobic avoidance"], correct: 1 },
+  { q: "Which personality disorder is characterized by a pattern of instability in relationships, self-image, and affect with marked impulsivity?", answers: ["Histrionic", "Narcissistic", "Borderline", "Dependent"], correct: 2 },
+  { q: "The 'kindling' hypothesis is most relevant to which disorder?", answers: ["Bipolar disorder", "OCD", "PTSD", "Generalized anxiety disorder"], correct: 0 },
+  { q: "Which assessment instrument is considered the gold standard structured interview for PTSD?", answers: ["BDI-II", "CAPS-5", "MMPI-2", "SCID-5"], correct: 1 },
+  { q: "A patient believes the TV news anchor is sending them secret coded messages. This is:", answers: ["Delusion of grandeur", "Idea of reference", "Thought insertion", "Loose association"], correct: 1 },
+  { q: "Which therapeutic technique involves having clients hold distressing images while engaging in bilateral stimulation?", answers: ["Prolonged exposure", "EMDR", "Systematic desensitization", "Dialectical behavior therapy"], correct: 1 },
+  { q: "The dopamine hypothesis of schizophrenia primarily implicates hyperactivity in which pathway for positive symptoms?", answers: ["Mesocortical", "Nigrostriatal", "Mesolimbic", "Tuberoinfundibular"], correct: 2 },
+  { q: "In Beck's cognitive triad of depression, the three negative views concern:", answers: ["Self, world, future", "Past, present, future", "Body, mind, spirit", "Family, work, self"], correct: 0 },
+  { q: "Which defense mechanism involves attributing one's own unacceptable feelings to others?", answers: ["Displacement", "Projection", "Reaction formation", "Sublimation"], correct: 1 },
+  { q: "A key diagnostic distinction between bipolar I and bipolar II is:", answers: ["Presence of psychosis", "Full manic episode vs. hypomanic episode", "Duration of depressive episodes", "Age of onset"], correct: 1 },
+  { q: "Which brain structure shows the most consistent volume reduction in chronic PTSD?", answers: ["Amygdala", "Hippocampus", "Thalamus", "Cerebellum"], correct: 1 },
+  { q: "The 'expressed emotion' construct in schizophrenia relapse research refers to:", answers: ["Patient's flat affect", "Family criticism, hostility, and over-involvement", "Therapist countertransference", "Medication-induced blunting"], correct: 1 },
+  { q: "Which is a first-line, gold-standard psychotherapy for borderline personality disorder?", answers: ["Psychoanalysis", "Dialectical behavior therapy", "Client-centered therapy", "Gestalt therapy"], correct: 1 },
+  { q: "Agoraphobia is most commonly conceptualized as a fear of:", answers: ["Open spaces", "Situations where escape is difficult or help unavailable", "Social judgment", "Contamination"], correct: 1 },
+  { q: "Which symptom is required for a DSM-5 diagnosis of major depressive disorder?", answers: ["Weight loss", "Depressed mood or anhedonia", "Insomnia", "Fatigue"], correct: 1 },
+  { q: "The 'fight or flight' response in panic disorder is mediated primarily by the:", answers: ["Parasympathetic nervous system", "Sympathetic nervous system and HPA axis", "Enteric nervous system", "Somatic nervous system"], correct: 1 },
+  { q: "In motivational interviewing, 'rolling with resistance' means:", answers: ["Confronting denial directly", "Avoiding argumentation and exploring ambivalence", "Agreeing with the client's excuses", "Terminating treatment"], correct: 1 },
+  { q: "Which eating disorder diagnosis requires binge eating plus inappropriate compensatory behavior?", answers: ["Anorexia nervosa, binge/purge type only", "Bulimia nervosa", "Binge eating disorder", "ARFID"], correct: 1 },
+  { q: "Thought broadcasting, thought insertion, and delusions of control are examples of:", answers: ["Schneiderian first-rank symptoms", "Negative symptoms", "Dissociative symptoms", "Conversion symptoms"], correct: 0 },
+  { q: "The primary mechanism of SSRIs involves:", answers: ["Blocking dopamine D2 receptors", "Inhibiting serotonin reuptake at the synapse", "Enhancing GABA-A activity", "Blocking norepinephrine receptors"], correct: 1 },
+  { q: "Which dissociative disorder involves two or more distinct personality states?", answers: ["Depersonalization/derealization disorder", "Dissociative amnesia", "Dissociative identity disorder", "Conversion disorder"], correct: 2 },
+  { q: "In behavioral terms, avoidance maintains phobias through:", answers: ["Positive reinforcement", "Negative reinforcement", "Punishment", "Extinction"], correct: 1 },
+  { q: "The 'diathesis-stress model' proposes that psychopathology results from:", answers: ["Genetics alone", "Environmental trauma alone", "Interaction of predisposition and environmental stressors", "Random neurochemical events"], correct: 2 }
 ];
 
 const PRAISE = ["Wahoo! 🍄", "It's-a correct! ⭐", "Mamma mia, nice! 🎉", "Coin collected! 🪙", "1-UP! 💚"];
@@ -292,13 +498,14 @@ function renderStart() {
   app.innerHTML = `
     <div class="mario-buddy">🍄</div>
     <h1>SUPER QUIZ BROS</h1>
-    <p class="subtitle">10 questions stand between you and the flagpole.<br>
+    <p class="subtitle">25 hard clinical psychology questions stand between you and the flagpole.<br>
     Collect coins. Avoid pits. Don't let Bowser win.</p>
     <button class="big-btn" onclick="startQuiz()">▶ START GAME</button>
   `;
 }
 
 function startQuiz() {
+  startMusic();
   SFX.start();
   current = 0; score = 0; results = [];
   renderQuestion();
