@@ -207,6 +207,18 @@
   .feedback.good { color: #2a9d3a; }
   .feedback.bad { color: #d43a3a; }
 
+  .why-box {
+    margin-top: 0.9rem;
+    text-align: left;
+    background: #fff8e1;
+    border: 3px solid #d4a017;
+    border-radius: 1rem;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: #5a4300;
+  }
+
   .big-btn {
     font-family: 'Fredoka', sans-serif;
     font-size: 1.15rem;
@@ -385,28 +397,7 @@
   .breakdown-item .your-answer { color: #9a8ab8; font-size: 0.78rem; }
 
   /* 📱 Mobile: keep the scenery, but shrink & tuck it behind the card */
-  @media (max-width: 480px) {
-    body { padding: 12px; align-items: flex-start; padding-top: 8vh; }
-    .card { padding: 1.4rem; border-radius: 1.5rem; border-width: 4px; }
-    h1 { font-size: 0.95rem; }
-    .subtitle { font-size: 0.85rem; }
-    .question { font-size: 1.05rem; min-height: 2.6rem; }
-    .answer-btn { font-size: 0.9rem; padding: 0.75rem 1rem; }
-    .big-btn { font-size: 1rem; padding: 0.8rem 1.8rem; }
-    .cloud { font-size: 2rem; }
-    .pipe { width: 42px; }
-    .pipe[style*="105px"] { height: 70px; }
-    .hill { width: 65px; height: 32px; }
-    .hill[style*="130px"] { width: 90px; height: 45px; }
-    .qblock { width: 34px; height: 34px; font-size: 0.75rem; }
-    .mario-buddy { font-size: 2.2rem; }
-    .result-emoji { font-size: 3rem; }
-    .result-score { font-size: 1.8rem; }
-    .breakdown { max-height: 180px; }
-    .runner { font-size: 1.9rem; }
-    .enemy { font-size: 1.4rem; }
-    .spin-coin { font-size: 1.1rem; }
-  }
+
 </style>
 </head>
 <body>
@@ -550,31 +541,31 @@ function toggleMusic() {
    📝 QUESTIONS
    ============================================================ */
 const QUESTIONS = [
-  { q: "Which neurotransmitter deficiency is most strongly implicated in the negative symptoms of schizophrenia?", answers: ["Serotonin", "Dopamine (mesocortical)", "GABA", "Acetylcholine"], correct: 1 },
-  { q: "In CBT, 'catastrophizing' is best classified as which type of cognitive distortion?", answers: ["Arbitrary inference", "Overgeneralization", "Magnification", "Selective abstraction"], correct: 2 },
-  { q: "A patient must wash their hands exactly 7 times to prevent harm to family. This is an example of:", answers: ["Obsession only", "Compulsion with magical thinking", "Delusion of control", "Phobic avoidance"], correct: 1 },
-  { q: "Which personality disorder is characterized by a pattern of instability in relationships, self-image, and affect with marked impulsivity?", answers: ["Histrionic", "Narcissistic", "Borderline", "Dependent"], correct: 2 },
-  { q: "The 'kindling' hypothesis is most relevant to which disorder?", answers: ["Bipolar disorder", "OCD", "PTSD", "Generalized anxiety disorder"], correct: 0 },
-  { q: "Which assessment instrument is considered the gold standard structured interview for PTSD?", answers: ["BDI-II", "CAPS-5", "MMPI-2", "SCID-5"], correct: 1 },
-  { q: "A patient believes the TV news anchor is sending them secret coded messages. This is:", answers: ["Delusion of grandeur", "Idea of reference", "Thought insertion", "Loose association"], correct: 1 },
-  { q: "Which therapeutic technique involves having clients hold distressing images while engaging in bilateral stimulation?", answers: ["Prolonged exposure", "EMDR", "Systematic desensitization", "Dialectical behavior therapy"], correct: 1 },
-  { q: "The dopamine hypothesis of schizophrenia primarily implicates hyperactivity in which pathway for positive symptoms?", answers: ["Mesocortical", "Nigrostriatal", "Mesolimbic", "Tuberoinfundibular"], correct: 2 },
-  { q: "In Beck's cognitive triad of depression, the three negative views concern:", answers: ["Self, world, future", "Past, present, future", "Body, mind, spirit", "Family, work, self"], correct: 0 },
-  { q: "Which defense mechanism involves attributing one's own unacceptable feelings to others?", answers: ["Displacement", "Projection", "Reaction formation", "Sublimation"], correct: 1 },
-  { q: "A key diagnostic distinction between bipolar I and bipolar II is:", answers: ["Presence of psychosis", "Full manic episode vs. hypomanic episode", "Duration of depressive episodes", "Age of onset"], correct: 1 },
-  { q: "Which brain structure shows the most consistent volume reduction in chronic PTSD?", answers: ["Amygdala", "Hippocampus", "Thalamus", "Cerebellum"], correct: 1 },
-  { q: "The 'expressed emotion' construct in schizophrenia relapse research refers to:", answers: ["Patient's flat affect", "Family criticism, hostility, and over-involvement", "Therapist countertransference", "Medication-induced blunting"], correct: 1 },
-  { q: "Which is a first-line, gold-standard psychotherapy for borderline personality disorder?", answers: ["Psychoanalysis", "Dialectical behavior therapy", "Client-centered therapy", "Gestalt therapy"], correct: 1 },
-  { q: "Agoraphobia is most commonly conceptualized as a fear of:", answers: ["Open spaces", "Situations where escape is difficult or help unavailable", "Social judgment", "Contamination"], correct: 1 },
-  { q: "Which symptom is required for a DSM-5 diagnosis of major depressive disorder?", answers: ["Weight loss", "Depressed mood or anhedonia", "Insomnia", "Fatigue"], correct: 1 },
-  { q: "The 'fight or flight' response in panic disorder is mediated primarily by the:", answers: ["Parasympathetic nervous system", "Sympathetic nervous system and HPA axis", "Enteric nervous system", "Somatic nervous system"], correct: 1 },
-  { q: "In motivational interviewing, 'rolling with resistance' means:", answers: ["Confronting denial directly", "Avoiding argumentation and exploring ambivalence", "Agreeing with the client's excuses", "Terminating treatment"], correct: 1 },
-  { q: "Which eating disorder diagnosis requires binge eating plus inappropriate compensatory behavior?", answers: ["Anorexia nervosa, binge/purge type only", "Bulimia nervosa", "Binge eating disorder", "ARFID"], correct: 1 },
-  { q: "Thought broadcasting, thought insertion, and delusions of control are examples of:", answers: ["Schneiderian first-rank symptoms", "Negative symptoms", "Dissociative symptoms", "Conversion symptoms"], correct: 0 },
-  { q: "The primary mechanism of SSRIs involves:", answers: ["Blocking dopamine D2 receptors", "Inhibiting serotonin reuptake at the synapse", "Enhancing GABA-A activity", "Blocking norepinephrine receptors"], correct: 1 },
-  { q: "Which dissociative disorder involves two or more distinct personality states?", answers: ["Depersonalization/derealization disorder", "Dissociative amnesia", "Dissociative identity disorder", "Conversion disorder"], correct: 2 },
-  { q: "In behavioral terms, avoidance maintains phobias through:", answers: ["Positive reinforcement", "Negative reinforcement", "Punishment", "Extinction"], correct: 1 },
-  { q: "The 'diathesis-stress model' proposes that psychopathology results from:", answers: ["Genetics alone", "Environmental trauma alone", "Interaction of predisposition and environmental stressors", "Random neurochemical events"], correct: 2 }
+  { q: "A patient on clozapine develops fever, myalgia, and a WBC of 900/µL. The most likely diagnosis is:", answers: ["Neuroleptic malignant syndrome", "Agranulocytosis", "Serotonin syndrome", "Tardive dyskinesia"], correct: 1, why: "Clozapine's most dangerous adverse effect is agranulocytosis (WBC < 500–1000/µL), which is why mandatory blood monitoring exists. NMS also causes fever but with rigidity and elevated CK, not a collapsed WBC." },
+  { q: "Which finding best differentiates delirium from dementia?", answers: ["Impaired short-term memory", "Acute onset with fluctuating attention", "Aphasia and apraxia", "Insidious progression over years"], correct: 1, why: "Delirium = acute onset (hours–days), fluctuating course, and impaired attention/awareness. Dementia is insidious and progressive with attention preserved until late. Memory impairment occurs in both, so it doesn't discriminate." },
+  { q: "A patient has euphoria, decreased need for sleep, and pressured speech for 4 days with no functional impairment or psychosis. This is:", answers: ["Manic episode", "Hypomanic episode", "Cyclothymic disorder", "Substance-induced mood disorder"], correct: 1, why: "Hypomania = ≥4 days of elevated/expansive mood WITHOUT marked functional impairment, psychosis, or hospitalization. Mania requires ≥7 days (or hospitalization) WITH marked impairment." },
+  { q: "Blocking D2 receptors in the tuberoinfundibular pathway most directly causes:", answers: ["Akathesia", "Hyperprolactinemia", "Tardive dyskinesia", "Orthostatic hypotension"], correct: 1, why: "Dopamine normally inhibits prolactin release from the pituitary via the tuberoinfundibular pathway. Blocking D2 there removes the brake → hyperprolactinemia (galactorrhea, amenorrhea, sexual dysfunction)." },
+  { q: "A patient recounts trauma in a flat, detached monotone without any emotional response. This is an example of:", answers: ["Dissociative amnesia", "Isolation of affect", "Blunted affect as a negative symptom", "Alexithymia"], correct: 1, why: "Isolation of affect is a defense mechanism where the traumatic event is recalled but stripped of its emotional charge. Alexithymia is inability to identify/describe feelings; blunted affect is a negative symptom of schizophrenia." },
+  { q: "Which EEG finding is classically associated with Creutzfeldt-Jakob disease?", answers: ["Triphasic waves", "Periodic sharp wave complexes", "3 Hz spike-and-wave", "Hypsarrhythmia"], correct: 1, why: "CJD classically shows periodic (1–2 Hz) sharp wave complexes on EEG. Triphasic waves → hepatic encephalopathy; 3 Hz spike-and-wave → absence seizures; hypsarrhythmia → infantile spasms (West syndrome)." },
+  { q: "In Clark's cognitive model of panic disorder, panic attacks are maintained primarily by:", answers: ["Conditioned avoidance of places", "Catastrophic misinterpretation of bodily sensations", "Repressed conflict over anger", "Interoceptive hyposensitivity"], correct: 1, why: "Clark's model: benign bodily sensations (e.g., palpitations) are catastrophically misinterpreted ('I'm having a heart attack'), which increases anxiety, which intensifies sensations — a vicious cycle." },
+  { q: "A patient believes their organs are rotting and that they are already dead. This delusion is characteristic of:", answers: ["Capgras syndrome", "Cotard syndrome", "Fregoli delusion", "Ekbom syndrome"], correct: 1, why: "Cotard syndrome = nihilistic delusions of being dead, rotting, or not existing. Capgras = loved one replaced by an impostor; Fregoli = different people are one person in disguise; Ekbom = delusion of insect infestation." },
+  { q: "Which is the strongest single predictor of completed suicide?", answers: ["Major depressive disorder", "A previous suicide attempt", "Male sex", "Access to lethal means"], correct: 1, why: "A prior suicide attempt is the single strongest predictor of future completed suicide — stronger than any diagnosis, demographic, or access factor." },
+  { q: "Lithium toxicity is most potentiated by concurrent use of:", answers: ["SSRIs", "Thiazide diuretics and NSAIDs", "Beta-blockers", "Benzodiazepines"], correct: 1, why: "Thiazides and NSAIDs reduce renal lithium clearance (thiazides increase proximal Na/Li reabsorption; NSAIDs reduce renal blood flow via prostaglandin inhibition), raising lithium levels toward toxicity." },
+  { q: "A child consistently violates others' rights, is cruel to animals, and sets fires. Before diagnosing conduct disorder, the clinician must rule out:", answers: ["ADHD", "Nothing — these behaviors meet criteria if persistent", "Oppositional defiant disorder only", "Intermittent explosive disorder"], correct: 1, why: "Cruelty to animals, fire-setting, and persistent violation of others' rights are core conduct disorder criteria. If the pattern is persistent (≥3 criteria over 12 months), the diagnosis stands on its own." },
+  { q: "The 'jumping to conclusions' bias in psychosis is most reliably measured by:", answers: ["The Stroop task", "The beads (urn) task", "The Wisconsin Card Sort", "The Iowa Gambling Task"], correct: 1, why: "In the beads task, participants guess which of two jars (with opposite bead ratios) a drawn bead came from. Patients with delusions decide after very few beads — demonstrating the jumping-to-conclusions bias." },
+  { q: "Which antidepressant carries the highest risk of hypertensive crisis with tyramine-rich foods?", answers: ["Venlafaxine", "Phenelzine", "Bupropion", "Mirtazapine"], correct: 1, why: "Phenelzine is an irreversible, non-selective MAOI. Tyramine (aged cheese, cured meats) displaces norepinephrine from vesicles; with MAO blocked it can't be degraded → hypertensive crisis." },
+  { q: "In line with the 'vascular depression' hypothesis, late-onset depression is most associated with:", answers: ["Hippocampal hypertrophy", "White matter hyperintensities on MRI", "Reduced amygdala volume", "Enlarged ventricles only"], correct: 1, why: "The vascular depression hypothesis links late-onset depression to cerebrovascular disease, visible as white matter hyperintensities (small-vessel ischemic changes) disrupting frontostriatal mood circuits." },
+  { q: "A patient with panic disorder is started on an SSRI. The most important initial counseling point is:", answers: ["Take only during panic attacks", "Anxiety may transiently worsen in the first 1–2 weeks", "Avoid all caffeine permanently", "Expect full response within 48 hours"], correct: 1, why: "SSRIs commonly cause a transient increase in anxiety/jitteriness in the first 1–2 weeks before therapeutic benefit (4–6 weeks). Warning patients prevents premature discontinuation; 'start low, go slow' helps." },
+  { q: "Which symptom is NOT part of the DSM-5 criteria for PTSD?", answers: ["Intrusive memories", "Persistent negative alterations in cognition and mood", "Hallucinations", "Marked alterations in arousal and reactivity"], correct: 2, why: "DSM-5 PTSD clusters: intrusion, avoidance, negative alterations in cognition/mood, and arousal/reactivity. Hallucinations are NOT a criterion — their presence suggests another diagnosis (e.g., psychotic disorder)." },
+  { q: "The 'expressed emotion' research of Brown and Vaughn showed that high EE predicts relapse most strongly in patients who:", answers: ["Take medication irregularly", "Spend more than 35 hours/week in face-to-face contact with high-EE relatives", "Live alone", "Have predominantly negative symptoms"], correct: 1, why: "Brown & Vaughn found relapse risk from high expressed emotion (criticism, hostility, over-involvement) was greatest when patients spent >35 hours/week in face-to-face contact with high-EE relatives." },
+  { q: "A patient cannot recognize familiar faces but can identify people by voice. This deficit is:", answers: ["Prosopagnosia", "Capgras syndrome", "Visual agnosia with preserved audition", "Anosognosia"], correct: 0, why: "Prosopagnosia = selective inability to recognize faces (fusiform face area damage), with recognition via voice/gait preserved. Capgras is a delusion that a familiar person is an impostor — recognition occurs but familiarity feels wrong." },
+  { q: "Which psychotherapy has the strongest evidence base for chronic PTSD in military veterans per VA/DoD guidelines?", answers: ["Psychodynamic therapy", "Prolonged exposure and cognitive processing therapy", "Supportive counseling", "Hypnotherapy"], correct: 1, why: "VA/DoD guidelines give the strongest recommendation to trauma-focused therapies: Prolonged Exposure (PE) and Cognitive Processing Therapy (CPT), both with large RCT evidence in veteran populations." },
+  { q: "Wernicke encephalopathy classically presents with which triad?", answers: ["Fever, rigidity, autonomic instability", "Encephalopathy, ophthalmoplegia, ataxia", "Amnesia, confabulation, apathy", "Tremor, hallucinations, seizures"], correct: 1, why: "Wernicke (thiamine deficiency, often in alcohol use disorder) = encephalopathy/confusion + ophthalmoplegia (nystagmus, lateral gaze palsy) + gait ataxia. Amnesia + confabulation describes Korsakoff syndrome, its chronic sequela." },
+  { q: "In behavioral activation for depression, the core mechanism of change is hypothesized to be:", answers: ["Cognitive restructuring of core beliefs", "Increased contact with positive reinforcement", "Cathartic emotional expression", "Extinction of avoidance via imaginal exposure"], correct: 1, why: "Behavioral activation schedules rewarding, value-consistent activities to increase contact with positive reinforcement, breaking the withdrawal–inactivity–low-mood cycle — without targeting cognitions directly." },
+  { q: "A patient with schizophrenia hears a voice commenting on their actions in the third person. Per Schneider, this is:", answers: ["A second-rank symptom", "A first-rank symptom", "A negative symptom", "A dissociative symptom"], correct: 1, why: "Third-person running-commentary hallucinations are a Schneiderian first-rank symptom, along with voices conversing, thought insertion/withdrawal/broadcast, and delusional perception." },
+  { q: "Which lab abnormality is most characteristic of anorexia nervosa with purging?", answers: ["Hyperkalemia", "Hypokalemic hypochloremic metabolic alkalosis", "Metabolic acidosis", "Hypernatremia"], correct: 1, why: "Self-induced vomiting loses H⁺ and Cl⁻ → hypochloremic metabolic alkalosis; volume depletion triggers aldosterone → renal K⁺ wasting → hypokalemia. This pattern is a red flag for purging." },
+  { q: "The 'hopelessness theory' of depression (Abramson, Metalsky & Alloy) centers on:", answers: ["Global, stable attributions plus negative inferred consequences", "Low self-esteem alone", "Learned helplessness in childhood", "Serotonin transporter polymorphisms"], correct: 0, why: "Hopelessness theory: depression arises when negative events are attributed to stable + global causes AND are inferred to have catastrophic consequences and imply personal worthlessness — producing hopelessness." },
+  { q: "Abrupt discontinuation of which antidepressant most commonly causes 'brain zaps' and severe discontinuation syndrome?", answers: ["Fluoxetine", "Venlafaxine or paroxetine", "Bupropion", "Mirtazapine"], correct: 1, why: "Short half-life serotonergic agents (venlafaxine, paroxetine) cause the worst discontinuation syndromes — dizziness, 'brain zaps', irritability. Fluoxetine's long half-life (norfluoxetine) makes it the mildest." }
 ];
 
 const PRAISE = ["Wahoo! 🍄", "It's-a correct! ⭐", "Mamma mia, nice! 🎉", "Coin collected! 🪙", "1-UP! 💚"];
@@ -654,17 +645,24 @@ function answer(i, btn) {
   } else {
     SFX.wrong();
     buttons[i].classList.add('wrong');
-    feedback.textContent = ROASTS[Math.floor(Math.random() * ROASTS.length)] +
-      ` (It was: ${q.answers[q.correct]})`;
+    feedback.textContent = `The correct answer was: ${q.answers[q.correct]}`;
     feedback.className = 'feedback bad';
   }
 
   results.push({ question: q.q, picked: q.answers[i], correctAnswer: q.answers[q.correct], isCorrect });
 
-  setTimeout(() => {
-    current++;
-    current < QUESTIONS.length ? renderQuestion() : renderResults();
-  }, 1600);
+  // 📖 Explanation step — replaces the MCQ answers, user reads then continues
+  const isLast = current === QUESTIONS.length - 1;
+  document.querySelector('.answers').innerHTML = `
+    <div class="why-box">💡 <strong>Why:</strong> ${q.why}</div>
+    <button class="big-btn" onclick="nextQuestion()">${isLast ? '🏁 SEE RESULTS' : '▶ NEXT QUESTION'}</button>
+  `;
+}
+
+function nextQuestion() {
+  SFX.jump();
+  current++;
+  current < QUESTIONS.length ? renderQuestion() : renderResults();
 }
 
 function renderResults() {
